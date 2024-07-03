@@ -282,26 +282,26 @@ class SpecFitAnalyzer:
 
     #         return fitted_params
 
-    def fit_baseline(self):
-        """
-        Fit a sinusoidal baseline to the spectrum.
-
-        Returns
-        -------
-        params : list
-            Fitted parameters [amplitude, frequency, phase, offset] of the sinusoidal baseline.
-        """
-        x = self.wavelength_values
-        y = self.signal_values
-
-        def sine_wave(x, amplitude, freq, phase, offset):
-            return amplitude * np.sin(2 * np.pi * freq * x + phase) + offset
-
-        # Initial guesses for amplitude, frequency, phase, and offset
-        initial_guesses = [baseline_amplitude, baseline_frequency, 0, 0]
-        params, _ = curve_fit(sine_wave, x, y, p0=initial_guesses, maxfev=1000000)
-
-        return params
+    # def fit_baseline(self):
+    #     """
+    #     Fit a sinusoidal baseline to the spectrum.
+    #
+    #     Returns
+    #     -------
+    #     params : list
+    #         Fitted parameters [amplitude, frequency, phase, offset] of the sinusoidal baseline.
+    #     """
+    #     x = self.wavelength_values
+    #     y = self.signal_values
+    #
+    #     def sine_wave(x, amplitude, freq, phase, offset):
+    #         return amplitude * np.sin(2 * np.pi * freq * x + phase) + offset
+    #
+    #     # Initial guesses for amplitude, frequency, phase, and offset
+    #     initial_guesses = [baseline_amplitude, baseline_frequency, 0, 0]
+    #     params, _ = curve_fit(sine_wave, x, y, p0=initial_guesses, maxfev=1000000)
+    #
+    #     return params
 
     def plot_baseline_fitting(self):
         """
@@ -469,7 +469,7 @@ class SpecFitAnalyzer:
             errors = np.sqrt(np.diag(covariance_matrix))
             rounded_errors = [round(error, 3) for error in errors]  # Round errors to 3 significant figures
 
-            peak_info = dict(zip(['center', 'amplitude', 'width'], params))
+            peak_info = dict(zip(['center', 'Intensity', 'width'], params))
             peak_info_with_errors = {}
 
             # Include ± 1-sigma error bars in the peak information
@@ -502,8 +502,8 @@ class SpecFitAnalyzer:
                 'Peak Number': peak_number,
                 'center': round(params[0], 4),
                 'center Error': rounded_errors[0],
-                'Amplitude': round(params[1], 3),
-                'Amplitude Error': rounded_errors[1],
+                'Intensity': round(params[1], 3),
+                'Intensity Error': rounded_errors[1],
                 'Width': round(params[2], 3),
                 'Width Error': rounded_errors[2]
             }
@@ -514,28 +514,28 @@ class SpecFitAnalyzer:
 
     #         return df
 
-    def fit_polynomial_baseline(self, degree):
-        """
-        Fit a polynomial baseline to the spectrum using least squares.
-
-        Parameters
-        ----------
-        degree : int
-            Degree of the polynomial to fit.
-
-        Returns
-        -------
-        params : np.ndarray
-            Coefficients of the fitted polynomial.
-        """
-        x = self.wavelength_values
-        y = self.signal_values
-
-        # Fit polynomial baseline using least squares
-        p = Polynomial.fit(x, y, degree)
-        self.fitted_baseline_params = p.convert().coef
-        self.baseline_degree = degree
-        return self.fitted_baseline_params
+    # def fit_polynomial_baseline(self, degree):
+    #     """
+    #     Fit a polynomial baseline to the spectrum using least squares.
+    #
+    #     Parameters
+    #     ----------
+    #     degree : int
+    #         Degree of the polynomial to fit.
+    #
+    #     Returns
+    #     -------
+    #     params : np.ndarray
+    #         Coefficients of the fitted polynomial.
+    #     """
+    #     x = self.wavelength_values
+    #     y = self.signal_values
+    #
+    #     # Fit polynomial baseline using least squares
+    #     p = Polynomial.fit(x, y, degree)
+    #     self.fitted_baseline_params = p.convert().coef
+    #     self.baseline_degree = degree
+    #     return self.fitted_baseline_params
 
     def plot_baseline_fitting(self):
         """

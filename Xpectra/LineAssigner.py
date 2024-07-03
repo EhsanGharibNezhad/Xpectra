@@ -35,27 +35,6 @@ import numpy as np
 import matplotlib.pyplot as plt
 from matplotlib.ticker import MaxNLocator
 
-def print_results_fun(targets, print_title=None):
-    """
-    Print the outputs in a pretty format using the pprint library.
-
-    Parameters
-    ----------
-    targets : any
-        The data to be printed.
-    print_title : str
-        An optional title to display before the printed data.
-    """
-
-    print('*' * 30 + '\n')
-
-    if print_title is not None:
-        print(print_title+ '\n')
-
-    # Use pprint to print the data in a well-formatted and indented manner.
-    pprint.pprint(targets, indent=4, width=30)
-
-    print('*' * 30 + '\n')
 
 
 
