@@ -13,7 +13,7 @@ long_description = (this_directory / "README.md").read_text()
 #     install_requires = fh.readlines()
 
 # Read the __version__.py file
-with open('TelescopeML/__version__.py', 'r') as f:
+with open('Xpectra/__version__.py', 'r') as f:
     vf = f.read()
 
 # Obtain version from read-in __version__.py file
@@ -23,7 +23,7 @@ version = re.search(r"^_*version_* = ['\"]([^'\"]*)['\"]", vf, re.M).group(1)
 setup(
     name='Xpectra',
     version = version,  # MAJOR.MINOR.PATCH
-    description = 'An End-to-End Python Package for Analyzing Laboratory Spectra through Machine Learning Models, Generating Statistical Reports, and Visualizing Results',
+    description = 'An End-to-End Python Package for Analyzing Laboratory Spectra through Machine Learning Models For Extrasolar Atmospheres, Generating Statistical Reports, and Visualizing Results',
     long_description = long_description,
     long_description_content_type='text/markdown',
     author = 'Ehsan (Sam) Gharib-Nezhad',
@@ -49,8 +49,6 @@ setup(
                     'seaborn==0.12.2',
                     'sphinx==7.2.6',
                     'scipy==1.11.1',
-                    'keras==2.14.0',
-                    'tensorflow==2.14.0',
                     'jupyterlab',
                     'sphinx',
                     'spectres==2.2.0',

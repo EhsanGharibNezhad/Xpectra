@@ -822,18 +822,18 @@ class SpecFitAnalyzer:
 
         if __plot__:
             # Create a new plot with a title and axis labels
-            p = figure(title="Raman Spectrum",
+            p = figure(title="Laser Spectrum",
                        x_axis_label="Wavenumber (cm^-1)",
                        y_axis_label="Intensity",
                        width=800, height=400)
 
             # Add the original spectrum to the plot
-            original_spectrum = p.line(x, y, legend_label="Original Spectrum", line_width=2, color="blue")
+            original_spectrum = p.line(self.wavelength_values, y, legend_label="Original Spectrum", line_width=2, color="blue")
 
             # Add the baseline corrected spectrum to the plot
-            corrected_spectrum = p.line(x, z, legend_label="Baseline correction with ARPLS", line_width=2, color="red")
+            corrected_spectrum = p.line(self.wavelength_values, z, legend_label="Baseline correction with ARPLS", line_width=2, color="red")
 
-            p.line(x, y - z, legend_label="Baseline correction with ARPLS", line_width=2, color="black")
+            p.line(self.wavelength_values, y - z, legend_label="Baseline correction with ARPLS", line_width=2, color="black")
             # Show the results
 
             # Add HoverTool
