@@ -33,6 +33,8 @@ from bokeh.plotting import figure, show
 from bokeh.models import ColumnDataSource
 
 import numpy as np
+from numpy.polynomial import Polynomial
+
 import matplotlib.pyplot as plt
 from matplotlib.ticker import MaxNLocator
 
