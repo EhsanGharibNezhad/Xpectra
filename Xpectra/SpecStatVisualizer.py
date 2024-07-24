@@ -38,6 +38,10 @@ from numpy.polynomial import Polynomial
 import matplotlib.pyplot as plt
 from matplotlib.ticker import MaxNLocator
 
+# have seaborn + bokeh fns 
+# take out trained class --> input all params 
+
+
 def print_results_fun(targets, print_title=None):
     """
     Print the outputs in a pretty format using the pprint library.
@@ -192,27 +196,37 @@ def plot_spectra_errorbar_seaborn(trained_fit_class,
     plt.show()
 
 
-def plot_baseline_fitting(trained_fit_class):
+def plot_baseline_fitting(wavelength_values, signal_values, baseline_type, fitted_baseline_params, baseline_degree=None):
     """
     Plot the original spectrum and the fitted baseline.
+
+    Parameters
+    ----------
+    signal_values : np.ndarray
+        Signal arrays (input data).
+    wavelength_values : np.ndarray
+        Wavelength array in microns.
+    baseline_type : str
+        Function type of fitted baseline.
+    fitted_baseline_params : np.ndarray
+        Fitted baseline parameters according to baseline_type.
+    baseline_degree : int, optional
+        Degree of fitted polynomial baseline. 
     """
-    if trained_fit_class.fitted_baseline_params is None:
-        raise ValueError(
-            "Baseline parameters have not been fitted yet. Call fit_polynomial_baseline() or fit_sinusoidal_baseline() first.")
 
-    x = trained_fit_class.wavelength_values
-    y = trained_fit_class.signal_values
+    x = wavelength_values
+    y = signal_values
 
-    if trained_fit_class.baseline_type == 'polynomial':
-        p = Polynomial(trained_fit_class.fitted_baseline_params)
+    if baseline_type == 'polynomial':
+        p = Polynomial(fitted_baseline_params)
         y_baseline = p(x)
-        label = f"Fitted Polynomial Baseline (degree={trained_fit_class.baseline_degree})"
-    elif trained_fit_class.baseline_type == 'sinusoidal':
-        amplitude, freq, phase, offset = trained_fit_class.fitted_baseline_params
+        label = f"Fitted Polynomial Baseline (degree={baseline_degree})"
+    elif baseline_type == 'sinusoidal':
+        amplitude, freq, phase, offset = fitted_baseline_params
         y_baseline = amplitude * np.sin(2 * np.pi * freq * x + phase) + offset
         label = "Fitted Sinusoidal Baseline"
 
-    plt.figure(figsize=(10, 6))
+    plt.figure(figsize=(10, 6),dpi=700)
     plt.plot(x, y, label="Original Spectrum", color="blue")
     plt.plot(x, y_baseline, label=label, color="red", linestyle="--")
     plt.xlabel("Wavelength [µm]")
@@ -220,4 +234,9 @@ def plot_baseline_fitting(trained_fit_class):
     plt.title("Spectrum with Fitted Baseline")
     plt.legend()
     plt.show()
+
+
+
+
+
 

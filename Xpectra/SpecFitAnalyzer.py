@@ -41,6 +41,11 @@ from matplotlib import rcParams
 from bokeh.models import ColumnDataSource
 
 
+from .SpecStatVisualizer import *
+
+# move print fns
+# add __plot__ and __print__ to all 
+
 
 # Import local module
 # from io_funs import LoadSave
@@ -273,7 +278,7 @@ class SpecFitAnalyzer:
     #     return self.fitted_baseline_params
 
 
-    def fit_polynomial_baseline(self, degree):
+    def fit_polynomial_baseline(self, degree, __plot__=True):
         """
         Fit a polynomial baseline to the spectrum using least squares.
 
@@ -295,6 +300,12 @@ class SpecFitAnalyzer:
         self.fitted_baseline_params = p.convert().coef
         self.baseline_type = 'polynomial'
         self.baseline_degree = degree
+
+        if __plot__:
+            plot_baseline_fitting(self.wavelength_values, self.signal_values, 
+                self.baseline_type, self.fitted_baseline_params, 
+                baseline_degree=self.baseline_degree)
+
         return self.fitted_baseline_params
 
     def fit_sinusoidal_baseline(self, initial_guesses):
