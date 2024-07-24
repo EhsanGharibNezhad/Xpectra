@@ -176,144 +176,6 @@ class SpecFitAnalyzer:
     #
     #     return params
 
-    def plot_baseline_fitting(self):
-        """
-        Plot the original spectrum and the fitted baseline.
-        """
-        if self.fitted_baseline_params is None:
-            raise ValueError("Baseline parameters have not been fitted yet. Call fit_baseline() first.")
-
-        x = self.wavelength_values
-        y = self.signal_values
-
-        amplitude, freq, phase, offset = self.fitted_baseline_params
-
-        def sine_wave(x, amplitude, freq, phase, offset):
-            return amplitude * np.sin(2 * np.pi * freq * x + phase) + offset
-
-        y_baseline = sine_wave(x, amplitude, freq, phase, offset)
-
-        plt.figure(figsize=(10, 6))
-        plt.plot(x, y, label="Original Spectrum", color="blue")
-        plt.plot(x, y_baseline, label="Fitted Baseline", color="red", linestyle="--")
-        plt.xlabel("Wavelength [µm]")
-        plt.ylabel("Signal")
-        plt.title("Spectrum with Fitted Baseline")
-        plt.legend()
-        plt.show()
-
-    def plot_fitted_spectrum_plt(self, line_profile='gaussian'):
-        """
-        Plot the original spectrum and fitted profiles using Matplotlib.
-
-        Parameters
-        ----------
-        line_profile : str, {'gaussian', 'lorentzian', 'voigt'}, optional
-            Type of line profile to use for fitting and plotting. Default is 'gaussian'.
-        """
-
-        if self.fitted_params is None:
-            raise ValueError("Fit spectrum first using fit_spectrum method.")
-
-        x = self.wavelength_values
-        y = self.signal_values
-        fitted_params = self.fitted_params
-
-        # Calculate fitted y values
-        y_fitted = np.zeros_like(x)
-        for params in fitted_params:
-            if line_profile == 'gaussian':
-                y_fitted += self.gaussian(x, *params)
-            elif line_profile == 'lorentzian':
-                y_fitted += self.lorentzian(x, *params)
-            elif line_profile == 'voigt':
-                y_fitted += self.voigt(x, *params)
-
-        # Calculate RMSE
-        rmse_value = self.rmse(y_fitted, y)
-
-        # Plot the original spectrum and fitted profile
-        plt.figure(figsize=(8, 6))
-        plt.plot(x, y, label='Noisy Data', color='blue')
-        plt.plot(x, y_fitted, linestyle='--', label=f'Fitted {line_profile.capitalize()}', color='red')
-        plt.title(f'Fitted {line_profile.capitalize()} with RMSE = {rmse_value:.4f}')
-        plt.xlabel('Wavelength')
-        plt.ylabel('Signal')
-        plt.legend()
-        plt.grid(True)
-        plt.tight_layout()
-        plt.show()
-
-        print(f"RMSE ({line_profile.capitalize()}): {rmse_value:.4f}")
-
-    def plot_fitted_spectrum_bokeh(self, line_profile='gaussian'):
-        """
-        Plot the original spectrum and fitted profiles using Bokeh.
-
-        Parameters
-        ----------
-        line_profile : str, {'gaussian', 'lorentzian', 'voigt'}, optional
-            Type of line profile to use for fitting and plotting. Default is 'gaussian'.
-        """
-
-        if self.fitted_params is None:
-            raise ValueError("Fit spectrum first using fit_spectrum method.")
-
-        x = self.wavelength_values
-        #         y = self.signal_values
-        y = self.y_baseline_corrected
-        fitted_params = self.fitted_params
-
-        # Calculate fitted y values
-        y_fitted = np.zeros_like(x)
-        for params in fitted_params:
-            if line_profile == 'gaussian':
-                y_fitted += self.gaussian(x, *params)
-            elif line_profile == 'lorentzian':
-                y_fitted += self.lorentzian(x, *params)
-            elif line_profile == 'voigt':
-                y_fitted += self.voigt(x, *params)
-
-        # Calculate RMSE
-        rmse_value = self.rmse(y_fitted, y)
-
-        # Create a Bokeh figure
-        p = figure(title=f'Fitted {line_profile.capitalize()} with RMSE = {rmse_value:.4f}',
-                   x_axis_label='Wavelength',
-                   y_axis_label='Signal',
-                   width=1000, height=300)
-
-        # Plot the original data
-        p.line(x, y, legend_label='Lab Spectrum', line_width=2, line_color='blue')
-
-        # Plot the fitted profile
-        p.line(x, y_fitted, legend_label=f'Fitted {line_profile.capitalize()}', line_width=2, line_dash='dashed',
-               line_color='red')
-
-        p.legend.location = "top_left"
-        p.grid.visible = True
-
-        # Increase size of x and y ticks
-        p.title.text_font_size = '14pt'
-        p.xaxis.major_label_text_font_size = '14pt'
-        p.xaxis.axis_label_text_font_size = '14pt'
-        p.yaxis.major_label_text_font_size = '14pt'
-        p.yaxis.axis_label_text_font_size = '14pt'
-
-        # Show the plot
-        output_notebook()
-
-        # Add HoverTool
-        hover = HoverTool()
-        hover.tooltips = [
-            ("Wavenumber (cm^-1)", "@x{0.0000}"),
-            ("Original Intensity", "@y{0.0000}"),
-            ("Corrected Intensity", "@z{0.00}"),
-            ("Baseline Corrected Intensity", "@corrected_y")
-        ]
-        p.add_tools(hover)
-
-        show(p)
 
     @staticmethod
     def rmse(predictions, targets):
@@ -410,29 +272,6 @@ class SpecFitAnalyzer:
     #     self.baseline_degree = degree
     #     return self.fitted_baseline_params
 
-    def plot_baseline_fitting(self):
-        """
-        Plot the original spectrum and the fitted polynomial baseline.
-        """
-        if self.fitted_baseline_params is None:
-            raise ValueError("Baseline parameters have not been fitted yet. Call fit_polynomial_baseline() first.")
-
-        x = self.wavelength_values
-        y = self.signal_values
-        degree = self.baseline_degree
-
-        # Evaluate the fitted polynomial baseline
-        p = Polynomial(self.fitted_baseline_params)
-        y_baseline = p(x)
-
-        plt.figure(figsize=(10, 6))
-        plt.plot(x, y, label="Original Spectrum", color="blue")
-        plt.plot(x, y_baseline, label=f"Fitted Polynomial Baseline (degree={degree})", color="red", linestyle="--")
-        plt.xlabel("Wavelength [µm]")
-        plt.ylabel("Signal")
-        plt.title("Spectrum with Fitted Polynomial Baseline")
-        plt.legend()
-        plt.show()
 
     def fit_polynomial_baseline(self, degree):
         """
@@ -482,6 +321,8 @@ class SpecFitAnalyzer:
         self.fitted_baseline_params = params
         self.baseline_type = 'sinusoidal'
         return self.fitted_baseline_params
+
+
 
     def fit_spline_baseline(self, s=None):
         """

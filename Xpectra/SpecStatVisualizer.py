@@ -195,26 +195,27 @@ def plot_baseline_fitting(trained_fit_class):
     Plot the original spectrum and the fitted baseline.
     """
     if trained_fit_class.fitted_baseline_params is None:
-        raise ValueError("Baseline parameters have not been fitted yet. Call fit_baseline() first.")
+        raise ValueError(
+            "Baseline parameters have not been fitted yet. Call fit_polynomial_baseline() or fit_sinusoidal_baseline() first.")
 
     x = trained_fit_class.wavelength_values
     y = trained_fit_class.signal_values
 
-    amplitude, freq, phase, offset = trained_fit_class.fitted_baseline_params
-
-    def sine_wave(x, amplitude, freq, phase, offset):
-        return amplitude * np.sin(2 * np.pi * freq * x + phase) + offset
-
-    y_baseline = sine_wave(x, amplitude, freq, phase, offset)
+    if trained_fit_class.baseline_type == 'polynomial':
+        p = Polynomial(trained_fit_class.fitted_baseline_params)
+        y_baseline = p(x)
+        label = f"Fitted Polynomial Baseline (degree={trained_fit_class.baseline_degree})"
+    elif trained_fit_class.baseline_type == 'sinusoidal':
+        amplitude, freq, phase, offset = trained_fit_class.fitted_baseline_params
+        y_baseline = amplitude * np.sin(2 * np.pi * freq * x + phase) + offset
+        label = "Fitted Sinusoidal Baseline"
 
     plt.figure(figsize=(10, 6))
     plt.plot(x, y, label="Original Spectrum", color="blue")
-    plt.plot(x, y_baseline, label="Fitted Baseline", color="red", linestyle="--")
+    plt.plot(x, y_baseline, label=label, color="red", linestyle="--")
     plt.xlabel("Wavelength [µm]")
     plt.ylabel("Signal")
     plt.title("Spectrum with Fitted Baseline")
     plt.legend()
     plt.show()
-
-
 
