@@ -122,7 +122,10 @@ def print_fitted_parameters_df(fitted_params, covariance_matrices):
     display(df)
 
 
-def plot_spectra_errorbar_bokeh(trained_fit_class,
+def plot_spectra_errorbar_bokeh(wavelength_values,
+                                signal_values,
+                                signal_values_err = None,
+                                absorber_name = None,
                                 y_label="Signal",
                                 title_label=None,
                                 data_type='x_y_yerr',
@@ -142,10 +145,10 @@ def plot_spectra_errorbar_bokeh(trained_fit_class,
         Type of plot. Can be 'scatter' or 'line'. Default is 'scatter'.
     """
 
-    molecule_name = trained_fit_class.absorber_name
-    x_obs = trained_fit_class.wavelength_values
-    y_obs = trained_fit_class.signal_values
-    y_obs_err = getattr(trained_fit_class, 'signal_errors', None)  # Assuming signal_errors is an attribute
+    molecule_name = absorber_name
+    x_obs = wavelength_values
+    y_obs = signal_values
+    y_obs_err = signal_values_err
 
     # Create the figure
     p = figure(title=f"{molecule_name}: Calibrated Laboratory Spectra" if title_label is None else title_label,
@@ -187,7 +190,10 @@ def plot_spectra_errorbar_bokeh(trained_fit_class,
     show(p)
 
 
-def plot_spectra_errorbar_seaborn(trained_fit_class,
+def plot_spectra_errorbar_seaborn(wavelength_values,
+                                  signal_values,
+                                  signal_values_err = None,
+                                  absorber_name = None,
                                   y_label="Signal",
                                   title_label=None,
                                   data_type='x_y_yerr',
@@ -211,12 +217,12 @@ def plot_spectra_errorbar_seaborn(trained_fit_class,
     rcParams['font.sans-serif'] = ['DejaVu Sans']
     rcParams['axes.unicode_minus'] = False
 
-    molecule_name = trained_fit_class.absorber_name
-    x_obs = trained_fit_class.wavelength_values
-    y_obs = trained_fit_class.signal_values
-    y_obs_err = getattr(trained_fit_class, 'signal_errors', None)  # Assuming signal_errors is an attribute
+    molecule_name = absorber_name
+    x_obs = wavelength_values
+    y_obs = signal_values
+    y_obs_err = signal_values_err
 
-    fig, ax1 = plt.subplots(figsize=(10, 4))
+    fig, ax1 = plt.subplots(figsize=(10, 4),dpi=700)
 
     if plot_type == 'scatter':
         sns.scatterplot(x=x_obs, y=y_obs, color='green', s=40, alpha=0.6,
@@ -253,7 +259,11 @@ def plot_spectra_errorbar_seaborn(trained_fit_class,
     plt.show()
 
 
-def plot_baseline_fitting(wavelength_values, signal_values, baseline_type, fitted_baseline_params, baseline_degree=None):
+def plot_baseline_fitting(wavelength_values, 
+                          signal_values, 
+                          baseline_type, 
+                          fitted_baseline_params, 
+                          baseline_degree=None):
     """
     Plot the original spectrum and the fitted baseline.
 
