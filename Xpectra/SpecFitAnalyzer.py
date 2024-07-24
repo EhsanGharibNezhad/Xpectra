@@ -43,7 +43,6 @@ from bokeh.models import ColumnDataSource
 
 from .SpecStatVisualizer import *
 
-# move print fns
 # add __plot__ and __print__ to all 
 
 
@@ -223,7 +222,10 @@ class SpecFitAnalyzer:
     #     return self.fitted_baseline_params
 
 
-    def fit_polynomial_baseline(self, degree, __plot__=True):
+    def fit_polynomial_baseline(self, 
+                                degree, 
+                                __plot__ = False, 
+                                __print__ = False):
         """
         Fit a polynomial baseline to the spectrum using least squares.
 
@@ -250,6 +252,10 @@ class SpecFitAnalyzer:
             plot_baseline_fitting(self.wavelength_values, self.signal_values, 
                 self.baseline_type, self.fitted_baseline_params, 
                 baseline_degree=self.baseline_degree)
+
+        if __print__:
+            print_results_fun(self.fitted_baseline_params, 
+                print_title = f'Polynomial Baseline Coefficients (degree={self.baseline_degree})')
 
         return self.fitted_baseline_params
 
