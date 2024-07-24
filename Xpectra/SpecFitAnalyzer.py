@@ -24,7 +24,7 @@ import numpy as np
 import pandas as pd
 import os
 import pprint
-from scipy.interpolate import interp1d, RegularGridInterpolator
+from scipy.interpolate import interp1d, RegularGridInterpolator, UnivariateSpline
 from scipy import stats, optimize
 from scipy.optimize import curve_fit
 from scipy.special import wofz
@@ -39,6 +39,7 @@ from matplotlib.ticker import AutoMinorLocator, MaxNLocator
 from matplotlib import rcParams
 # from bokeh.plotting import output_notebook, figure, show
 from bokeh.models import ColumnDataSource
+
 
 
 # Import local module
@@ -481,35 +482,6 @@ class SpecFitAnalyzer:
         self.fitted_baseline_params = params
         self.baseline_type = 'sinusoidal'
         return self.fitted_baseline_params
-
-    def plot_baseline_fitting(self):
-        """
-        Plot the original spectrum and the fitted baseline.
-        """
-        if self.fitted_baseline_params is None:
-            raise ValueError(
-                "Baseline parameters have not been fitted yet. Call fit_polynomial_baseline() or fit_sinusoidal_baseline() first.")
-
-        x = self.wavelength_values
-        y = self.signal_values
-
-        if self.baseline_type == 'polynomial':
-            p = Polynomial(self.fitted_baseline_params)
-            y_baseline = p(x)
-            label = f"Fitted Polynomial Baseline (degree={self.baseline_degree})"
-        elif self.baseline_type == 'sinusoidal':
-            amplitude, freq, phase, offset = self.fitted_baseline_params
-            y_baseline = amplitude * np.sin(2 * np.pi * freq * x + phase) + offset
-            label = "Fitted Sinusoidal Baseline"
-
-        plt.figure(figsize=(10, 6))
-        plt.plot(x, y, label="Original Spectrum", color="blue")
-        plt.plot(x, y_baseline, label=label, color="red", linestyle="--")
-        plt.xlabel("Wavelength [µm]")
-        plt.ylabel("Signal")
-        plt.title("Spectrum with Fitted Baseline")
-        plt.legend()
-        plt.show()
 
     def fit_spline_baseline(self, s=None):
         """
