@@ -196,61 +196,6 @@ class SpecFitAnalyzer:
         """
         return np.sqrt(((predictions - targets) ** 2).mean())
 
-    def print_fitted_parameters(self):
-        # Calculate 1-sigma error for each parameter
-
-        fitted_params = self.fitted_params
-        covariance_matrices = self.covariance_matrices
-
-        peaks_info = {}
-        for i, params in enumerate(fitted_params):
-            peak_number = i + 1
-            covariance_matrix = covariance_matrices[i]
-            errors = np.sqrt(np.diag(covariance_matrix))
-            rounded_errors = [round(error, 3) for error in errors]  # Round errors to 3 significant figures
-
-            peak_info = dict(zip(['center', 'Intensity', 'width'], params))
-            peak_info_with_errors = {}
-
-            # Include ± 1-sigma error bars in the peak information
-            for param_name, param_value, error in zip(['center', 'amplitude', 'width'], params, rounded_errors):
-                peak_info_with_errors[param_name] = {'value': round(param_value, 3), 'error': error}
-
-            peaks_info[f'Peak {peak_number}'] = peak_info_with_errors
-
-        # Print peaks information
-        for peak, info in peaks_info.items():
-            print(peak + ':')
-            for param, values in info.items():
-                print(f"    {param}: {values['value']} ± {values['error']}")
-
-    def print_fitted_parameters_df(self):
-        """
-        Print the fitted parameters and their errors for each peak.
-        """
-        if self.fitted_params is None or self.covariance_matrices is None:
-            raise RuntimeError("Fit spectrum first using fit_spectrum method.")
-
-        peaks_info = []
-        for i, params in enumerate(self.fitted_params):
-            peak_number = i + 1
-            covariance_matrix = self.covariance_matrices[i]
-            errors = np.sqrt(np.diag(covariance_matrix))
-            rounded_errors = [round(error, 4) for error in errors]
-
-            peak_info = {
-                'Peak Number': peak_number,
-                'center': round(params[0], 4),
-                'center Error': rounded_errors[0],
-                'Intensity': round(params[1], 3),
-                'Intensity Error': rounded_errors[1],
-                'Width': round(params[2], 3),
-                'Width Error': rounded_errors[2]
-            }
-            peaks_info.append(peak_info)
-
-        df = pd.DataFrame(peaks_info)
-        display(df)
 
     #         return df
 
