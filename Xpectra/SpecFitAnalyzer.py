@@ -77,70 +77,7 @@ class SpecFitAnalyzer:
         self.wavelength_values = wavelength_values
         self.absorber_name = absorber_name
 
-    def plot_spectra_errorbar_bokeh(self,
-                                    y_label="Signal",
-                                    title_label=None,
-                                    data_type='x_y_yerr',
-                                    plot_type='scatter'):
-        """
-        Plot the spectra with error bars using Bokeh.
-
-        Parameters
-        ----------
-        y_label : str, optional
-            Label for the y-axis. Default is "Signal".
-        title_label : str, optional
-            Title of the plot. Default is None.
-        data_type : str, optional
-            Type of data. Default is 'x_y_yerr'.
-        plot_type : str, optional
-            Type of plot. Can be 'scatter' or 'line'. Default is 'scatter'.
-        """
-
-        molecule_name = self.absorber_name
-        x_obs = self.wavelength_values
-        y_obs = self.signal_values
-        y_obs_err = getattr(self, 'signal_errors', None)  # Assuming signal_errors is an attribute
-
-        # Create the figure
-        p = figure(title=f"{molecule_name}: Calibrated Laboratory Spectra" if title_label is None else title_label,
-                   x_axis_label="Wavelength [𝜇m]",
-                   y_axis_label=y_label,
-                   width=1000, height=300,
-                   y_axis_type="linear",
-                   tools="pan,wheel_zoom,box_zoom,reset")
-
-        if plot_type == 'scatter':
-            # Add the scatter plot
-            p.scatter(x_obs, y_obs, size=4, fill_color='green', line_color=None, line_alpha=0.2,
-                      legend_label=f"{molecule_name}: Laboratory Spectra")
-        elif plot_type == 'line':
-            # Add the line plot
-            p.line(x_obs, y_obs, line_width=2, line_color='green', alpha=0.6,
-                   legend_label=f"{molecule_name}: Laboratory Spectra")
-
-        if data_type == 'x_y_yerr' and y_obs_err is not None:
-            # Define maximum error threshold as a percentertage of y-value
-            max_error_threshold = 0.8
-
-            # Calculate adjusted error bar coordinates
-            upper = np.minimum(y_obs + y_obs_err, y_obs + y_obs * max_error_threshold)
-            lower = np.maximum(y_obs - y_obs_err, y_obs - y_obs * max_error_threshold)
-
-            # Add error bars to the plot
-            p.segment(x0=x_obs, y0=lower, x1=x_obs, y1=upper, color='gray', line_alpha=0.7)
-
-        # Increase size of x and y ticks
-        p.title.text_font_size = '14pt'
-        p.xaxis.major_label_text_font_size = '14pt'
-        p.xaxis.axis_label_text_font_size = '14pt'
-        p.yaxis.major_label_text_font_size = '14pt'
-        p.yaxis.axis_label_text_font_size = '14pt'
-
-        # Show the plot
-        output_notebook()
-        show(p)
-
+    
     def plot_spectra_errorbar_seaborn(self,
                                       y_label="Signal",
                                       title_label=None,
