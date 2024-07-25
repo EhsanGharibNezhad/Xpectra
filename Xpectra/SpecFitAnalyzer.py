@@ -109,7 +109,7 @@ class SpecFitAnalyzer:
                      line_profile='gaussian',
                      fitting_method='lm',
                      __plot__=True,
-                     __print__=True, ):
+                     __print__=True):
         """
         Fit a spectrum with multiple peaks using specified line profiles (gaussian, lorentzian, voigt).
 
@@ -255,11 +255,15 @@ class SpecFitAnalyzer:
 
         if __print__:
             print_results_fun(self.fitted_baseline_params, 
-                print_title = f'Polynomial Baseline Coefficients (degree={self.baseline_degree})')
+                print_title = f'Fitted Polynomial Baseline Coefficients (degree={self.baseline_degree})')
 
-        return self.fitted_baseline_params
+        #return self.fitted_baseline_params
 
-    def fit_sinusoidal_baseline(self, initial_guesses):
+
+    def fit_sinusoidal_baseline(self, 
+                                initial_guesses,
+                                __plot__ = False,
+                                __print__ = False):
         """
         Fit a sinusoidal baseline to the spectrum.
 
@@ -282,8 +286,18 @@ class SpecFitAnalyzer:
         params, _ = curve_fit(sine_wave, x, y, p0=initial_guesses, maxfev=1000000)
         self.fitted_baseline_params = params
         self.baseline_type = 'sinusoidal'
-        return self.fitted_baseline_params
+        
+        if __plot__:
+            plot_baseline_fitting(self.wavelength_values, self.signal_values, 
+                self.baseline_type, self.fitted_baseline_params)
 
+        if __print__:
+            baseline_info = dict(zip(['Amplitude', 'Frequency', 'Phase', 'Offset'], 
+                self.fitted_baseline_params))
+            print_results_fun(baseline_info, 
+                print_title = 'Fitted Sinusoidal Baseline Parameters')
+
+        #return self.fitted_baseline_params
 
 
     def fit_spline_baseline(self, s=None):
@@ -307,6 +321,7 @@ class SpecFitAnalyzer:
         self.fitted_baseline_params = spline
         self.baseline_type = 'spline'
         return spline
+
 
     def als(self, lam=1e6, p=0.1, itermax=10, __plot__=True):
         r"""
