@@ -39,7 +39,6 @@ import matplotlib.pyplot as plt
 from matplotlib.ticker import MaxNLocator
 
 # have seaborn + bokeh fns 
-# take out trained class --> input all params 
 
 
 def print_results_fun(targets, print_title=None):
@@ -259,13 +258,13 @@ def plot_spectra_errorbar_seaborn(wavelength_values,
     plt.show()
 
 
-def plot_baseline_fitting(wavelength_values, 
+def plot_baseline_fitting_seaborn(wavelength_values, 
                           signal_values, 
                           baseline_type, 
                           fitted_baseline_params, 
                           baseline_degree=None):
     """
-    Plot the original spectrum and the fitted baseline.
+    Plot the original spectrum and the fitted baseline using Seaborn.
 
     Parameters
     ----------
@@ -292,16 +291,81 @@ def plot_baseline_fitting(wavelength_values,
         amplitude, freq, phase, offset = fitted_baseline_params
         y_baseline = amplitude * np.sin(2 * np.pi * freq * x + phase) + offset
         label = "Fitted Sinusoidal Baseline"
+    else:
+        raise ValueError(f"Invalid baseline_type '{baseline_type}'. Expected {{'polynomial', 'sinusoidal'}}")
 
     plt.figure(figsize=(10, 6),dpi=700)
     plt.plot(x, y, label="Original Spectrum", color="blue")
     plt.plot(x, y_baseline, label=label, color="red", linestyle="--")
     plt.xlabel("Wavelength [µm]")
     plt.ylabel("Signal")
-    plt.title("Spectrum with Fitted Baseline")
+    plt.title(f"Spectra with Fitted {baseline_type.capitalize()} Baseline")
     plt.legend()
     plt.show()
 
+
+def plot_baseline_fitting_bokeh(wavelength_values, 
+                          signal_values, 
+                          baseline_type, 
+                          fitted_baseline_params, 
+                          baseline_degree=None):
+    """
+    Plot the original spectrum and the fitted baseline using Bokeh.
+
+    Parameters
+    ----------
+    signal_values : np.ndarray
+        Signal arrays (input data).
+    wavelength_values : np.ndarray
+        Wavelength array in microns.
+    baseline_type : str, {'polynomial', 'sinusoidal'}
+        Function type of fitted baseline.
+    fitted_baseline_params : np.ndarray
+        Fitted baseline parameters according to baseline_type.
+    baseline_degree : int, optional
+        Degree of fitted polynomial baseline. 
+    """
+
+    x = wavelength_values
+    y = signal_values
+
+    if baseline_type == 'polynomial':
+        p = Polynomial(fitted_baseline_params)
+        y_baseline = p(x)
+        baseline_label = f"Fitted Polynomial Baseline (degree={baseline_degree})"
+    elif baseline_type == 'sinusoidal':
+        amplitude, freq, phase, offset = fitted_baseline_params
+        y_baseline = amplitude * np.sin(2 * np.pi * freq * x + phase) + offset
+        baseline_label = "Fitted Sinusoidal Baseline"
+    else:
+        raise ValueError(f"Invalid baseline_type '{baseline_type}'. Expected {{'polynomial', 'sinusoidal'}}")
+
+    # Create the figure
+    p = figure(title=f"Spectra with Fitted {baseline_type.capitalize()} Baseline",
+               x_axis_label="Wavelength [𝜇m]",
+               y_axis_label="Signal",
+               width=800, height=500,
+               y_axis_type="linear",
+               tools="pan,wheel_zoom,box_zoom,reset")
+
+    # Add line plot
+    p.line(x, y, line_width=1.5, line_color='blue', alpha=0.8,
+        legend_label="Original Spectrum")
+
+    # Add line plot
+    p.line(x, y_baseline, line_width=3, line_color='red', line_dash='dashed', 
+        legend_label=baseline_label)    
+
+    # Increase size of x and y ticks
+    p.title.text_font_size = '14pt'
+    p.xaxis.major_label_text_font_size = '14pt'
+    p.xaxis.axis_label_text_font_size = '14pt'
+    p.yaxis.major_label_text_font_size = '14pt'
+    p.yaxis.axis_label_text_font_size = '14pt'
+
+    # Show the plot
+    output_notebook()
+    show(p)
 
 
 
