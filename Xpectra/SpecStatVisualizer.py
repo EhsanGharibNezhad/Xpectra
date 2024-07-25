@@ -272,7 +272,7 @@ def plot_baseline_fitting_seaborn(wavelength_values,
         Signal arrays (input data).
     wavelength_values : np.ndarray
         Wavelength array in microns.
-    baseline_type : str
+    baseline_type : str, {'polynomial', 'sinusoidal', 'spline'}
         Function type of fitted baseline.
     fitted_baseline_params : np.ndarray
         Fitted baseline parameters according to baseline_type.
@@ -291,8 +291,12 @@ def plot_baseline_fitting_seaborn(wavelength_values,
         amplitude, freq, phase, offset = fitted_baseline_params
         y_baseline = amplitude * np.sin(2 * np.pi * freq * x + phase) + offset
         label = "Fitted Sinusoidal Baseline"
+    elif baseline_type == 'spline':
+        spline = fitted_baseline_params
+        y_baseline = spline(x)
+        label = "Fitted Spline Baseline"    
     else:
-        raise ValueError(f"Invalid baseline_type '{baseline_type}'. Expected {{'polynomial', 'sinusoidal'}}")
+        raise ValueError(f"Invalid baseline_type '{baseline_type}'. Expected {{'polynomial', 'sinusoidal', 'spline'}}")
 
     plt.figure(figsize=(10, 6),dpi=700)
     plt.plot(x, y, label="Original Spectrum", color="blue")
@@ -318,7 +322,7 @@ def plot_baseline_fitting_bokeh(wavelength_values,
         Signal arrays (input data).
     wavelength_values : np.ndarray
         Wavelength array in microns.
-    baseline_type : str, {'polynomial', 'sinusoidal'}
+    baseline_type : str, {'polynomial', 'sinusoidal', 'spline'}
         Function type of fitted baseline.
     fitted_baseline_params : np.ndarray
         Fitted baseline parameters according to baseline_type.
@@ -337,8 +341,12 @@ def plot_baseline_fitting_bokeh(wavelength_values,
         amplitude, freq, phase, offset = fitted_baseline_params
         y_baseline = amplitude * np.sin(2 * np.pi * freq * x + phase) + offset
         baseline_label = "Fitted Sinusoidal Baseline"
+     elif baseline_type == 'spline':
+        spline = fitted_baseline_params
+        y_baseline = spline(x)
+        label = "Fitted Spline Baseline"    
     else:
-        raise ValueError(f"Invalid baseline_type '{baseline_type}'. Expected {{'polynomial', 'sinusoidal'}}")
+        raise ValueError(f"Invalid baseline_type '{baseline_type}'. Expected {{'polynomial', 'sinusoidal', 'spline'}}")
 
     # Create the figure
     p = figure(title=f"Spectra with Fitted {baseline_type.capitalize()} Baseline",

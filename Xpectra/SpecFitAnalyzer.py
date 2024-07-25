@@ -249,7 +249,7 @@ class SpecFitAnalyzer:
         self.baseline_degree = degree
 
         if __plot__:
-            plot_baseline_fitting(self.wavelength_values, self.signal_values, 
+            plot_baseline_fitting_seaborn(self.wavelength_values, self.signal_values, 
                 self.baseline_type, self.fitted_baseline_params, 
                 baseline_degree=self.baseline_degree)
 
@@ -257,7 +257,7 @@ class SpecFitAnalyzer:
             print_results_fun(self.fitted_baseline_params, 
                 print_title = f'Fitted Polynomial Baseline Coefficients (degree={self.baseline_degree})')
 
-        #return self.fitted_baseline_params
+        return self.fitted_baseline_params
 
 
     def fit_sinusoidal_baseline(self, 
@@ -288,7 +288,7 @@ class SpecFitAnalyzer:
         self.baseline_type = 'sinusoidal'
         
         if __plot__:
-            plot_baseline_fitting(self.wavelength_values, self.signal_values, 
+            plot_baseline_fitting_seaborn(self.wavelength_values, self.signal_values, 
                 self.baseline_type, self.fitted_baseline_params)
 
         if __print__:
@@ -297,10 +297,12 @@ class SpecFitAnalyzer:
             print_results_fun(baseline_info, 
                 print_title = 'Fitted Sinusoidal Baseline Parameters')
 
-        #return self.fitted_baseline_params
+        return self.fitted_baseline_params
 
 
-    def fit_spline_baseline(self, s=None):
+    def fit_spline_baseline(self, 
+                            s=None, 
+                            __plot__ = False):
         """
         Fit a spline baseline to the spectrum.
 
@@ -320,6 +322,11 @@ class SpecFitAnalyzer:
         spline = UnivariateSpline(x, y, s=s)
         self.fitted_baseline_params = spline
         self.baseline_type = 'spline'
+
+        if __plot__:
+            plot_baseline_fitting_seaborn(self.wavelength_values, self.signal_values, 
+                self.baseline_type, self.fitted_baseline_params)
+
         return spline
 
 
