@@ -1,0 +1,72 @@
+.. TelescopeML documentation master file, created by
+   sphinx-quickstart on Tue Dec 27 15:39:09 2022.
+   You can adapt this file completely to your liking, but it should at least
+   contain the root `toctree` directive.
+
+Xpectra
+==============
+
+
+# Xpectra
+for analyzing exoplanetary spectra in the lab, providing insights into atmospheric composition
+and habitability. The tasks executed by the ``Xpectra``
+modules are outlined below:
+
+.. image:: figures/TelescopeML_modules.png
+   :width: 600
+
+``Xpectra`` is a Python package comprising a series of modules, each equipped with specialized machine learning and
+statistical capabilities for conducting spectral analysis or Machine Learning (ML) tasks on
+molecular and atomic spectra recorded from laboratory spectroscopic measuremtns to understand the atmospheres of extrasolar planets and brown dwarfs.
+The tasks executed by the ``Xpectra`` modules are outlined below:
+
+
+![](docs/figures/Xpectra_modules.jpg)
+
+- *SpecMaster module*: Performs various tasks to process the spectra, including:
+
+    - Preparing inputs and outputs
+    - Visualizing the data
+
+- *SpecAnalyzer module*: Utilizes different methods/packages such as TensorFlow to:
+
+  - Build Convolutional Neural Networks (CNNs) model using the training examples
+  - Utilize tuned hyperparameters
+  - Fit/train the ML models
+  - Visualize the loss and training history, as well as the trained model's performance
+
+- *SpecStatVisualizer module*: Implements the following tasks to predict atmospheric parameters:
+
+  - Processes and predicts the observational datasets
+  - Deploys the trained ML/CNNs model to predict atmospheric parameters
+  - Visualizes the processed observational dataset and the uncertainty in the predicted results
+
+
+
+or simply...
+
+ - Load laboratory spectra
+ - Follow the tutorials
+ - Label the quantum assignments by connecting to the HITRAN database
+ - Extract spectroscopic parameters, e.g., line position, pressure-broadening coefficients
+ - Report the statistical analysis
+
+
+
+
+======================
+
+.. toctree::
+   :maxdepth: 2
+   :hidden:
+  
+   Installation <installation>
+   Tutorials <tutorials>
+   The Code <code>
+   GitHub <https://github.com/EhsanGharibNezhad/Xpectra>
+
+.. KnowledgeBase <knowledgebase>
+.. Publications <publications>
+.. What to Cite <cite>
+
+
