@@ -77,7 +77,7 @@ class SpecFitAnalyzer:
         self.wavelength_values = wavelength_values
         self.absorber_name = absorber_name
 
-    
+
     def plot_spectra_errorbar_seaborn(self,
                                       y_label="Signal",
                                       title_label=None,
