@@ -38,8 +38,7 @@ from numpy.polynomial import Polynomial
 import matplotlib.pyplot as plt
 from matplotlib.ticker import MaxNLocator
 
-# have seaborn + bokeh fns 
-
+# UPDATE DOCS!
 
 def print_results_fun(targets, print_title=None):
     """
@@ -67,6 +66,13 @@ def print_results_fun(targets, print_title=None):
 def print_fitted_parameters(fitted_params, covariance_matrices):
     """
     Print the fitted parameters and their errors for each peak as a dataframe.
+
+    Parameters
+    ----------
+    fitted_params : np.ndarray
+        The fitted parameters for each peak.
+    covariance_matrices : np.ndarray
+        The covariance matrices of the fitted parameters.
     """
 
     # Calculate 1-sigma error for each parameter
@@ -96,6 +102,13 @@ def print_fitted_parameters(fitted_params, covariance_matrices):
 def print_fitted_parameters_df(fitted_params, covariance_matrices):
     """
     Print the fitted parameters and their errors for each peak.
+
+    Parameters
+    ----------
+    fitted_params : np.ndarray
+        The fitted parameters for each peak.
+    covariance_matrices : np.ndarray
+        The covariance matrices of the fitted parameters.
     """
 
     # Calculate 1-sigma error for each parameter
@@ -134,6 +147,14 @@ def plot_spectra_errorbar_bokeh(wavelength_values,
 
     Parameters
     ----------
+    wavelength_values : nd.array
+        Wavelength array in microns.
+    signal_values : nd.array
+        Signal arrays (input data).
+    signal_values_err : nd.array, optional
+        Error on input data.
+    absorber_name : str, optional
+        Molecule or atom name.
     y_label : str, optional
         Label for the y-axis. Default is "Signal".
     title_label : str, optional
@@ -202,6 +223,14 @@ def plot_spectra_errorbar_seaborn(wavelength_values,
 
     Parameters
     ----------
+    wavelength_values : nd.array
+        Wavelength array in microns.
+    signal_values : nd.array
+        Signal arrays (input data).
+    signal_values_err : nd.array, optional
+        Error on input data.
+    absorber_name : str, optional
+        Molecule or atom name.
     y_label : str, optional
         Label for the y-axis. Default is "Signal".
     title_label : str, optional
@@ -268,10 +297,10 @@ def plot_baseline_fitting_seaborn(wavelength_values,
 
     Parameters
     ----------
-    signal_values : np.ndarray
-        Signal arrays (input data).
     wavelength_values : np.ndarray
         Wavelength array in microns.
+    signal_values : np.ndarray
+        Signal arrays (input data).    
     baseline_type : str, {'polynomial', 'sinusoidal', 'spline'}
         Function type of fitted baseline.
     fitted_baseline_params : np.ndarray
@@ -318,10 +347,10 @@ def plot_baseline_fitting_bokeh(wavelength_values,
 
     Parameters
     ----------
-    signal_values : np.ndarray
-        Signal arrays (input data).
     wavelength_values : np.ndarray
         Wavelength array in microns.
+    signal_values : np.ndarray
+        Signal arrays (input data). 
     baseline_type : str, {'polynomial', 'sinusoidal', 'spline'}
         Function type of fitted baseline.
     fitted_baseline_params : np.ndarray
@@ -341,7 +370,7 @@ def plot_baseline_fitting_bokeh(wavelength_values,
         amplitude, freq, phase, offset = fitted_baseline_params
         y_baseline = amplitude * np.sin(2 * np.pi * freq * x + phase) + offset
         baseline_label = "Fitted Sinusoidal Baseline"
-     elif baseline_type == 'spline':
+    elif baseline_type == 'spline':
         spline = fitted_baseline_params
         y_baseline = spline(x)
         label = "Fitted Spline Baseline"    
