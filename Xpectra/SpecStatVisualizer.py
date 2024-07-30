@@ -31,11 +31,13 @@ from bokeh.plotting import output_notebook
 
 from bokeh.plotting import figure, show
 from bokeh.models import ColumnDataSource
+from bokeh.layouts import column
 
 import numpy as np
 from numpy.polynomial import Polynomial
 
 import matplotlib.pyplot as plt
+import matplotlib.gridspec as gridspec
 from matplotlib.ticker import MaxNLocator
 
 # UPDATE DOCS!
@@ -327,13 +329,33 @@ def plot_baseline_fitting_seaborn(wavelength_values,
     else:
         raise ValueError(f"Invalid baseline_type '{baseline_type}'. Expected {{'polynomial', 'sinusoidal', 'spline'}}")
 
-    plt.figure(figsize=(10, 6),dpi=700)
-    plt.plot(x, y, label="Original Spectrum", color="blue")
-    plt.plot(x, y_baseline, label=label, color="red", linestyle="--")
-    plt.xlabel("Wavelength [µm]")
-    plt.ylabel("Signal")
-    plt.title(f"Spectra with Fitted {baseline_type.capitalize()} Baseline")
-    plt.legend()
+    # Create figure
+    fig = plt.figure(figsize=(10, 6), dpi=700)
+    # Create GridSpec object
+    gs = gridspec.GridSpec(3, 1, height_ratios=[3, 1, 1])
+    # Create first subplot for spectrum
+    ax1 = fig.add_subplot(gs[:2,0])
+    # Plot original spectrum
+    ax1.plot(x, y, label="Original Spectrum", color="blue")
+    # Plot fitted baseline
+    ax1.plot(x, y_baseline, label=label, color="red", linestyle="--")
+    # Create second subplot for residual
+    ax2 = fig.add_subplot(gs[2, 0])
+    y_residual = y - y_baseline
+    # Plot residual 
+    ax2.plot(x, y_residual, 
+        label=f'Residual = (Data) - (Fitted {baseline_type.capitalize()} Baseline)',
+        color='green')
+
+    ax1.set_ylabel("Signal")
+    ax2.set_xlabel("Wavelength [µm]")
+    ax2.set_ylabel("Adjusted Signal")
+
+    ax1.set_title(f"Spectra with Fitted {baseline_type.capitalize()} Baseline")
+    
+    ax1.legend()
+    ax2.legend()
+
     plt.show()
 
 
@@ -378,31 +400,48 @@ def plot_baseline_fitting_bokeh(wavelength_values,
         raise ValueError(f"Invalid baseline_type '{baseline_type}'. Expected {{'polynomial', 'sinusoidal', 'spline'}}")
 
     # Create the figure
-    p = figure(title=f"Spectra with Fitted {baseline_type.capitalize()} Baseline",
-               x_axis_label="Wavelength [𝜇m]",
+    p1 = figure(title=f"Spectra with Fitted {baseline_type.capitalize()} Baseline",
+               #x_axis_label="Wavelength [𝜇m]",
                y_axis_label="Signal",
                width=800, height=500,
                y_axis_type="linear",
                tools="pan,wheel_zoom,box_zoom,reset")
 
     # Add line plot
-    p.line(x, y, line_width=1.5, line_color='blue', alpha=0.8,
+    p1.line(x, y, line_width=1.5, line_color='blue', alpha=0.8,
         legend_label="Original Spectrum")
 
     # Add line plot
-    p.line(x, y_baseline, line_width=3, line_color='red', line_dash='dashed', 
+    p1.line(x, y_baseline, line_width=3, line_color='red', line_dash='dashed', 
         legend_label=baseline_label)    
 
+    # Create lower plot
+    p2 = figure(title=' ',
+               x_axis_label="Wavelength [𝜇m]",
+               y_axis_label="Adjusted Signal",
+               width=800, height=200,
+               y_axis_type="linear",
+               tools="pan,wheel_zoom,box_zoom,reset")
+
+    # Add line plot
+    residual = y - y_baseline
+    p2.line(x, residual, line_width=1.5, line_color='green',
+        legend_label=f'Residual = (Data) - (Fitted {baseline_type.capitalize()} Baseline)')  
+
     # Increase size of x and y ticks
-    p.title.text_font_size = '14pt'
-    p.xaxis.major_label_text_font_size = '14pt'
-    p.xaxis.axis_label_text_font_size = '14pt'
-    p.yaxis.major_label_text_font_size = '14pt'
-    p.yaxis.axis_label_text_font_size = '14pt'
+    for p in (p1,p2):
+        p.title.text_font_size = '14pt'
+        p.xaxis.major_label_text_font_size = '14pt'
+        p.xaxis.axis_label_text_font_size = '14pt'
+        p.yaxis.major_label_text_font_size = '14pt'
+        p.yaxis.axis_label_text_font_size = '14pt'
+
+    # Combine plots into a column
+    layout = column(p1, p2)
 
     # Show the plot
     output_notebook()
-    show(p)
+    show(layout)
 
 
 

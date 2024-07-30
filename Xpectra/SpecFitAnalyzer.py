@@ -262,7 +262,8 @@ class SpecFitAnalyzer:
 
     def fit_sinusoidal_baseline(self, 
                                 initial_guesses,
-                                __plot__ = False,
+                                __plot_seaborn__ = False,
+                                __plot_bokeh__ = False,
                                 __print__ = False):
         """
         Fit a sinusoidal baseline to the spectrum.
@@ -287,10 +288,12 @@ class SpecFitAnalyzer:
         self.fitted_baseline_params = params
         self.baseline_type = 'sinusoidal'
         
-        if __plot__:
+        if __plot_seaborn__:
             plot_baseline_fitting_seaborn(self.wavelength_values, self.signal_values, 
                 self.baseline_type, self.fitted_baseline_params)
-
+        if __plot_bokeh__:
+            plot_baseline_fitting_bokeh(self.wavelength_values, self.signal_values, 
+                self.baseline_type, self.fitted_baseline_params)
         if __print__:
             baseline_info = dict(zip(['Amplitude', 'Frequency', 'Phase', 'Offset'], 
                 self.fitted_baseline_params))
