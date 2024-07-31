@@ -27,10 +27,8 @@ import matplotlib.pyplot as plt
 from matplotlib.ticker import AutoMinorLocator, MaxNLocator
 from matplotlib import rcParams
 
-from bokeh.plotting import output_notebook
-
-from bokeh.plotting import figure, show
-from bokeh.models import ColumnDataSource
+from bokeh.plotting import output_notebook, figure, show
+from bokeh.models import HoverTool, ColumnDataSource
 from bokeh.layouts import column
 
 import numpy as np
@@ -40,7 +38,6 @@ import matplotlib.pyplot as plt
 import matplotlib.gridspec as gridspec
 from matplotlib.ticker import MaxNLocator
 
-# UPDATE DOCS!
 
 def print_results_fun(targets, print_title=None):
     """
@@ -206,6 +203,14 @@ def plot_spectra_errorbar_bokeh(wavelength_values,
     p.xaxis.axis_label_text_font_size = '14pt'
     p.yaxis.major_label_text_font_size = '14pt'
     p.yaxis.axis_label_text_font_size = '14pt'
+
+    # Add HoverTool
+    hover = HoverTool()
+    hover.tooltips = [
+        ("Wavenumber (micron)", "@x{0.0000}"),
+        ("Intensity", "@y{0.0000}")
+        ]
+    p.add_tools(hover)
 
     # Show the plot
     output_notebook()
@@ -442,6 +447,58 @@ def plot_baseline_fitting_bokeh(wavelength_values,
     # Show the plot
     output_notebook()
     show(layout)
+
+def plot_fitted_spectrum_bokeh(wavelength_values, 
+                               signal_values,
+                               initial_guesses,
+                               line_profile='gaussian',
+                               fitting_method='lm'):
+    """
+    Plot the original spectrum and the fitted peaks using Bokeh.
+
+    Parameters
+    ----------
+    wavelength_values : np.ndarray
+        Wavelength array in microns.
+    signal_values : np.ndarray
+        Signal arrays (input data). 
+    initial_guesses : list
+        List of initial guesses for parameters of the line profile.
+    line_profile : str, {'gaussian', 'lorentzian', 'voigt'}, optional
+        Type of line profile to use for fitting. Default is 'gaussian'.
+    """
+
+    x = wavelength_values
+    y = signal_values
+
+   # Create a new plot with a title and axis labels
+    p1 = figure(title=f"Spectra with Fitted {line_profile.capitalize()} Peaks",
+               x_axis_label="Wavelength [𝜇m]",
+               y_axis_label="Signal",
+               width=800, height=500,
+               y_axis_type="linear",
+               tools="pan,wheel_zoom,box_zoom,reset")
+
+    # Add the original spectrum to the plot
+    original_spectrum = p.line(x, y, legend_label="Original Spectrum", line_width=2, color="blue")
+
+    # Add the baseline corrected spectrum to the plot
+    corrected_spectrum = p.line(x, y_fitted, legend_label="", line_width=2, color="red")
+
+    # Add HoverTool
+    hover = HoverTool()
+    hover.tooltips = [
+        ("Wavenumber [𝜇m]", "@x{0.0000}"),
+        ("Original Intensity", "@y{0.0000}"),
+        ("Corrected Intensity", "@z{0.00}"),
+    ]
+    p.add_tools(hover)
+
+    # Show the results
+    show(p)
+
+
+
 
 
 
