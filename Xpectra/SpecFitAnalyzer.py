@@ -119,6 +119,10 @@ class SpecFitAnalyzer:
             List of initial guesses for parameters of the line profile.
         line_profile : str, {'gaussian', 'lorentzian', 'voigt'}, optional
             Type of line profile to use for fitting. Default is 'gaussian'.
+        __plot__ : bool
+            True or False.
+        __print__ : bool
+            True or False.
 
         Returns
         -------
@@ -223,8 +227,9 @@ class SpecFitAnalyzer:
 
 
     def fit_polynomial_baseline(self, 
-                                degree, 
-                                __plot__ = False, 
+                                degree,
+                                __plot_seaborn__ = False,
+                                __plot_bokeh__ = False,
                                 __print__ = False):
         """
         Fit a polynomial baseline to the spectrum using least squares.
@@ -233,6 +238,12 @@ class SpecFitAnalyzer:
         ----------
         degree : int
             Degree of the polynomial to fit.
+        __plot_seaborn__ : bool
+            True or False.
+        __plot_bokeh__ : bool
+            True or False.
+        __print__ : bool
+            True or False.
 
         Returns
         -------
@@ -272,6 +283,12 @@ class SpecFitAnalyzer:
         ----------
         initial_guesses : list
             Initial guesses for amplitude, frequency, phase, and offset.
+        __plot_seaborn__ : bool
+            True or False.
+        __plot_bokeh__ : bool
+            True or False.
+        __print__ : bool
+            True or False.
 
         Returns
         -------
@@ -305,7 +322,8 @@ class SpecFitAnalyzer:
 
     def fit_spline_baseline(self, 
                             s=None, 
-                            __plot__ = False):
+                            __plot_seaborn__ = False,
+                            __plot_bokeh__ = False):
         """
         Fit a spline baseline to the spectrum.
 
@@ -313,6 +331,10 @@ class SpecFitAnalyzer:
         ----------
         s : float or None
             Smoothing factor to control the spline smoothness. If None, it is set by the algorithm.
+        __plot_seaborn__ : bool
+            True or False.
+        __plot_bokeh__ : bool
+            True or False.
 
         Returns
         -------
@@ -326,8 +348,11 @@ class SpecFitAnalyzer:
         self.fitted_baseline_params = spline
         self.baseline_type = 'spline'
 
-        if __plot__:
+        if __plot_seaborn__:
             plot_baseline_fitting_seaborn(self.wavelength_values, self.signal_values, 
+                self.baseline_type, self.fitted_baseline_params)
+        if __plot_bokeh__:
+            plot_baseline_fitting_bokeh(self.wavelength_values, self.signal_values, 
                 self.baseline_type, self.fitted_baseline_params)
 
         return spline
