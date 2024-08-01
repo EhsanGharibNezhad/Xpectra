@@ -135,6 +135,7 @@ def print_fitted_parameters_df(fitted_params, covariance_matrices):
 
 def plot_spectra_errorbar_bokeh(wavelength_values,
                                 signal_values,
+                                wavelength_range = None,
                                 signal_values_err = None,
                                 absorber_name = None,
                                 y_label="Signal",
@@ -150,6 +151,8 @@ def plot_spectra_errorbar_bokeh(wavelength_values,
         Wavelength array in microns.
     signal_values : nd.array
         Signal arrays (input data).
+    wavelength_range : list-like, optional
+        List-like object (list, tuple, or np.ndarray) with of length 2 representing wavelength range for plotting.
     signal_values_err : nd.array, optional
         Error on input data.
     absorber_name : str, optional
@@ -168,6 +171,16 @@ def plot_spectra_errorbar_bokeh(wavelength_values,
     x_obs = wavelength_values
     y_obs = signal_values
     y_obs_err = signal_values_err
+
+    # Trim x and y to desired wavelength range
+    if wavelength_range is not None:
+        # Make sure range is in correct format
+        if len(wavelength_range) != 2:
+            raise ValueError('wavelength_range must be tuple, list, or array with 2 elements')
+        # Locate indices and splice
+        condition_range = (x_obs > wavelength_range[0]) & (x_obs < wavelength_range[1])
+        x_obs = x_obs[condition_range]
+        y_obs = y_obs[condition_range]
 
     # Create the figure
     p = figure(title=f"{molecule_name}: Calibrated Laboratory Spectra" if title_label is None else title_label,
@@ -219,6 +232,7 @@ def plot_spectra_errorbar_bokeh(wavelength_values,
 
 def plot_spectra_errorbar_seaborn(wavelength_values,
                                   signal_values,
+                                  wavelength_range = None,
                                   signal_values_err = None,
                                   absorber_name = None,
                                   y_label="Signal",
@@ -234,6 +248,8 @@ def plot_spectra_errorbar_seaborn(wavelength_values,
         Wavelength array in microns.
     signal_values : nd.array
         Signal arrays (input data).
+    wavelength_range : list-like, optional
+        List-like object (list, tuple, or np.ndarray) with of length 2 representing wavelength range for plotting.
     signal_values_err : nd.array, optional
         Error on input data.
     absorber_name : str, optional
@@ -256,6 +272,16 @@ def plot_spectra_errorbar_seaborn(wavelength_values,
     x_obs = wavelength_values
     y_obs = signal_values
     y_obs_err = signal_values_err
+
+    # Trim x and y to desired wavelength range
+    if wavelength_range is not None:
+        # Make sure range is in correct format
+        if len(wavelength_range) != 2:
+            raise ValueError('wavelength_range must be tuple, list, or array with 2 elements')
+        # Locate indices and splice
+        condition_range = (x_obs > wavelength_range[0]) & (x_obs < wavelength_range[1])
+        x_obs = x_obs[condition_range]
+        y_obs = y_obs[condition_range]
 
     fig, ax1 = plt.subplots(figsize=(10, 4),dpi=700)
 
@@ -365,10 +391,10 @@ def plot_baseline_fitting_seaborn(wavelength_values,
 
 
 def plot_baseline_fitting_bokeh(wavelength_values, 
-                          signal_values, 
-                          baseline_type, 
-                          fitted_baseline_params, 
-                          baseline_degree=None):
+                                signal_values, 
+                                baseline_type, 
+                                fitted_baseline_params, 
+                                baseline_degree=None):
     """
     Plot the original spectrum and the fitted baseline using Bokeh.
 
@@ -448,9 +474,13 @@ def plot_baseline_fitting_bokeh(wavelength_values,
     output_notebook()
     show(layout)
 
+
+
+
+
 def plot_fitted_spectrum_bokeh(wavelength_values, 
                                signal_values,
-                               initial_guesses,
+                               fitted_params,
                                line_profile='gaussian',
                                fitting_method='lm'):
     """
@@ -462,14 +492,33 @@ def plot_fitted_spectrum_bokeh(wavelength_values,
         Wavelength array in microns.
     signal_values : np.ndarray
         Signal arrays (input data). 
-    initial_guesses : list
-        List of initial guesses for parameters of the line profile.
+    fitted_params : list
+        List of fitted parameters of the line profile.
     line_profile : str, {'gaussian', 'lorentzian', 'voigt'}, optional
         Type of line profile to use for fitting. Default is 'gaussian'.
     """
 
     x = wavelength_values
     y = signal_values
+
+    # Calculate fitted y values
+    y_fitted = np.zeros_like(x)
+    for params in fitted_params:
+        if line_profile == 'gaussian':
+            center, amplitude, width = params
+            y_fitted += amplitude * np.exp(-(x - center) ** 2 / (2 * width ** 2))
+        elif line_profile == 'lorentzian':
+            center, amplitude, width = params
+            y_fitted += amplitude / (1 + ((x - center) / width) ** 2)
+        elif line_profile == 'voigt':
+            center, amplitude, wid_g, wid_l = params
+            sigma = wid_g / np.sqrt(2 * np.log(2))
+            gamma = wid_l / 2
+            z = ((x - center) + 1j * gamma) / (sigma * np.sqrt(2))
+            y_fitted += amplitude * np.real(wofz(z)).astype(float) / (sigma * np.sqrt(2 * np.pi))
+
+    # Calculate RMSE
+    rmse_value = np.sqrt(((y_fitted - y) ** 2).mean())
 
    # Create a new plot with a title and axis labels
     p1 = figure(title=f"Spectra with Fitted {line_profile.capitalize()} Peaks",
@@ -480,11 +529,31 @@ def plot_fitted_spectrum_bokeh(wavelength_values,
                tools="pan,wheel_zoom,box_zoom,reset")
 
     # Add the original spectrum to the plot
-    original_spectrum = p.line(x, y, legend_label="Original Spectrum", line_width=2, color="blue")
+    p1.line(x, y, legend_label="Original Spectrum", line_width=2, color="blue")
 
     # Add the baseline corrected spectrum to the plot
-    corrected_spectrum = p.line(x, y_fitted, legend_label="", line_width=2, color="red")
+    p1.line(x, y_fitted, legend_label=f'Fitted {line_profile.capitalize()}', line_width=2, line_dash='dashed', color="red")
 
+    # Add line plot
+    residual = y - y_fitted
+    p2.line(x, residual, line_width=1.5, line_color='green',
+        legend_label=f'Residual = (Data) - (Fitted {line_profile.capitalize()} Peaks)')  
+
+    # Increase size of x and y ticks
+    for p in (p1,p2):
+        p.title.text_font_size = '14pt'
+        p.xaxis.major_label_text_font_size = '14pt'
+        p.xaxis.axis_label_text_font_size = '14pt'
+        p.yaxis.major_label_text_font_size = '14pt'
+        p.yaxis.axis_label_text_font_size = '14pt'
+
+    # Combine plots into a column
+    layout = column(p1, p2)
+
+    # Show the plot
+    output_notebook()
+    show(layout)
+    
     # Add HoverTool
     hover = HoverTool()
     hover.tooltips = [
