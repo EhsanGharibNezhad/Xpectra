@@ -108,6 +108,7 @@ class SpecFitAnalyzer:
                      initial_guesses,
                      line_profile='gaussian',
                      fitting_method='lm',
+                     wavelength_range=None,
                      __plot__=True,
                      __print__=True):
         """
@@ -119,6 +120,8 @@ class SpecFitAnalyzer:
             List of initial guesses for parameters of the line profile.
         line_profile : str, {'gaussian', 'lorentzian', 'voigt'}, optional
             Type of line profile to use for fitting. Default is 'gaussian'.
+        wavelength_range : list-like, optional
+            List-like object (list, tuple, or np.ndarray) with of length 2 representing wavelength range for plotting.
         __plot__ : bool
             True or False.
         __print__ : bool
@@ -152,14 +155,16 @@ class SpecFitAnalyzer:
 
         self.fitted_params = fitted_params
         self.covariance_matrices = covariance_matrices
-        self.covariance_matrices = covariance_matrices
         # FIND ME
 
         if __plot__ == True:
-            self.plot_fitted_spectrum_bokeh(line_profile=line_profile)
+            plot_fitted_spectrum_bokeh(x,y,fitted_params,
+                wavelength_range = wavelength_range, 
+                line_profile=line_profile,
+                fitting_method=fitting_method)
 
         if __print__ == True:
-            self.print_fitted_parameters_df()
+            print_fitted_parameters_df(fitted_params,covariance_matrices)
 
     #         return fitted_params
 

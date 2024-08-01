@@ -481,6 +481,7 @@ def plot_baseline_fitting_bokeh(wavelength_values,
 def plot_fitted_spectrum_bokeh(wavelength_values, 
                                signal_values,
                                fitted_params,
+                               wavelength_range = None,
                                line_profile='gaussian',
                                fitting_method='lm'):
     """
@@ -522,17 +523,36 @@ def plot_fitted_spectrum_bokeh(wavelength_values,
 
    # Create a new plot with a title and axis labels
     p1 = figure(title=f"Spectra with Fitted {line_profile.capitalize()} Peaks",
-               x_axis_label="Wavelength [𝜇m]",
+               #x_axis_label="Wavelength [𝜇m]",
                y_axis_label="Signal",
                width=800, height=500,
                y_axis_type="linear",
                tools="pan,wheel_zoom,box_zoom,reset")
+
+    # Trim x and y to desired wavelength range
+    if wavelength_range is not None:
+        # Make sure range is in correct format
+        if len(wavelength_range) != 2:
+            raise ValueError('wavelength_range must be tuple, list, or array with 2 elements')
+        # Locate indices and splice
+        condition_range = (x > wavelength_range[0]) & (x < wavelength_range[1])
+        x = x[condition_range]
+        y = y[condition_range]
+        y_fitted = y_fitted[condition_range]
 
     # Add the original spectrum to the plot
     p1.line(x, y, legend_label="Original Spectrum", line_width=2, color="blue")
 
     # Add the baseline corrected spectrum to the plot
     p1.line(x, y_fitted, legend_label=f'Fitted {line_profile.capitalize()}', line_width=2, line_dash='dashed', color="red")
+    
+    # Create lower plot
+    p2 = figure(title=' ',
+               x_axis_label="Wavelength [𝜇m]",
+               y_axis_label="Residual",
+               width=800, height=200,
+               y_axis_type="linear",
+               tools="pan,wheel_zoom,box_zoom,reset")
 
     # Add line plot
     residual = y - y_fitted
@@ -547,24 +567,26 @@ def plot_fitted_spectrum_bokeh(wavelength_values,
         p.yaxis.major_label_text_font_size = '14pt'
         p.yaxis.axis_label_text_font_size = '14pt'
 
+    # Add HoverTool
+    hover_p1 = HoverTool()
+    hover_p1.tooltips = [
+        ("Wavelength [𝜇m]", "@x{0.0000}"),
+        ("Intensity", "@y{0.0000}"),
+    ]
+    hover_p2 = HoverTool()
+    hover_p2.tooltips = [
+        ("Wavelength [𝜇m]", "@x{0.0000}"),
+        ("Residual", "@y{0.0000}"),
+    ]
+    p1.add_tools(hover_p1)
+    p2.add_tools(hover_p2)
+
     # Combine plots into a column
     layout = column(p1, p2)
 
     # Show the plot
     output_notebook()
     show(layout)
-    
-    # Add HoverTool
-    hover = HoverTool()
-    hover.tooltips = [
-        ("Wavenumber [𝜇m]", "@x{0.0000}"),
-        ("Original Intensity", "@y{0.0000}"),
-        ("Corrected Intensity", "@z{0.00}"),
-    ]
-    p.add_tools(hover)
-
-    # Show the results
-    show(p)
 
 
 
