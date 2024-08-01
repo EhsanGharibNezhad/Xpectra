@@ -6,16 +6,11 @@ import matplotlib.pyplot as plt
 import pywt
 from scipy.sparse.linalg import spsolve, splu
 
-from bokeh.plotting import figure, show, output_notebook
-from bokeh.models import ColumnDataSource, CustomJS
-from bokeh.models.tools import TapTool
-from bokeh.io import push_notebook
-from bokeh.models import HoverTool, ColumnDataSource
 
 # Nedded for ALS
 from scipy import sparse
 from scipy.linalg import cholesky
-from scipy.sparse.linalg import spsolve
+from scipy.sparse.linalg import spsolve, splu
 # Module for performing detailed spectral analysis, including feature extraction, peak identification, and line fitting.
 
 
@@ -32,13 +27,6 @@ from scipy.stats import chi2
 from sklearn.metrics import r2_score, mean_squared_error, mean_absolute_error
 from typing import List, Union
 from numpy.polynomial import Polynomial
-
-import seaborn as sns
-import matplotlib.pyplot as plt
-from matplotlib.ticker import AutoMinorLocator, MaxNLocator
-from matplotlib import rcParams
-# from bokeh.plotting import output_notebook, figure, show
-from bokeh.models import ColumnDataSource
 
 
 from .SpecStatVisualizer import *
@@ -168,27 +156,6 @@ class SpecFitAnalyzer:
 
     #         return fitted_params
 
-    # def fit_baseline(self):
-    #     """
-    #     Fit a sinusoidal baseline to the spectrum.
-    #
-    #     Returns
-    #     -------
-    #     params : list
-    #         Fitted parameters [amplitude, frequency, phase, offset] of the sinusoidal baseline.
-    #     """
-    #     x = self.wavelength_values
-    #     y = self.signal_values
-    #
-    #     def sine_wave(x, amplitude, freq, phase, offset):
-    #         return amplitude * np.sin(2 * np.pi * freq * x + phase) + offset
-    #
-    #     # Initial guesses for amplitude, frequency, phase, and offset
-    #     initial_guesses = [baseline_amplitude, baseline_frequency, 0, 0]
-    #     params, _ = curve_fit(sine_wave, x, y, p0=initial_guesses, maxfev=1000000)
-    #
-    #     return params
-
 
     @staticmethod
     def rmse(predictions, targets):
@@ -203,32 +170,6 @@ class SpecFitAnalyzer:
         - RMSE value.
         """
         return np.sqrt(((predictions - targets) ** 2).mean())
-
-
-    #         return df
-
-    # def fit_polynomial_baseline(self, degree):
-    #     """
-    #     Fit a polynomial baseline to the spectrum using least squares.
-    #
-    #     Parameters
-    #     ----------
-    #     degree : int
-    #         Degree of the polynomial to fit.
-    #
-    #     Returns
-    #     -------
-    #     params : np.ndarray
-    #         Coefficients of the fitted polynomial.
-    #     """
-    #     x = self.wavelength_values
-    #     y = self.signal_values
-    #
-    #     # Fit polynomial baseline using least squares
-    #     p = Polynomial.fit(x, y, degree)
-    #     self.fitted_baseline_params = p.convert().coef
-    #     self.baseline_degree = degree
-    #     return self.fitted_baseline_params
 
 
     def fit_polynomial_baseline(self, 
@@ -457,9 +398,6 @@ class SpecFitAnalyzer:
 
         #         return z
 
-    from scipy import sparse
-    from scipy.sparse.linalg import spsolve, splu
-    import numpy as np
 
     def arpls(self, lam=1e4, ratio=0.05, itermax=100, __plot__=True):
         r"""
