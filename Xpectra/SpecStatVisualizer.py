@@ -476,8 +476,6 @@ def plot_baseline_fitting_bokeh(wavelength_values,
 
 
 
-
-
 def plot_fitted_spectrum_bokeh(wavelength_values, 
                                signal_values,
                                fitted_params,
@@ -495,6 +493,8 @@ def plot_fitted_spectrum_bokeh(wavelength_values,
         Signal arrays (input data). 
     fitted_params : list
         List of fitted parameters of the line profile.
+    wavelength_range : list-like, optional
+        List-like object (list, tuple, or np.ndarray) with of length 2 representing wavelength range for plotting.
     line_profile : str, {'gaussian', 'lorentzian', 'voigt'}, optional
         Type of line profile to use for fitting. Default is 'gaussian'.
     """
@@ -587,6 +587,105 @@ def plot_fitted_spectrum_bokeh(wavelength_values,
     # Show the plot
     output_notebook()
     show(layout)
+
+
+def plot_fitted_spectrum_seaborn(wavelength_values, 
+                               signal_values,
+                               fitted_params,
+                               wavelength_range = None,
+                               line_profile='gaussian',
+                               fitting_method='lm'):
+    """
+    Plot the original spectrum and the fitted peaks using Bokeh.
+
+    Parameters
+    ----------
+    wavelength_values : np.ndarray
+        Wavelength array in microns.
+    signal_values : np.ndarray
+        Signal arrays (input data). 
+    fitted_params : list
+        List of fitted parameters of the line profile.
+    wavelength_range : list-like, optional
+        List-like object (list, tuple, or np.ndarray) with of length 2 representing wavelength range for plotting.
+    line_profile : str, {'gaussian', 'lorentzian', 'voigt'}, optional
+        Type of line profile to use for fitting. Default is 'gaussian'.
+    """
+
+    x = wavelength_values
+    y = signal_values
+
+    # Calculate fitted y values
+    y_fitted = np.zeros_like(x)
+    for params in fitted_params:
+        if line_profile == 'gaussian':
+            center, amplitude, width = params
+            y_fitted += amplitude * np.exp(-(x - center) ** 2 / (2 * width ** 2))
+        elif line_profile == 'lorentzian':
+            center, amplitude, width = params
+            y_fitted += amplitude / (1 + ((x - center) / width) ** 2)
+        elif line_profile == 'voigt':
+            center, amplitude, wid_g, wid_l = params
+            sigma = wid_g / np.sqrt(2 * np.log(2))
+            gamma = wid_l / 2
+            z = ((x - center) + 1j * gamma) / (sigma * np.sqrt(2))
+            y_fitted += amplitude * np.real(wofz(z)).astype(float) / (sigma * np.sqrt(2 * np.pi))
+
+    # Calculate RMSE
+    rmse_value = np.sqrt(((y_fitted - y) ** 2).mean())
+
+    # Trim x and y to desired wavelength range for plotting
+    if wavelength_range is not None:
+        # Make sure range is in correct format
+        if len(wavelength_range) != 2:
+            raise ValueError('wavelength_range must be tuple, list, or array with 2 elements')
+        # Locate indices and splice
+        condition_range = (x > wavelength_range[0]) & (x < wavelength_range[1])
+        x = x[condition_range]
+        y = y[condition_range]
+        y_fitted = y_fitted[condition_range]
+
+    # Create figure
+    fig = plt.figure(figsize=(10, 6), dpi=700)
+    # Create GridSpec object
+    gs = gridspec.GridSpec(3, 1, height_ratios=[3, 1, 1])
+
+    # Create first subplot for spectrum
+    ax1 = fig.add_subplot(gs[:2,0])
+    # Plot original spectrum
+    ax1.plot(x, y, label="Original Spectrum", color="blue")
+    # Plot fitted baseline
+    ax1.plot(x, y_fitted, label=f'Fitted {line_profile.capitalize()}', color="red", linestyle="--")
+
+    ax1.set_ylabel("Signal")
+    ax1.set_title(f"Spectra with Fitted {line_profile.capitalize()} Peaks")
+
+    # Create second subplot for residual
+    ax2 = fig.add_subplot(gs[2, 0])
+    y_residual = y - y_fitted
+    # Plot residual 
+    ax2.plot(x, y_residual, 
+        label=f'Residual = (Data) - (Fitted {line_profile.capitalize()} Peaks)',
+        color='green')
+
+    ax2.set_xlabel("Wavelength [µm]")
+    ax2.set_ylabel("Residual")
+
+    # Set axes ticks, inwards
+    for ax in (ax1,ax2):
+        ax.tick_params(axis='both', which='major', direction='in', length=7, width=1.1)
+        ax.tick_params(axis='x', direction='in', top=True)
+        ax.tick_params(axis='y', direction='in', right=True)
+        ax.minorticks_on()
+        ax.tick_params(axis='both', which='minor', direction='in', length=4, width=1.1)
+        ax.tick_params(axis='x', which='minor', direction='in', top=True)
+        ax.tick_params(axis='y', which='minor', direction='in', right=True)   
+
+    ax1.legend()
+    ax2.legend()
+
+    plt.show()
+
 
 
 
