@@ -213,6 +213,7 @@ class SpecFitAnalyzer:
         self.fitted_baseline_params = p.convert().coef
         self.baseline_type = 'polynomial'
         self.baseline_degree = degree
+        self.y_baseline_corrected = y - p(x)
 
         if __plot_bokeh__:
             plot_baseline_fitting_bokeh(self.wavelength_values, self.signal_values, 
@@ -264,7 +265,8 @@ class SpecFitAnalyzer:
         params, _ = curve_fit(sine_wave, x, y, p0=initial_guesses, maxfev=1000000)
         self.fitted_baseline_params = params
         self.baseline_type = 'sinusoidal'
-        
+        self.y_baseline_corrected = y - sine_wave(x,*params)
+
         if __plot_seaborn__:
             plot_baseline_fitting_seaborn(self.wavelength_values, self.signal_values, 
                 self.baseline_type, self.fitted_baseline_params)
@@ -307,6 +309,7 @@ class SpecFitAnalyzer:
         spline = UnivariateSpline(x, y, s=s)
         self.fitted_baseline_params = spline
         self.baseline_type = 'spline'
+        self.y_baseline_corrected = y - spline(x)
 
         if __plot_seaborn__:
             plot_baseline_fitting_seaborn(self.wavelength_values, self.signal_values, 
@@ -457,7 +460,7 @@ class SpecFitAnalyzer:
         """
         x = self.wavelength_values
         y = self.signal_values
-        
+
         N = len(y)
         D = sparse.eye(N, format='csc')
         D = D[1:] - D[:-1]  # numpy.diff( ,2) does not work with sparse matrix. This is a workaround.
