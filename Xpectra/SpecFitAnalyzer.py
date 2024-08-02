@@ -97,7 +97,8 @@ class SpecFitAnalyzer:
                      line_profile='gaussian',
                      fitting_method='lm',
                      wavelength_range=None,
-                     __plot__=True,
+                     __plot_bokeh__=True,
+                     __plot_seaborn__=False,
                      __print__=True):
         """
         Fit a spectrum with multiple peaks using specified line profiles (gaussian, lorentzian, voigt).
@@ -110,7 +111,9 @@ class SpecFitAnalyzer:
             Type of line profile to use for fitting. Default is 'gaussian'.
         wavelength_range : list-like, optional
             List-like object (list, tuple, or np.ndarray) with of length 2 representing wavelength range for plotting.
-        __plot__ : bool
+        __plot_bokeh__ : bool
+            True or False.
+        __plot_seaborn__ : bool
             True or False.
         __print__ : bool
             True or False.
@@ -145,8 +148,14 @@ class SpecFitAnalyzer:
         self.covariance_matrices = covariance_matrices
         # FIND ME
 
-        if __plot__ == True:
+        if __plot_bokeh__ == True:
             plot_fitted_spectrum_bokeh(x,y,fitted_params,
+                wavelength_range = wavelength_range, 
+                line_profile=line_profile,
+                fitting_method=fitting_method)
+        
+        if __plot_seaborn__ == True:
+            plot_fitted_spectrum_seaborn(x,y,fitted_params,
                 wavelength_range = wavelength_range, 
                 line_profile=line_profile,
                 fitting_method=fitting_method)
@@ -205,7 +214,12 @@ class SpecFitAnalyzer:
         self.baseline_type = 'polynomial'
         self.baseline_degree = degree
 
-        if __plot__:
+        if __plot_bokeh__:
+            plot_baseline_fitting_bokeh(self.wavelength_values, self.signal_values, 
+                self.baseline_type, self.fitted_baseline_params, 
+                baseline_degree=self.baseline_degree)
+
+        if __plot_seaborn__:
             plot_baseline_fitting_seaborn(self.wavelength_values, self.signal_values, 
                 self.baseline_type, self.fitted_baseline_params, 
                 baseline_degree=self.baseline_degree)
