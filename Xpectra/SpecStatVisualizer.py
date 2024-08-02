@@ -499,6 +499,105 @@ def plot_baseline_fitting_bokeh(wavelength_values,
     output_notebook()
     show(layout)
 
+def plot_fitted_als_bokeh(wavelength_values, 
+                          signal_values,
+                          fitted_baseline,
+                          baseline_type = 'als'
+                          ):
+
+    """
+    Plot the original spectrum and the fitted baseline using Bokeh.
+
+    Parameters
+    ----------
+    wavelength_values : np.ndarray
+        Wavelength array in microns.
+    signal_values : np.ndarray
+        Signal arrays (input data). 
+    fitted_baseline : np.ndarray
+        Fitted baseline using baseline_type. 
+    baseline_type : str, {'als', 'arpls'}
+        Function type of fitted baseline.
+
+    """
+    x = wavelength_values
+    y = signal_values
+    y_baseline = fitted_baseline
+    y_baseline_corrected = y - y_baseline
+
+    # Create a shared range object for consistent zoom
+    x_min,x_max = np.min(x),np.max(x)
+    x_padding = (x_max-x_min) * 0.05
+    x_range = Range1d(start=x_min-x_padding, end=x_max+x_padding)
+
+    # Create ColumnDataSource
+    source_p1 = ColumnDataSource(data=dict(x=x, y=y, y_baseline=y_baseline))
+    source_p2 = ColumnDataSource(data=dict(x=x, y_baseline_corrected=y_baseline_corrected))
+
+    # Create the figure
+    p1 = figure(title=f"Spectra with Fitted {baseline_type.upper()} Baseline",
+               #x_axis_label="Wavelength [𝜇m]",
+               y_axis_label="Signal",
+               width=800, height=350,
+               x_range=x_range, 
+               y_axis_type="linear",
+               tools="pan,wheel_zoom,box_zoom,reset")
+    
+    # Add line plot
+    p1.line('x', 'y', line_width=1.5, line_color='blue', alpha=0.8,
+        legend_label="Original Spectrum", source=source_p1)
+
+    # Add line plot
+    p1.line('x', 'y_baseline', line_width=2.5, line_color='red', line_dash='dashed', 
+        legend_label=f'Fitted {baseline_type.upper()} Baseline', source=source_p1)  
+
+    # Create lower plot
+    p2 = figure(title=' ',
+               x_axis_label="Wavelength [𝜇m]",
+               y_axis_label="Baseline-Corrected Signal",
+               width=800, height=350,
+               x_range=x_range, 
+               y_axis_type="linear",
+               tools="pan,wheel_zoom,box_zoom,reset")
+   
+   # Add line plot
+    p2.line('x', 'y_baseline_corrected', line_width=1.5, line_color='green',
+        legend_label=f"Baseline correction with {baseline_type.upper()}",
+        source=source_p2)  
+
+    # Add line plot
+    p2.line(x, np.zeros_like(x), line_width=2.5, line_color='red', line_dash='dashed', 
+        legend_label='Zero point')   
+    
+    for p in (p1,p2):
+        # Increase size of x and y ticks
+        p.title.text_font_size = '14pt'
+        p.xaxis.major_label_text_font_size = '14pt'
+        p.xaxis.axis_label_text_font_size = '14pt'
+        p.yaxis.major_label_text_font_size = '14pt'
+        p.yaxis.axis_label_text_font_size = '14pt'
+
+    # Add HoverTool
+    hover_p1 = HoverTool()
+    hover_p1.tooltips = [
+        ("Wavelength [𝜇m]", "@x{0.000}"),
+        ("Intensity", "@y{0.000}"),
+        (f"Fitted {baseline_type.upper()} Baseline", "@y_baseline{0.000}"),
+    ]
+    hover_p2 = HoverTool()
+    hover_p2.tooltips = [
+        ("Wavelength [𝜇m]", "@x{0.000}"),
+        ("Baseline-Corrected Intensity", "@y_baseline_corrected{0.000}"),
+    ]
+    p1.add_tools(hover_p1)
+    p2.add_tools(hover_p2)
+
+    # Combine plots into a column
+    layout = column(p1, p2)
+
+    # Show the plot
+    output_notebook()
+    show(layout)
 
 
 def plot_fitted_spectrum_bokeh(wavelength_values, 

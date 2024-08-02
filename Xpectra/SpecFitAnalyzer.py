@@ -372,43 +372,48 @@ class SpecFitAnalyzer:
             z = spsolve(Z, w * y)
             w = p * (y > z) + (1 - p) * (y < z)
 
+        self.y_baseline_corrected = y - z
+
         if __plot__:
-            # Create a new plot with a title and axis labels
-            p = figure(title="Raman Spectrum",
-                       x_axis_label="Wavenumber (cm^-1)",
-                       y_axis_label="Intensity",
-                       width=800, height=400)
 
-            # Add the original spectrum to the plot
-            original_spectrum = p.line(x, y, legend_label="Original Spectrum", line_width=2, color="blue")
+            plot_fitted_als_bokeh(x, y, z, baseline_type = 'als')
 
-            # Add the baseline corrected spectrum to the plot
-            corrected_spectrum = p.line(x, z, legend_label="Baseline correction with ALS", line_width=2, color="red")
+            # # Create a new plot with a title and axis labels
+            # p = figure(title="Raman Spectrum",
+            #            x_axis_label="Wavenumber (cm^-1)",
+            #            y_axis_label="Intensity",
+            #            width=800, height=400)
 
-            p.line(x, y - z, legend_label="Baseline correction with ALS", line_width=2, color="black")
+            # # Add the original spectrum to the plot
+            # original_spectrum = p.line(x, y, legend_label="Original Spectrum", line_width=2, color="blue")
 
-            # Add HoverTool
-            hover = HoverTool()
-            hover.tooltips = [
-                ("Wavenumber (cm^-1)", "@x"),
-                ("Original Intensity", "@y"),
-                ("Corrected Intensity", "@z"),
-                ("Baseline Corrected Intensity", "@corrected_y")
-            ]
-            p.add_tools(hover)
+            # # Add the baseline corrected spectrum to the plot
+            # corrected_spectrum = p.line(x, z, legend_label="Baseline correction with ALS", line_width=2, color="red")
 
-            # Add HoverTool
-            hover = HoverTool()
-            hover.tooltips = [
-                ("Wavenumber (cm^-1)", "@x{0.0000}"),
-                ("Original Intensity", "@y{0.0000}"),
-                ("Corrected Intensity", "@z{0.00}"),
-                ("Baseline Corrected Intensity", "@corrected_y")
-            ]
-            p.add_tools(hover)
+            # p.line(x, y - z, legend_label="Baseline correction with ALS", line_width=2, color="black")
 
-            # Show the results
-            show(p)
+            # # Add HoverTool
+            # hover = HoverTool()
+            # hover.tooltips = [
+            #     ("Wavenumber (cm^-1)", "@x"),
+            #     ("Original Intensity", "@y"),
+            #     ("Corrected Intensity", "@z"),
+            #     ("Baseline Corrected Intensity", "@corrected_y")
+            # ]
+            # p.add_tools(hover)
+
+            # # Add HoverTool
+            # hover = HoverTool()
+            # hover.tooltips = [
+            #     ("Wavenumber (cm^-1)", "@x{0.0000}"),
+            #     ("Original Intensity", "@y{0.0000}"),
+            #     ("Corrected Intensity", "@z{0.00}"),
+            #     ("Baseline Corrected Intensity", "@corrected_y")
+            # ]
+            # p.add_tools(hover)
+
+            # # Show the results
+            # show(p)
 
         #         return z
 
@@ -450,7 +455,9 @@ class SpecFitAnalyzer:
             the fitted background vector
 
         """
+        x = self.wavelength_values
         y = self.signal_values
+        
         N = len(y)
         D = sparse.eye(N, format='csc')
         D = D[1:] - D[:-1]  # numpy.diff( ,2) does not work with sparse matrix. This is a workaround.
@@ -475,31 +482,33 @@ class SpecFitAnalyzer:
         self.y_baseline_corrected = y - z
 
         if __plot__:
-            # Create a new plot with a title and axis labels
-            p = figure(title="Laser Spectrum",
-                       x_axis_label="Wavenumber (cm^-1)",
-                       y_axis_label="Intensity",
-                       width=800, height=400)
 
-            # Add the original spectrum to the plot
-            original_spectrum = p.line(self.wavelength_values, y, legend_label="Original Spectrum", line_width=2, color="blue")
+            plot_fitted_als_bokeh(x, y, z, baseline_type = 'arpls')
+            # # Create a new plot with a title and axis labels
+            # p = figure(title="Laser Spectrum",
+            #            x_axis_label="Wavenumber (cm^-1)",
+            #            y_axis_label="Intensity",
+            #            width=800, height=400)
 
-            # Add the baseline corrected spectrum to the plot
-            corrected_spectrum = p.line(self.wavelength_values, z, legend_label="Baseline correction with ARPLS", line_width=2, color="red")
+            # # Add the original spectrum to the plot
+            # original_spectrum = p.line(self.wavelength_values, y, legend_label="Original Spectrum", line_width=2, color="blue")
 
-            p.line(self.wavelength_values, y - z, legend_label="Baseline correction with ARPLS", line_width=2, color="black")
-            # Show the results
+            # # Add the baseline corrected spectrum to the plot
+            # corrected_spectrum = p.line(self.wavelength_values, z, legend_label="Baseline correction with ARPLS", line_width=2, color="red")
 
-            # Add HoverTool
-            hover = HoverTool()
-            hover.tooltips = [
-                ("Wavenumber (cm^-1)", "@x{0.0000}"),
-                ("Original Intensity", "@y{0.0000}"),
-                ("Corrected Intensity", "@z{0.00}"),
-                ("Baseline Corrected Intensity", "@corrected_y")
-            ]
-            p.add_tools(hover)
+            # p.line(self.wavelength_values, y - z, legend_label="Baseline correction with ARPLS", line_width=2, color="black")
+            # # Show the results
 
-            show(p)
+            # # Add HoverTool
+            # hover = HoverTool()
+            # hover.tooltips = [
+            #     ("Wavenumber (cm^-1)", "@x{0.0000}"),
+            #     ("Original Intensity", "@y{0.0000}"),
+            #     ("Corrected Intensity", "@z{0.00}"),
+            #     ("Baseline Corrected Intensity", "@corrected_y")
+            # ]
+            # p.add_tools(hover)
+
+            # show(p)
 
         #         return z
