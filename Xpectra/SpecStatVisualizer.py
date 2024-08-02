@@ -440,12 +440,17 @@ def plot_baseline_fitting_bokeh(wavelength_values,
     else:
         raise ValueError(f"Invalid baseline_type '{baseline_type}'. Expected {{'polynomial', 'sinusoidal', 'spline'}}")
 
+    
+    y_baseline_corrected = y - y_baseline
+
+    # Create ColumnDataSource
+    source_p1 = ColumnDataSource(data=dict(x=x, y=y, y_baseline=y_baseline))
+    source_p2 = ColumnDataSource(data=dict(x=x, y_baseline_corrected=y_baseline_corrected))
+
     # Create a shared range object for consistent zoom
-    x_min,x_max,y_min,y_max = np.min(x),np.max(x),np.min(y),np.max(y)
+    x_min,x_max = np.min(x),np.max(x)
     x_padding = (x_max-x_min) * 0.05
-    y_padding = (y_max-y_min) * 0.05
     x_range = Range1d(start=x_min-x_padding, end=x_max+x_padding)
-    y_range = Range1d(start=y_min-y_padding, end=y_max+y_padding)
 
     # Create the figure
     p1 = figure(title=f"Spectra with Fitted {baseline_type.capitalize()} Baseline",
@@ -453,17 +458,16 @@ def plot_baseline_fitting_bokeh(wavelength_values,
                y_axis_label="Signal",
                width=800, height=350,
                x_range=x_range, 
-               y_range=y_range,
                y_axis_type="linear",
                tools="pan,wheel_zoom,box_zoom,reset")
 
     # Add line plot
-    p1.line(x, y, line_width=1.5, line_color='blue', alpha=0.8,
-        legend_label="Original Spectrum")
+    p1.line('x', 'y', line_width=1.5, line_color='blue', alpha=0.8,
+        legend_label="Original Spectrum", source = source_p1)
 
     # Add line plot
-    p1.line(x, y_baseline, line_width=2.5, line_color='red', line_dash='dashed', 
-        legend_label=baseline_label)    
+    p1.line('x', 'y_baseline', line_width=2.5, line_color='red', line_dash='dashed', 
+        legend_label=baseline_label, source = source_p1)    
 
     # Create lower plot
     p2 = figure(title=' ',
@@ -471,14 +475,13 @@ def plot_baseline_fitting_bokeh(wavelength_values,
                y_axis_label="Baseline-Corrected Signal",
                width=800, height=350,
                x_range=x_range, 
-               y_range=y_range,
                y_axis_type="linear",
                tools="pan,wheel_zoom,box_zoom,reset")
 
     # Add line plot
-    residual = y - y_baseline
-    p2.line(x, residual, line_width=1.5, line_color='green',
-        legend_label=f'[Data] - [Fitted {baseline_type.capitalize()} Baseline]')  
+    p2.line('x', 'y_baseline_corrected', line_width=1.5, line_color='green',
+        legend_label=f'[Data] - [Fitted {baseline_type.capitalize()} Baseline]',
+        source = source_p2)  
 
     # Add line plot
     p2.line(x, np.zeros_like(x), line_width=2.5, line_color='red', line_dash='dashed', 
@@ -491,6 +494,21 @@ def plot_baseline_fitting_bokeh(wavelength_values,
         p.xaxis.axis_label_text_font_size = '14pt'
         p.yaxis.major_label_text_font_size = '14pt'
         p.yaxis.axis_label_text_font_size = '14pt'
+
+    # Add HoverTool
+    hover_p1 = HoverTool()
+    hover_p1.tooltips = [
+        ("Wavelength [𝜇m]", "@x{0.000}"),
+        ("Intensity", "@y{0.000}"),
+        (f"Fitted {baseline_type.capitalize()} Baseline", "@y_baseline{0.000}"),
+    ]
+    hover_p2 = HoverTool()
+    hover_p2.tooltips = [
+        ("Wavelength [𝜇m]", "@x{0.000}"),
+        ("Baseline-Corrected Intensity", "@y_baseline_corrected{0.000}"),
+    ]
+    p1.add_tools(hover_p1)
+    p2.add_tools(hover_p2)
 
     # Combine plots into a column
     layout = column(p1, p2)
