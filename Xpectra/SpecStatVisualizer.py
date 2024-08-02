@@ -28,7 +28,7 @@ from matplotlib.ticker import AutoMinorLocator, MaxNLocator
 from matplotlib import rcParams
 
 from bokeh.plotting import output_notebook, figure, show
-from bokeh.models import HoverTool, ColumnDataSource
+from bokeh.models import HoverTool, ColumnDataSource, Range1d
 from bokeh.layouts import column
 
 import numpy as np
@@ -361,26 +361,36 @@ def plot_baseline_fitting_seaborn(wavelength_values,
         raise ValueError(f"Invalid baseline_type '{baseline_type}'. Expected {{'polynomial', 'sinusoidal', 'spline'}}")
 
     # Create figure
-    fig = plt.figure(figsize=(10, 6), dpi=700)
+    fig = plt.figure(figsize=(8, 6), dpi=700)
     # Create GridSpec object
-    gs = gridspec.GridSpec(3, 1, height_ratios=[3, 1, 1])
+    gs = gridspec.GridSpec(2, 1, height_ratios=[1, 1])
     # Create first subplot for spectrum
-    ax1 = fig.add_subplot(gs[:2,0])
+    ax1 = fig.add_subplot(gs[0,0])
     # Plot original spectrum
-    ax1.plot(x, y, label="Original Spectrum", color="blue")
+    ax1.plot(x, y, label="Original Spectrum", color="blue",lw=0.9,alpha=0.8)
     # Plot fitted baseline
     ax1.plot(x, y_baseline, label=label, color="red", linestyle="--")
     # Create second subplot for residual
-    ax2 = fig.add_subplot(gs[2, 0])
+    ax2 = fig.add_subplot(gs[1, 0])
     y_residual = y - y_baseline
     # Plot residual 
     ax2.plot(x, y_residual, 
-        label=f'Residual = (Data) - (Fitted {baseline_type.capitalize()} Baseline)',
-        color='green')
+        label=f'[Data] - [Fitted {baseline_type.capitalize()} Baseline]',
+        color='green', lw=0.9, alpha=0.8)
+    # Plot zero-point
+    ax2.plot(x, np.zeros_like(x), label='Zero point', color="red",linestyle="--")
+
+    for ax in (ax1,ax2):
+        # Turn on grid lines with transparency
+        ax.grid(True, alpha=0.5)
+        # Set axes ticks, inwards
+        ax.tick_params(axis='both', which='major', direction='in', length=6, width=1)
+        ax.minorticks_on()
+        ax.tick_params(axis='both', which='minor', direction='in', length=3.5, width=1)  
 
     ax1.set_ylabel("Signal")
     ax2.set_xlabel("Wavelength [µm]")
-    ax2.set_ylabel("Adjusted Signal")
+    ax2.set_ylabel("Baseline-Corrected Signal")
 
     ax1.set_title(f"Spectra with Fitted {baseline_type.capitalize()} Baseline")
     
@@ -430,11 +440,20 @@ def plot_baseline_fitting_bokeh(wavelength_values,
     else:
         raise ValueError(f"Invalid baseline_type '{baseline_type}'. Expected {{'polynomial', 'sinusoidal', 'spline'}}")
 
+    # Create a shared range object for consistent zoom
+    x_min,x_max,y_min,y_max = np.min(x),np.max(x),np.min(y),np.max(y)
+    x_padding = (x_max-x_min) * 0.05
+    y_padding = (y_max-y_min) * 0.05
+    x_range = Range1d(start=x_min-x_padding, end=x_max+x_padding)
+    y_range = Range1d(start=y_min-y_padding, end=y_max+y_padding)
+
     # Create the figure
     p1 = figure(title=f"Spectra with Fitted {baseline_type.capitalize()} Baseline",
                #x_axis_label="Wavelength [𝜇m]",
                y_axis_label="Signal",
-               width=800, height=500,
+               width=800, height=350,
+               x_range=x_range, 
+               y_range=y_range,
                y_axis_type="linear",
                tools="pan,wheel_zoom,box_zoom,reset")
 
@@ -443,24 +462,30 @@ def plot_baseline_fitting_bokeh(wavelength_values,
         legend_label="Original Spectrum")
 
     # Add line plot
-    p1.line(x, y_baseline, line_width=3, line_color='red', line_dash='dashed', 
+    p1.line(x, y_baseline, line_width=2.5, line_color='red', line_dash='dashed', 
         legend_label=baseline_label)    
 
     # Create lower plot
     p2 = figure(title=' ',
                x_axis_label="Wavelength [𝜇m]",
-               y_axis_label="Adjusted Signal",
-               width=800, height=200,
+               y_axis_label="Baseline-Corrected Signal",
+               width=800, height=350,
+               x_range=x_range, 
+               y_range=y_range,
                y_axis_type="linear",
                tools="pan,wheel_zoom,box_zoom,reset")
 
     # Add line plot
     residual = y - y_baseline
     p2.line(x, residual, line_width=1.5, line_color='green',
-        legend_label=f'Residual = (Data) - (Fitted {baseline_type.capitalize()} Baseline)')  
+        legend_label=f'[Data] - [Fitted {baseline_type.capitalize()} Baseline]')  
 
-    # Increase size of x and y ticks
+    # Add line plot
+    p2.line(x, np.zeros_like(x), line_width=2.5, line_color='red', line_dash='dashed', 
+        legend_label='Zero point')   
+    
     for p in (p1,p2):
+        # Increase size of x and y ticks
         p.title.text_font_size = '14pt'
         p.xaxis.major_label_text_font_size = '14pt'
         p.xaxis.axis_label_text_font_size = '14pt'
