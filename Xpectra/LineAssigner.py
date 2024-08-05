@@ -32,6 +32,101 @@ from bokeh.models import CustomJS, ColumnDataSource, TapTool, Div,HoverTool
 from bokeh.layouts import column
 
 
+
+def parse_line(line, columns):
+    """
+    Parse a single line of data according to the specified columns.
+    
+    Parameters
+    ----------
+    line : str
+        Line of text to parse.
+    columns : dict
+        Dictionary defining column names, positions, data types, and format specifiers.
+        
+    Returns
+    -------
+    parsed_data : dict
+        Dictionary where keys are column names and values are parsed data.
+    """
+    parsed_data = {}
+    
+    for key, (start, end, data_type, format_specifier) in columns.items():
+        value_str = line[start:end].strip()
+        try:
+            if data_type == int:
+                parsed_data[key] = int(value_str)
+            elif data_type == float:
+                parsed_data[key] = float(value_str)
+            else:
+                parsed_data[key] = value_str
+        except ValueError:
+            parsed_data[key] = None
+    
+    return parsed_data
+
+
+def parse_file_to_dataframe(input_file, selected_columns):
+    """
+    Parse an input file into a pandas DataFrame based on specified columns.
+    
+    Parameters
+    ----------
+    input_file : str
+        Path to the input file to parse.
+    selected_columns : list
+        List of column names to select from the input file.
+        
+    Returns
+    -------
+    df : pandas.DataFrame
+        DataFrame containing parsed data from the input file.
+    """
+    # Define the formats and the ranges for the columns
+    columns = {
+        'molec_id': (0, 2, int, "%2d"),
+        'local_iso_id': (2, 3, int, "%1d"),
+        'nu': (3, 15, float, "%12.6f"),
+        'sw': (15, 25, float, "%10.3e"),
+        'a': (25, 35, float, "%10.3e"),
+        'gamma_air': (35, 40, float, "%5.4f"),
+        'gamma_self': (40, 45, float, "%5.3f"),
+        'elower': (45, 55, float, "%10.4f"),
+        'n_air': (55, 59, float, "%4.2f"),
+        'delta_air': (59, 67, float, "%8.6f"),
+        'global_upper_quanta': (67, 82, str, "%15s"),
+        'global_lower_quanta': (82, 97, str, "%15s"),
+        'local_upper_quanta': (97, 112, str, "%15s"),
+        'local_lower_quanta': (112, 127, str, "%15s"),
+        'ierr': (127, 128, int, "%1d"),
+        'iref': (128, 130, int, "%2d"),
+        'line_mixing_flag': (130, 131, str, "%1s"),
+        'gp': (131, 138, float, "%7.1f"),
+        'gpp': (138, 145, float, "%7.1f")
+    }
+
+    # Filter columns based on selected_columns
+    columns_to_use = {key: columns[key] for key in selected_columns}
+
+    parsed_data_list = []  # Initialize an empty list to store parsed data dictionaries
+    
+    with open(input_file, 'r') as infile:
+        for line in infile:
+            data = parse_line(line, columns_to_use)
+            parsed_data_list.append(data)  # Append each parsed line dictionary to the list
+    
+    df = pd.DataFrame(parsed_data_list)  # Convert list of dictionaries to DataFrame
+    return df
+
+
+
+
+
+
+
+
+
+
 def click_and_print(wavelength_values,
                     signal_values,
                     wavelength_range = None,
@@ -42,7 +137,7 @@ def click_and_print(wavelength_values,
                     data_type='x_y_yerr',
                     plot_type='scatter'):
     """
-    Plot the spectra with error bars using Bokeh.
+    Click and print spectral peaks on plotted spectra with error bars using Bokeh.
 
     Parameters
     ----------
