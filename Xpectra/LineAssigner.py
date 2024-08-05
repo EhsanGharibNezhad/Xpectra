@@ -119,6 +119,47 @@ def parse_file_to_dataframe(input_file, selected_columns):
     return df
 
 
+def parse_hitran_description(hitran_description):
+    """
+    Parse HITRAN data description and extract column information.
+
+    Parameters
+    ----------
+    hitran_description : str
+        description of HITRAN data fields.
+
+    Returns
+    -------
+    df : pandas.DataFrame 
+        DataFrame containing column name, format specifier, units, and description.
+    """
+    lines = hitran_description.strip().split('\n\n')
+    data = []
+    
+    for line in lines:
+        name = line.split('\n')[0].strip()
+        format_specifier = None
+        units = None
+        description = None
+        
+        for subline in line.split('\n')[1:]:
+            if 'C-style format specifier:' in subline:
+                format_specifier = subline.split(': ')[1].strip()
+            elif 'Units:' in subline:
+                units = subline.split(': ')[1].strip()
+            elif 'Description:' in subline:
+                description = subline.split(': ')[1].strip()
+        
+        data.append({
+            'Column Name': name,
+            'Format Specifier': format_specifier,
+            'Units': units,
+            'Description': description
+        })
+    
+    df = pd.DataFrame(data) 
+    return df
+
 
 
 
