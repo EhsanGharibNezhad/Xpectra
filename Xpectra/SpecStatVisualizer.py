@@ -302,7 +302,7 @@ def plot_spectra_errorbar_seaborn(wavelength_values,
 
         ax1.errorbar(x_obs, y_obs, yerr=[y_obs - lower, upper - y_obs], fmt='none', ecolor='gray', alpha=0.7)
 
-    ax1.set_xlabel("Wavenumber [cm$^{-1}$]", fontsize=12)
+    ax1.set_xlabel("Wavelength [μm]", fontsize=12)
     ax1.set_ylabel(y_label, fontsize=12)
     ax1.set_title(f"{molecule_name}: Calibrated Laboratory Spectra" if title_label is None else title_label,
                   fontsize=14)
@@ -314,8 +314,8 @@ def plot_spectra_errorbar_seaborn(wavelength_values,
     x_transformed = 10 ** 4 / x_obs
     ax2.set_xlim(ax1.get_xlim())
     ax2.set_xticks(ax1.get_xticks())
-    ax2.set_xticklabels([f'{10 ** 4 / tick:.2f}' for tick in ax1.get_xticks()])
-    ax2.set_xlabel("Wavelength [μm]", fontsize=12)
+    ax2.set_xticklabels([f'{10 ** 4 / tick:.3f}' for tick in ax1.get_xticks()])
+    ax2.set_xlabel("Wavenumber [cm$^{-1}$]", fontsize=12)
     plt.tight_layout()
     plt.show()
 
@@ -829,7 +829,51 @@ def plot_fitted_spectrum_seaborn(wavelength_values,
     plt.show()
 
 
+def plot_assigned_lines_seaborn(wavelength_values, 
+                                signal_values, 
+                                line_positions, 
+                                local_upper_quanta):
+    """
+    Plot the original spectrum and the assigned lines using Seaborn.
 
+    Parameters
+    ----------
+    wavelength_values : np.ndarray
+        Wavelength array in microns.
+    signal_values : np.ndarray
+        Signal arrays (input data). 
+    line_positions : np.ndarray
+        Array of the positions of assigned spectral lines.
+    local_upper_quanta : np.ndarray
+        Array of the quantum assignments corresponding to line positions. 
+
+    """
+    # Create figure
+    fig, ax = plt.subplots(figsize=(8, 6),dpi=700)
+    
+    # Plot spectrum
+    ax.plot(wavelength_values,signal_values,color='k',alpha=0.8,label='Spectrum')
+    
+    # Plot assigned HITRAN lines
+    for q in range(len(local_upper_quanta)):
+        ax.axvline(x=line_positions[q],color='r',linestyle='--')
+        
+        # Text label 
+        y_half = (np.max(signal_values)-np.min(signal_values))/2
+        ax.text(line_positions[q], y_half, str(local_upper_quanta[q]))  
+
+    ax.set_xlabel("Wavelength [μm]", fontsize=12)
+    ax.set_ylabel("Intensity", fontsize=12)
+    ax.legend()
+    
+    # Turn on grid lines with transparency
+    ax.grid(True, alpha=0.5)
+    # Set axes ticks, inwards
+    ax.tick_params(axis='both', which='major', direction='in', length=6, width=1)
+    ax.minorticks_on()
+    ax.tick_params(axis='both', which='minor', direction='in', length=3.5, width=1)
+    
+    plt.show()
 
 
 
