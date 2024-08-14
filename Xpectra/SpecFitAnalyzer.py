@@ -68,19 +68,19 @@ class SpecFitAnalyzer:
         self.absorber_name = absorber_name
 
 
-    def gaussian(self, x, center, amplitude, width):
+    def gaussian(self, x: np.ndarray, center: float, amplitude: float, width: float) -> np.ndarray:
         """
         Gaussian function.
         """
         return amplitude * np.exp(-(x - center) ** 2 / (2 * width ** 2))
 
-    def lorentzian(self, x, center, amplitude, width):
+    def lorentzian(self, x: np.ndarray, center: float, amplitude: float, width: float) -> np.ndarray:
         """
         Lorentzian function.
         """
         return amplitude / (1 + ((x - center) / width) ** 2)
 
-    def voigt(self, x, center, amplitude, wid_g, wid_l):
+    def voigt(self, x: np.ndarray, center: float, amplitude: float, wid_g: float, wid_l: float) -> np.ndarray:
         """
         Voigt profile function.
         """
@@ -90,19 +90,20 @@ class SpecFitAnalyzer:
         return amplitude * np.real(wofz(z)).astype(float) / (sigma * np.sqrt(2 * np.pi))
 
     def fit_spectrum(self,
-                     initial_guesses,
-                     line_profile='gaussian',
-                     fitting_method='lm',
-                     wavelength_range=None,
-                     __plot_bokeh__=True,
-                     __plot_seaborn__=False,
-                     __print__=True):
+                     initial_guesses: Union[list, np.ndarray],
+                     line_profile: str = 'gaussian',
+                     fitting_method: str = 'lm',
+                     wavelength_range: Union[list, tuple, np.ndarray] = None,
+                     __plot_bokeh__: bool = True,
+                     __plot_seaborn__: bool = False,
+                     __print__: bool = True
+                     ) -> None:
         """
         Fit a spectrum with multiple peaks using specified line profiles (gaussian, lorentzian, voigt).
 
         Parameters
         ----------
-        initial_guesses : list
+        initial_guesses : list or np.ndarray
             List of initial guesses for parameters of the line profile.
         line_profile : str, {'gaussian', 'lorentzian', 'voigt'}, optional
             Type of line profile to use for fitting. Default is 'gaussian'.
@@ -190,10 +191,11 @@ class SpecFitAnalyzer:
 
 
     def fit_polynomial_baseline(self, 
-                                degree,
-                                __plot_seaborn__ = False,
-                                __plot_bokeh__ = False,
-                                __print__ = False):
+                                degree: int,
+                                __plot_seaborn__: bool = False,
+                                __plot_bokeh__: bool = False,
+                                __print__: bool = False
+                                ) -> np.ndarray:
         """
         Fit a polynomial baseline to the spectrum using least squares.
 
@@ -241,10 +243,11 @@ class SpecFitAnalyzer:
 
 
     def fit_sinusoidal_baseline(self, 
-                                initial_guesses,
-                                __plot_seaborn__ = False,
-                                __plot_bokeh__ = False,
-                                __print__ = False):
+                                initial_guesses: list,
+                                __plot_seaborn__: bool = False,
+                                __plot_bokeh__: bool = False,
+                                __print__: bool = False
+                                ) -> np.ndarray:
         """
         Fit a sinusoidal baseline to the spectrum.
 
@@ -291,9 +294,10 @@ class SpecFitAnalyzer:
 
 
     def fit_spline_baseline(self, 
-                            s=None, 
-                            __plot_seaborn__ = False,
-                            __plot_bokeh__ = False):
+                            s: float = None, 
+                            __plot_seaborn__: bool = False,
+                            __plot_bokeh__: bool = False
+                            ) -> UnivariateSpline:
         """
         Fit a spline baseline to the spectrum.
 
@@ -329,7 +333,13 @@ class SpecFitAnalyzer:
         return spline
 
 
-    def als(self, lam=1e6, p=0.1, itermax=10, __plot__=True):
+    def als(self, 
+            lam: float = 1e6, 
+            p: float = 0.1, 
+            itermax: int = 10, 
+            __plot__: bool = True
+            ) -> None:
+
         r"""
         Implements an Asymmetric Least Squares Smoothing
         baseline correction algorithm (P. Eilers, H. Boelens 2005)
@@ -390,7 +400,13 @@ class SpecFitAnalyzer:
             plot_fitted_als_bokeh(x, y, z, baseline_type = 'als')
 
 
-    def arpls(self, lam=1e4, ratio=0.05, itermax=100, __plot__=True):
+    def arpls(self, 
+              lam: float = 1e4, 
+              ratio: float = 0.05, 
+              itermax: int = 100, 
+              __plot__: bool = True
+              ) -> None:
+
         r"""
         Baseline correction using asymmetrically
         reweighted penalized least squares smoothing
