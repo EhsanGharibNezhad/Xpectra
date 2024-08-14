@@ -21,6 +21,8 @@ from matplotlib.ticker import AutoMinorLocator
 
 import pprint
 
+from typing import List, Union, Any
+
 # ******* Data Visulaization Libraries ****************************
 import seaborn as sns
 import matplotlib.pyplot as plt
@@ -39,7 +41,7 @@ import matplotlib.gridspec as gridspec
 from matplotlib.ticker import MaxNLocator
 
 
-def print_results_fun(targets, print_title=None):
+def print_results_fun(targets: Any, print_title: str = None) -> None:
     """
     Print the outputs in a pretty format using the pprint library.
 
@@ -62,7 +64,9 @@ def print_results_fun(targets, print_title=None):
     print('*' * 30 + '\n')
 
 
-def print_fitted_parameters(fitted_params, covariance_matrices):
+def print_fitted_parameters(fitted_params: np.ndarray, 
+                            covariance_matrices: np.ndarray
+                            ) -> None:
     """
     Print the fitted parameters and their errors for each peak as a dataframe.
 
@@ -98,7 +102,9 @@ def print_fitted_parameters(fitted_params, covariance_matrices):
             print(f"    {param}: {values['value']} ± {values['error']}")
 
 
-def print_fitted_parameters_df(fitted_params, covariance_matrices):
+def print_fitted_parameters_df(fitted_params: np.ndarray, 
+                               covariance_matrices: np.ndarray
+                               ) -> None:
     """
     Print the fitted parameters and their errors for each peak.
 
@@ -133,27 +139,28 @@ def print_fitted_parameters_df(fitted_params, covariance_matrices):
     display(df)
 
 
-def plot_spectra_errorbar_bokeh(wavelength_values,
-                                signal_values,
-                                wavelength_range = None,
-                                signal_values_err = None,
-                                absorber_name = None,
-                                y_label="Signal",
-                                title_label=None,
-                                data_type='x_y_yerr',
-                                plot_type='scatter'):
+def plot_spectra_errorbar_bokeh(wavelength_values: np.ndarray,
+                                signal_values: np.ndarray,
+                                wavelength_range: Union[list, tuple, np.ndarray] = None,
+                                signal_values_err: np.ndarray = None,
+                                absorber_name: str = None,
+                                y_label: str = "Signal",
+                                title_label: str = None,
+                                data_type: str ='x_y_yerr',
+                                plot_type: str ='scatter'
+                                ) -> None:
     """
     Plot the spectra with error bars using Bokeh.
 
     Parameters
     ----------
-    wavelength_values : nd.array
+    wavelength_values : np.ndarray
         Wavelength array in microns.
-    signal_values : nd.array
+    signal_values : np.ndarray
         Signal arrays (input data).
     wavelength_range : list-like, optional
         List-like object (list, tuple, or np.ndarray) with of length 2 representing wavelength range for plotting.
-    signal_values_err : nd.array, optional
+    signal_values_err : np.ndarray, optional
         Error on input data.
     absorber_name : str, optional
         Molecule or atom name.
@@ -230,15 +237,16 @@ def plot_spectra_errorbar_bokeh(wavelength_values,
     show(p)
 
 
-def plot_spectra_errorbar_seaborn(wavelength_values,
-                                  signal_values,
-                                  wavelength_range = None,
-                                  signal_values_err = None,
-                                  absorber_name = None,
-                                  y_label="Signal",
-                                  title_label=None,
-                                  data_type='x_y_yerr',
-                                  plot_type='scatter'):
+def plot_spectra_errorbar_seaborn(wavelength_values: np.ndarry,
+                                  signal_values: np.ndarray,
+                                  wavelength_range: Union[list, tuple, np.ndarray] = None,
+                                  signal_values_err: np.ndarray = None,
+                                  absorber_name: str = None,
+                                  y_label: str = "Signal",
+                                  title_label: str = None,
+                                  data_type: str = 'x_y_yerr',
+                                  plot_type: str = 'scatter'
+                                  ) -> None:
     """
     Plot the spectra with error bars using Seaborn.
 
@@ -320,11 +328,12 @@ def plot_spectra_errorbar_seaborn(wavelength_values,
     plt.show()
 
 
-def plot_baseline_fitting_seaborn(wavelength_values, 
-                          signal_values, 
-                          baseline_type, 
-                          fitted_baseline_params, 
-                          baseline_degree=None):
+def plot_baseline_fitting_seaborn(wavelength_values: np.ndarray, 
+                                  signal_values: np.ndarray, 
+                                  baseline_type: str, 
+                                  fitted_baseline_params: np.ndarray, 
+                                  baseline_degree: int = None
+                                  ) -> None:
     """
     Plot the original spectrum and the fitted baseline using Seaborn.
 
@@ -400,11 +409,12 @@ def plot_baseline_fitting_seaborn(wavelength_values,
     plt.show()
 
 
-def plot_baseline_fitting_bokeh(wavelength_values, 
-                                signal_values, 
-                                baseline_type, 
-                                fitted_baseline_params, 
-                                baseline_degree=None):
+def plot_baseline_fitting_bokeh(wavelength_values: np.ndarray, 
+                                signal_values: np.ndarray, 
+                                baseline_type: str, 
+                                fitted_baseline_params: np.ndarray, 
+                                baseline_degree: int = None
+                                ) -> None:
     """
     Plot the original spectrum and the fitted baseline using Bokeh.
 
@@ -517,11 +527,12 @@ def plot_baseline_fitting_bokeh(wavelength_values,
     output_notebook()
     show(layout)
 
-def plot_fitted_als_bokeh(wavelength_values, 
-                          signal_values,
-                          fitted_baseline,
-                          baseline_type = 'als'
-                          ):
+
+def plot_fitted_als_bokeh(wavelength_values: np.ndarray, 
+                          signal_values: np.ndarray,
+                          fitted_baseline: np.ndarray,
+                          baseline_type: str = 'als'
+                          ) -> None:
 
     """
     Plot the original spectrum and the fitted baseline using Bokeh.
@@ -618,12 +629,13 @@ def plot_fitted_als_bokeh(wavelength_values,
     show(layout)
 
 
-def plot_fitted_spectrum_bokeh(wavelength_values, 
-                               signal_values,
-                               fitted_params,
-                               wavelength_range = None,
-                               line_profile='gaussian',
-                               fitting_method='lm'):
+def plot_fitted_spectrum_bokeh(wavelength_values: np.ndarray, 
+                               signal_values: np.ndarray,
+                               fitted_params: np.ndarray,
+                               wavelength_range: Union[list, tuple, np.ndarray] = None,
+                               line_profile: str = 'gaussian',
+                               fitting_method: str = 'lm'
+                               ) -> None:
     """
     Plot the original spectrum and the fitted peaks using Bokeh.
 
@@ -731,12 +743,13 @@ def plot_fitted_spectrum_bokeh(wavelength_values,
     show(layout)
 
 
-def plot_fitted_spectrum_seaborn(wavelength_values, 
-                                 signal_values,
-                                 fitted_params,
-                                 wavelength_range = None,
-                                 line_profile='gaussian',
-                                 fitting_method='lm'):
+def plot_fitted_spectrum_seaborn(wavelength_values: np.ndarray, 
+                                 signal_values: np.ndarray,
+                                 fitted_params: np.ndarray,
+                                 wavelength_range: Union[list, tuple, np.ndarray] = None,
+                                 line_profile: str = 'gaussian',
+                                 fitting_method: str = 'lm'
+                                 ) -> None:
     """
     Plot the original spectrum and the fitted peaks using Bokeh.
 
@@ -838,14 +851,15 @@ def plot_fitted_spectrum_seaborn(wavelength_values,
     plt.show()
 
 
-def plot_assigned_lines_seaborn(wavelength_values, 
-                                signal_values, 
-                                fitted_hitran,
-                                fitted_params,
-                                columns_to_print,
-                                wavelength_range= None,
-                                line_profile='gaussian',
-                                fitting_method='lm'):
+def plot_assigned_lines_seaborn(wavelength_values: np.ndarray, 
+                                signal_values: np.ndarray, 
+                                fitted_hitran: pd.DataFrame,
+                                fitted_params: np.ndarray,
+                                columns_to_print: Union[str, List[str]],
+                                wavelength_range: Union[list, tuple, np.ndarray] = None,
+                                line_profile: str = 'gaussian',
+                                fitting_method: str = 'lm'
+                                ) -> None:
 
     """
     Plot the original spectrum and the assigned lines using Seaborn.
@@ -860,7 +874,7 @@ def plot_assigned_lines_seaborn(wavelength_values,
         Dataframe containing information about the assigned spectral lines, including columns ['amplitude', 'center', 'wing'].
     fitted_params : np.ndarray
         Fitted parameters of peaks.
-    columns_to_print : np.ndarray
+    columns_to_print : str or list
         Columns to print corresponding to line positions. 
     wavelength_range : list-like, optional
         List-like object (list, tuple, or np.ndarray) with of length 2 representing wavelength range for plotting.
