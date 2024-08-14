@@ -664,7 +664,7 @@ def plot_fitted_spectrum_bokeh(wavelength_values,
     rmse_value = np.sqrt(((y_fitted - y) ** 2).mean())
 
    # Create a new plot with a title and axis labels
-    p1 = figure(title=f"Spectra with Fitted {line_profile.capitalize()} Peaks",
+    p1 = figure(title=f"Spectra with Fitted {line_profile.capitalize()} Peaks - RMSE = {rmse_value:.2f}",
                #x_axis_label="Wavelength [𝜇m]",
                y_axis_label="Signal",
                width=800, height=500,
@@ -732,11 +732,11 @@ def plot_fitted_spectrum_bokeh(wavelength_values,
 
 
 def plot_fitted_spectrum_seaborn(wavelength_values, 
-                               signal_values,
-                               fitted_params,
-                               wavelength_range = None,
-                               line_profile='gaussian',
-                               fitting_method='lm'):
+                                 signal_values,
+                                 fitted_params,
+                                 wavelength_range = None,
+                                 line_profile='gaussian',
+                                 fitting_method='lm'):
     """
     Plot the original spectrum and the fitted peaks using Bokeh.
 
@@ -756,6 +756,8 @@ def plot_fitted_spectrum_seaborn(wavelength_values,
 
     x = wavelength_values
     y = signal_values
+
+    fitted_peak_positions = fitted_params[:,0]
 
     # Calculate fitted y values
     y_fitted = np.zeros_like(x)
@@ -796,11 +798,11 @@ def plot_fitted_spectrum_seaborn(wavelength_values,
     ax1 = fig.add_subplot(gs[:2,0])
     # Plot original spectrum
     ax1.plot(x, y, label="Original Spectrum", color="blue")
-    # Plot fitted baseline
+    # Plot fitted peaks
     ax1.plot(x, y_fitted, label=f'Fitted {line_profile.capitalize()}', color="red", linestyle="--")
 
     ax1.set_ylabel("Signal")
-    ax1.set_title(f"Spectra with Fitted {line_profile.capitalize()} Peaks")
+    ax1.set_title(f"Spectra with Fitted {line_profile.capitalize()} Peaks - RMSE = {rmse_value:.2f}")
 
     # Create second subplot for residual
     ax2 = fig.add_subplot(gs[2, 0])
@@ -813,6 +815,13 @@ def plot_fitted_spectrum_seaborn(wavelength_values,
     ax2.set_xlabel("Wavelength [µm]")
     ax2.set_ylabel("Residual")
 
+    for ax in (ax1, ax2):
+        for i in range(len(fitted_peak_positions)):
+            # Plot fitted peak centers
+            ax.axvline(x=fitted_peak_positions[i], color='r', alpha=0.8, lw=0.8)
+
+    ax1.plot([], [], color='r', alpha=0.8, lw=0.8, label='Fitted Peak Center') # label
+    
     # Set axes ticks, inwards
     for ax in (ax1,ax2):
         ax.tick_params(axis='both', which='major', direction='in', length=7, width=1.1)
@@ -831,8 +840,13 @@ def plot_fitted_spectrum_seaborn(wavelength_values,
 
 def plot_assigned_lines_seaborn(wavelength_values, 
                                 signal_values, 
-                                line_positions, 
-                                local_upper_quanta):
+                                fitted_hitran,
+                                fitted_params,
+                                columns_to_print,
+                                wavelength_range= None,
+                                line_profile='gaussian',
+                                fitting_method='lm'):
+
     """
     Plot the original spectrum and the assigned lines using Seaborn.
 
@@ -842,38 +856,133 @@ def plot_assigned_lines_seaborn(wavelength_values,
         Wavelength array in microns.
     signal_values : np.ndarray
         Signal arrays (input data). 
-    line_positions : np.ndarray
-        Array of the positions of assigned spectral lines.
-    local_upper_quanta : np.ndarray
-        Array of the quantum assignments corresponding to line positions. 
-
+    fitted_hitran : pd.DataFrame
+        Dataframe containing information about the assigned spectral lines, including columns ['amplitude', 'center', 'wing'].
+    fitted_params : np.ndarray
+        Fitted parameters of peaks.
+    columns_to_print : np.ndarray
+        Columns to print corresponding to line positions. 
+    wavelength_range : list-like, optional
+        List-like object (list, tuple, or np.ndarray) with of length 2 representing wavelength range for plotting.
+    line_profile : str, {'gaussian', 'lorentzian', 'voigt'}, optional
+        Type of line profile to use for fitting. Default is 'gaussian'.
     """
+
+    # option for printing different information
+    # add fitted spectrum
+
+    x = wavelength_values
+    y = signal_values
+
+    line_positions = fitted_hitran["nu"].to_numpy()
+    print_columns = fitted_hitran[columns_to_print].to_numpy(dtype=str)
+    fitted_peak_positions = fitted_params[:,0]
+
+    # Calculate fitted y values
+    y_fitted = np.zeros_like(x)
+    for params in fitted_params:
+        if line_profile == 'gaussian':
+            center, amplitude, width = params
+            y_fitted += amplitude * np.exp(-(x - center) ** 2 / (2 * width ** 2))
+        elif line_profile == 'lorentzian':
+            center, amplitude, width = params
+            y_fitted += amplitude / (1 + ((x - center) / width) ** 2)
+        elif line_profile == 'voigt':
+            center, amplitude, wid_g, wid_l = params
+            sigma = wid_g / np.sqrt(2 * np.log(2))
+            gamma = wid_l / 2
+            z = ((x - center) + 1j * gamma) / (sigma * np.sqrt(2))
+            y_fitted += amplitude * np.real(wofz(z)).astype(float) / (sigma * np.sqrt(2 * np.pi))
+
+    # Trim x and y to desired wavelength range for plotting
+    if wavelength_range is not None:
+        # Make sure range is in correct format
+        if len(wavelength_range) != 2:
+            raise ValueError('wavelength_range must be tuple, list, or array with 2 elements')
+        # Locate indices and splice
+        condition_range = (x > wavelength_range[0]) & (x < wavelength_range[1])
+        x = x[condition_range]
+        y = y[condition_range]
+        y_fitted = y_fitted[condition_range]
+
     # Create figure
-    fig, ax = plt.subplots(figsize=(8, 6),dpi=700)
+    fig = plt.figure(figsize=(10, 6), dpi=700)
+    # Create GridSpec object
+    gs = gridspec.GridSpec(3, 1, height_ratios=[3, 1, 1])
+
+    # Create first subplot for spectrum
+    ax1 = fig.add_subplot(gs[:2,0])
+
+    # Plot original spectrum
+    ax1.plot(x, y, color='k', alpha=0.8, label="Original Spectrum")
+    # Plot fitted peaks
+    ax1.plot(x, y_fitted, color='r', alpha=0.8, linestyle="--", 
+        label=f'Fitted {line_profile.capitalize()}')
     
-    # Plot spectrum
-    ax.plot(wavelength_values,signal_values,color='k',alpha=0.8,label='Spectrum')
+    ax1.set_ylabel("Signal")
+    ax1.set_title(f"Spectra with Fitted {line_profile.capitalize()} Peaks")
+        
+    # Create second subplot for residual
+    ax2 = fig.add_subplot(gs[2, 0])
+    y_residual = y - y_fitted
+
+    # Plot residual 
+    ax2.plot(x, y_residual, color='k', label=f'Residual = (Data) - (Fitted {line_profile.capitalize()} Peaks)')
+
+    ax2.set_xlabel("Wavelength [µm]")
+    ax2.set_ylabel("Residual")
     
     # Plot assigned HITRAN lines
-    for q in range(len(local_upper_quanta)):
-        ax.axvline(x=line_positions[q],color='r',linestyle='--')
-        
-        # Text label 
-        y_half = (np.max(signal_values)-np.min(signal_values))/2
-        ax.text(line_positions[q], y_half, str(local_upper_quanta[q]))  
+    for ax in (ax1, ax2):
+        for q in range(len(line_positions)):
 
-    ax.set_xlabel("Wavelength [μm]", fontsize=12)
-    ax.set_ylabel("Intensity", fontsize=12)
-    ax.legend()
-    
-    # Turn on grid lines with transparency
-    ax.grid(True, alpha=0.5)
-    # Set axes ticks, inwards
-    ax.tick_params(axis='both', which='major', direction='in', length=6, width=1)
-    ax.minorticks_on()
-    ax.tick_params(axis='both', which='minor', direction='in', length=3.5, width=1)
-    
+            # Plot assigned HITRAN lines
+            ax.axvline(x=line_positions[q], color='b')  # Plot vertical lines
+
+            # Plot fitted peak centers
+            ax.axvline(x=fitted_peak_positions[q], color='r', alpha=0.8, lw=0.8)
+
+    ax1.plot([], [], color='r', alpha=0.8, lw=0.8, label='Fitted Peak Center') # label     
+    ax1.plot([], [], color='b', label='HITRAN Assignment: \n ' +  ' \n '.join(columns_to_print)) # label 
+
+    ax1.legend()
+    ax2.legend()
+
+    # label  
+    y_up=0
+    y_range = ax1.get_ylim()
+    y_diff = y_range[1]-y_range[0]
+    for q in range(len(line_positions)):
+        # Calculate label position
+
+        y_up += y_diff / (len(line_positions)+1)
+
+        # Retrieve the label
+        label_q_list = list(print_columns[q])
+
+        label_q = '\n'.join(label_q_list)
+
+        # Add the text label
+        ax1.text(line_positions[q], np.min(y) + y_up, label_q, color='b', va="top")
+
+
+    for ax in (ax1,ax2):
+        # Turn on grid lines with transparency
+        ax.grid(True, alpha=0.25)
+
+        # Set axes ticks, inwards
+        ax.tick_params(axis='both', which='major', direction='in', length=7, width=1.1)
+        ax.tick_params(axis='x', direction='in', top=True)
+        ax.tick_params(axis='y', direction='in', right=True)
+        ax.minorticks_on()
+        ax.tick_params(axis='both', which='minor', direction='in', length=4, width=1.1)
+        ax.tick_params(axis='x', which='minor', direction='in', top=True)
+        ax.tick_params(axis='y', which='minor', direction='in', right=True)   
+
+
     plt.show()
+
+
 
 
 
