@@ -28,10 +28,7 @@ from sklearn.metrics import r2_score, mean_squared_error, mean_absolute_error
 from typing import List, Union
 from numpy.polynomial import Polynomial
 
-
 from .SpecStatVisualizer import *
-
-# add __plot__ and __print__ to all 
 
 
 # Import local module
@@ -110,7 +107,7 @@ class SpecFitAnalyzer:
         line_profile : str, {'gaussian', 'lorentzian', 'voigt'}, optional
             Type of line profile to use for fitting. Default is 'gaussian'.
         wavelength_range : list-like, optional
-            List-like object (list, tuple, or np.ndarray) with of length 2 representing wavelength range for plotting.
+            List-like object (list, tuple, or np.ndarray) with of length 2 representing wavelength range to fit within.
         __plot_bokeh__ : bool
             True or False.
         __plot_seaborn__ : bool
@@ -124,8 +121,21 @@ class SpecFitAnalyzer:
             List of fitted parameters for each peak.
         """
         x = self.wavelength_values
-        #         y = self.signal_values if y!= None
-        y = self.y_baseline_corrected
+
+        if self.y_baseline_corrected is None:
+            y = self.signal_values
+        else:
+            y = self.y_baseline_corrected
+
+        # Trim x and y to desired wavelength range for plotting
+        if wavelength_range is not None:
+            # Make sure range is in correct format
+            if len(wavelength_range) != 2:
+                raise ValueError('wavelength_range must be tuple, list, or array with 2 elements')
+            # Locate indices and splice
+            condition_range = (x > wavelength_range[0]) & (x < wavelength_range[1])
+            x = x[condition_range]
+            y = y[condition_range]
 
         fitted_params = []
         covariance_matrices = []
@@ -150,13 +160,11 @@ class SpecFitAnalyzer:
 
         if __plot_bokeh__ == True:
             plot_fitted_spectrum_bokeh(x,y,fitted_params,
-                wavelength_range = wavelength_range, 
                 line_profile=line_profile,
                 fitting_method=fitting_method)
         
         if __plot_seaborn__ == True:
             plot_fitted_spectrum_seaborn(x,y,fitted_params,
-                wavelength_range = wavelength_range, 
                 line_profile=line_profile,
                 fitting_method=fitting_method)
 
