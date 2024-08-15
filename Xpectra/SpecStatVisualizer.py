@@ -30,7 +30,7 @@ from matplotlib.ticker import AutoMinorLocator, MaxNLocator
 from matplotlib import rcParams
 
 from bokeh.plotting import output_notebook, figure, show
-from bokeh.models import HoverTool, ColumnDataSource, Range1d
+from bokeh.models import HoverTool, ColumnDataSource, Range1d, Span
 from bokeh.layouts import column
 
 import numpy as np
@@ -237,7 +237,7 @@ def plot_spectra_errorbar_bokeh(wavelength_values: np.ndarray,
     show(p)
 
 
-def plot_spectra_errorbar_seaborn(wavelength_values: np.ndarry,
+def plot_spectra_errorbar_seaborn(wavelength_values: np.ndarray,
                                   signal_values: np.ndarray,
                                   wavelength_range: Union[list, tuple, np.ndarray] = None,
                                   signal_values_err: np.ndarray = None,
@@ -446,7 +446,7 @@ def plot_baseline_fitting_bokeh(wavelength_values: np.ndarray,
     elif baseline_type == 'spline':
         spline = fitted_baseline_params
         y_baseline = spline(x)
-        label = "Fitted Spline Baseline"    
+        baseline_label = "Fitted Spline Baseline"    
     else:
         raise ValueError(f"Invalid baseline_type '{baseline_type}'. Expected {{'polynomial', 'sinusoidal', 'spline'}}")
 
@@ -565,7 +565,6 @@ def plot_fitted_als_bokeh(wavelength_values: np.ndarray,
 
     # Create the figure
     p1 = figure(title=f"Spectra with Fitted {baseline_type.upper()} Baseline",
-               #x_axis_label="Wavelength [𝜇m]",
                y_axis_label="Signal",
                width=800, height=350,
                x_range=x_range, 
@@ -672,14 +671,26 @@ def plot_fitted_spectrum_bokeh(wavelength_values: np.ndarray,
             z = ((x - center) + 1j * gamma) / (sigma * np.sqrt(2))
             y_fitted += amplitude * np.real(wofz(z)).astype(float) / (sigma * np.sqrt(2 * np.pi))
 
+    # Calculate residual
+    residual = y - y_fitted
+
+    # Create a shared range object for consistent zoom
+    x_min,x_max = np.min(x),np.max(x)
+    x_padding = (x_max-x_min) * 0.05
+    x_range = Range1d(start=x_min-x_padding, end=x_max+x_padding)
+
+    # Create ColumnDataSource
+    source_p1 = ColumnDataSource(data=dict(x=x, y=y, y_fitted=y_fitted))
+    source_p2 = ColumnDataSource(data=dict(x=x, residual=residual))
+
     # Calculate RMSE
     rmse_value = np.sqrt(((y_fitted - y) ** 2).mean())
 
    # Create a new plot with a title and axis labels
     p1 = figure(title=f"Spectra with Fitted {line_profile.capitalize()} Peaks - RMSE = {rmse_value:.2f}",
-               #x_axis_label="Wavelength [𝜇m]",
                y_axis_label="Signal",
                width=800, height=500,
+               x_range=x_range, 
                y_axis_type="linear",
                tools="pan,wheel_zoom,box_zoom,reset")
 
@@ -694,24 +705,26 @@ def plot_fitted_spectrum_bokeh(wavelength_values: np.ndarray,
         y = y[condition_range]
         y_fitted = y_fitted[condition_range]
 
-    # Add the original spectrum to the plot
-    p1.line(x, y, legend_label="Original Spectrum", line_width=2, color="blue")
+    # Add the original or baseline-corrected spectrum to the plot
+    p1.line('x', 'y', legend_label="Spectrum", line_width=2, color="blue", source=source_p1)
 
-    # Add the baseline corrected spectrum to the plot
-    p1.line(x, y_fitted, legend_label=f'Fitted {line_profile.capitalize()}', line_width=2, line_dash='dashed', color="red")
+    # Add the fitted peaks spectrum to the plot
+    p1.line('x', 'y_fitted', legend_label=f'Fitted {line_profile.capitalize()}', line_width=2, 
+        line_dash='dashed', color="red", source=source_p1)
     
     # Create lower plot
     p2 = figure(title=' ',
                x_axis_label="Wavelength [𝜇m]",
                y_axis_label="Residual",
                width=800, height=200,
+               x_range=x_range, 
                y_axis_type="linear",
                tools="pan,wheel_zoom,box_zoom,reset")
 
     # Add line plot
-    residual = y - y_fitted
-    p2.line(x, residual, line_width=1.5, line_color='green',
-        legend_label=f'Residual = (Data) - (Fitted {line_profile.capitalize()} Peaks)')  
+    p2.line('x', 'residual', line_width=1.5, line_color='green',
+        legend_label=f'Residual = (Data) - (Fitted {line_profile.capitalize()} Peaks)',
+        source=source_p2)  
 
     # Increase size of x and y ticks
     for p in (p1,p2):
@@ -721,16 +734,18 @@ def plot_fitted_spectrum_bokeh(wavelength_values: np.ndarray,
         p.yaxis.major_label_text_font_size = '14pt'
         p.yaxis.axis_label_text_font_size = '14pt'
 
+    
     # Add HoverTool
     hover_p1 = HoverTool()
     hover_p1.tooltips = [
-        ("Wavelength [𝜇m]", "@x{0.0000}"),
-        ("Intensity", "@y{0.0000}"),
+        ("Wavelength [𝜇m]", "@x{0.000}"),
+        ("Intensity", "@y{0.000}"),
+        (f"Fitted {line_profile.capitalize()}", "@y_fitted{0.000}"),
     ]
     hover_p2 = HoverTool()
     hover_p2.tooltips = [
-        ("Wavelength [𝜇m]", "@x{0.0000}"),
-        ("Residual", "@y{0.0000}"),
+        ("Wavelength [𝜇m]", "@x{0.000}"),
+        ("Residual", "@residual{0.000}"),
     ]
     p1.add_tools(hover_p1)
     p2.add_tools(hover_p2)
@@ -998,6 +1013,164 @@ def plot_assigned_lines_seaborn(wavelength_values: np.ndarray,
 
 
 
+def plot_assigned_lines_bokeh(wavelength_values: np.ndarray, 
+                              signal_values: np.ndarray, 
+                              fitted_hitran: pd.DataFrame,
+                              fitted_params: np.ndarray,
+                              columns_to_print: Union[str, List[str]],
+                              wavelength_range: Union[list, tuple, np.ndarray] = None,
+                              line_profile: str = 'gaussian',
+                              fitting_method: str = 'lm'
+                              ) -> None:
+
+    """
+    Plot the original spectrum and the fitted peaks using Bokeh.
+
+    Parameters
+    ----------
+    wavelength_values : np.ndarray
+        Wavelength array in microns.
+    signal_values : np.ndarray
+        Signal arrays (input data). 
+    fitted_hitran : pd.DataFrame
+        Dataframe containing information about the assigned spectral lines, including columns ['amplitude', 'center', 'wing'].
+    fitted_params : np.ndarray
+        Fitted parameters of peaks.
+    columns_to_print : str or list
+        Columns to print corresponding to line positions. 
+    wavelength_range : list-like, optional
+        List-like object (list, tuple, or np.ndarray) with of length 2 representing wavelength range for plotting.
+    line_profile : str, {'gaussian', 'lorentzian', 'voigt'}, optional
+        Type of line profile to use for fitting. Default is 'gaussian'.
+    """
+
+    x = wavelength_values
+    y = signal_values
+
+    line_positions = fitted_hitran["nu"].to_numpy()
+    print_columns = fitted_hitran[columns_to_print].to_numpy(dtype=str)
+    fitted_peak_positions = fitted_params[:,0]
+
+    # Calculate fitted y values
+    y_fitted = np.zeros_like(x)
+    for params in fitted_params:
+        if line_profile == 'gaussian':
+            center, amplitude, width = params
+            y_fitted += amplitude * np.exp(-(x - center) ** 2 / (2 * width ** 2))
+        elif line_profile == 'lorentzian':
+            center, amplitude, width = params
+            y_fitted += amplitude / (1 + ((x - center) / width) ** 2)
+        elif line_profile == 'voigt':
+            center, amplitude, wid_g, wid_l = params
+            sigma = wid_g / np.sqrt(2 * np.log(2))
+            gamma = wid_l / 2
+            z = ((x - center) + 1j * gamma) / (sigma * np.sqrt(2))
+            y_fitted += amplitude * np.real(wofz(z)).astype(float) / (sigma * np.sqrt(2 * np.pi))
+
+   # Create a new plot with a title and axis labels
+    p1 = figure(title=f"Spectra with Fitted {line_profile.capitalize()} Peaks",
+               #x_axis_label="Wavelength [𝜇m]",
+               y_axis_label="Signal",
+               width=800, height=500,
+               y_axis_type="linear",
+               tools="pan,wheel_zoom,box_zoom,reset")
+
+    # Trim x and y to desired wavelength range
+    if wavelength_range is not None:
+        # Make sure range is in correct format
+        if len(wavelength_range) != 2:
+            raise ValueError('wavelength_range must be tuple, list, or array with 2 elements')
+        # Locate indices and splice
+        condition_range = (x > wavelength_range[0]) & (x < wavelength_range[1])
+        x = x[condition_range]
+        y = y[condition_range]
+        y_fitted = y_fitted[condition_range]
+
+    # Add the original spectrum to the plot
+    p1.line(x, y, legend_label="Original Spectrum", line_width=2, color="black")
+
+    # Add the baseline corrected spectrum to the plot
+    p1.line(x, y_fitted, legend_label=f'Fitted {line_profile.capitalize()}', line_width=2, 
+        line_dash='dashed', color="red")
+    
+    # Create lower plot
+    p2 = figure(title=' ',
+               x_axis_label="Wavelength [𝜇m]",
+               y_axis_label="Residual",
+               width=800, height=200,
+               y_axis_type="linear",
+               tools="pan,wheel_zoom,box_zoom,reset")
+
+    # Add line plot
+    residual = y - y_fitted
+    p2.line(x, residual, line_width=1.5, line_color='black',
+        legend_label=f'Residual = (Data) - (Fitted {line_profile.capitalize()} Peaks)')  
+
+    # Plot assigned HITRAN lines
+    for p in (p1,p2):
+        for q in range(len(line_positions)):
+
+            # Plot assigned HITRAN lines
+            vline = Span(location=line_positions[q], dimension='height', line_width=1.5,
+                line_color='blue')
+            p.add_layout(vline)
+
+            # Plot fitted peak centers
+            vline = Span(location=fitted_peak_positions[q], dimension='height', 
+                line_color='red', line_alpha=0.8, line_width=0.8)
+            p.add_layout(vline)
+
+    # Manually add legend entries
+    dummy_line1 = p1.line(fitted_peak_positions[0], y[0], legend_label="Fitted Peak Center", 
+        line_color='red', line_alpha=0.8, line_width=0.8)
+    dummy_line2 = p1.line(fitted_peak_positions[0], y[0], legend_label='HITRAN Assignment: \n ' +  ' , '.join(columns_to_print), 
+        line_width=1.5, line_color='blue')
+   
+    # # label  
+    # y_up=0
+    # y_range = ax1.get_ylim()
+    # y_diff = y_range[1]-y_range[0]
+    # for q in range(len(line_positions)):
+    #     # Calculate label position
+
+    #     y_up += y_diff / (len(line_positions)+1)
+
+    #     # Retrieve the label
+    #     label_q_list = list(print_columns[q])
+
+    #     label_q = '\n'.join(label_q_list)
+
+    #     # Add the text label
+    #     ax1.text(line_positions[q], np.min(y) + y_up, label_q, color='b', va="top")
+
+    # Increase size of x and y ticks
+    for p in (p1,p2):
+        p.title.text_font_size = '14pt'
+        p.xaxis.major_label_text_font_size = '14pt'
+        p.xaxis.axis_label_text_font_size = '14pt'
+        p.yaxis.major_label_text_font_size = '14pt'
+        p.yaxis.axis_label_text_font_size = '14pt'
+
+    # Add HoverTool
+    hover_p1 = HoverTool()
+    hover_p1.tooltips = [
+        ("Wavelength [𝜇m]", "@x{0.0000}"),
+        ("Intensity", "@y{0.0000}"),
+    ]
+    hover_p2 = HoverTool()
+    hover_p2.tooltips = [
+        ("Wavelength [𝜇m]", "@x{0.0000}"),
+        ("Residual", "@y{0.0000}"),
+    ]
+    p1.add_tools(hover_p1)
+    p2.add_tools(hover_p2)
+
+    # Combine plots into a column
+    layout = column(p1, p2)
+
+    # Show the plot
+    output_notebook()
+    show(layout)
 
 
 
