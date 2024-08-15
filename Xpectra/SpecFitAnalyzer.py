@@ -31,6 +31,7 @@ from numpy.polynomial import Polynomial
 from .SpecStatVisualizer import *
 
 
+
 # Import local module
 # from io_funs import LoadSave
 
@@ -155,8 +156,8 @@ class SpecFitAnalyzer:
             fitted_params.append(params)
             covariance_matrices.append(cov_matrix)
 
-        self.fitted_params = fitted_params
-        self.covariance_matrices = covariance_matrices
+        self.fitted_params = np.array(fitted_params)
+        self.covariance_matrices = np.array(covariance_matrices)
         # FIND ME
 
         if __plot_bokeh__ == True:

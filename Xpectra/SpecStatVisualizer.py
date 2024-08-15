@@ -30,7 +30,7 @@ from matplotlib.ticker import AutoMinorLocator, MaxNLocator
 from matplotlib import rcParams
 
 from bokeh.plotting import output_notebook, figure, show
-from bokeh.models import HoverTool, ColumnDataSource, Range1d, Span
+from bokeh.models import HoverTool, ColumnDataSource, Range1d, Span, Legend, Label
 from bokeh.layouts import column
 
 import numpy as np
@@ -974,7 +974,7 @@ def plot_assigned_lines_seaborn(wavelength_values: np.ndarray,
     ax1.plot([], [], color='r', alpha=0.8, lw=0.8, label='Fitted Peak Center') # label     
     ax1.plot([], [], color='b', label='HITRAN Assignment: \n ' +  ' \n '.join(columns_to_print)) # label 
 
-    ax1.legend()
+    ax1.legend(loc='center left', bbox_to_anchor=(1, 0.5))
     ax2.legend()
 
     # label  
@@ -988,12 +988,10 @@ def plot_assigned_lines_seaborn(wavelength_values: np.ndarray,
 
         # Retrieve the label
         label_q_list = list(print_columns[q])
-
         label_q = '\n'.join(label_q_list)
 
         # Add the text label
         ax1.text(line_positions[q], np.min(y) + y_up, label_q, color='b', va="top")
-
 
     for ax in (ax1,ax2):
         # Turn on grid lines with transparency
@@ -1008,6 +1006,7 @@ def plot_assigned_lines_seaborn(wavelength_values: np.ndarray,
         ax.tick_params(axis='x', which='minor', direction='in', top=True)
         ax.tick_params(axis='y', which='minor', direction='in', right=True)   
 
+    plt.tight_layout(pad=2.0)
 
     plt.show()
 
@@ -1067,14 +1066,6 @@ def plot_assigned_lines_bokeh(wavelength_values: np.ndarray,
             z = ((x - center) + 1j * gamma) / (sigma * np.sqrt(2))
             y_fitted += amplitude * np.real(wofz(z)).astype(float) / (sigma * np.sqrt(2 * np.pi))
 
-   # Create a new plot with a title and axis labels
-    p1 = figure(title=f"Spectra with Fitted {line_profile.capitalize()} Peaks",
-               #x_axis_label="Wavelength [𝜇m]",
-               y_axis_label="Signal",
-               width=800, height=500,
-               y_axis_type="linear",
-               tools="pan,wheel_zoom,box_zoom,reset")
-
     # Trim x and y to desired wavelength range
     if wavelength_range is not None:
         # Make sure range is in correct format
@@ -1084,27 +1075,48 @@ def plot_assigned_lines_bokeh(wavelength_values: np.ndarray,
         condition_range = (x > wavelength_range[0]) & (x < wavelength_range[1])
         x = x[condition_range]
         y = y[condition_range]
-        y_fitted = y_fitted[condition_range]
+        y_fitted = y_fitted[condition_range]   
+
+    # Calculate residual
+    residual = y - y_fitted
+
+    # Create a shared range object for consistent zoom
+    x_min,x_max = np.min(x),np.max(x)
+    x_padding = (x_max-x_min) * 0.05
+    x_range = Range1d(start=x_min-x_padding, end=x_max+x_padding)
+
+    # Create ColumnDataSource
+    source_p1 = ColumnDataSource(data=dict(x=x, y=y, y_fitted=y_fitted))
+    source_p2 = ColumnDataSource(data=dict(x=x, residual=residual))
+
+   # Create a new plot with a title and axis labels
+    p1 = figure(title=f"Spectra with Fitted {line_profile.capitalize()} Peaks",
+               y_axis_label="Signal",
+               width=800, height=500,
+               x_range = x_range,
+               y_axis_type="linear",
+               tools="pan,wheel_zoom,box_zoom,reset")
 
     # Add the original spectrum to the plot
-    p1.line(x, y, legend_label="Original Spectrum", line_width=2, color="black")
+    p1.line('x', 'y', legend_label="Original Spectrum", line_width=2, color="black", source=source_p1)
 
     # Add the baseline corrected spectrum to the plot
-    p1.line(x, y_fitted, legend_label=f'Fitted {line_profile.capitalize()}', line_width=2, 
-        line_dash='dashed', color="red")
+    p1.line('x', 'y_fitted', legend_label=f'Fitted {line_profile.capitalize()}', line_width=2, 
+        line_dash='dashed', color="red", source=source_p1)
     
     # Create lower plot
     p2 = figure(title=' ',
                x_axis_label="Wavelength [𝜇m]",
                y_axis_label="Residual",
                width=800, height=200,
+               x_range = x_range,
                y_axis_type="linear",
                tools="pan,wheel_zoom,box_zoom,reset")
 
     # Add line plot
-    residual = y - y_fitted
-    p2.line(x, residual, line_width=1.5, line_color='black',
-        legend_label=f'Residual = (Data) - (Fitted {line_profile.capitalize()} Peaks)')  
+    p2.line('x', 'residual', line_width=1.5, line_color='black',
+        legend_label=f'Residual = (Data) - (Fitted {line_profile.capitalize()} Peaks)',
+        source=source_p2)  
 
     # Plot assigned HITRAN lines
     for p in (p1,p2):
@@ -1123,25 +1135,31 @@ def plot_assigned_lines_bokeh(wavelength_values: np.ndarray,
     # Manually add legend entries
     dummy_line1 = p1.line(fitted_peak_positions[0], y[0], legend_label="Fitted Peak Center", 
         line_color='red', line_alpha=0.8, line_width=0.8)
-    dummy_line2 = p1.line(fitted_peak_positions[0], y[0], legend_label='HITRAN Assignment: \n ' +  ' , '.join(columns_to_print), 
+    dummy_line2 = p1.line(fitted_peak_positions[0], y[0], legend_label='HITRAN Assignment: \n ' +  ', '.join(columns_to_print), 
         line_width=1.5, line_color='blue')
    
-    # # label  
-    # y_up=0
-    # y_range = ax1.get_ylim()
-    # y_diff = y_range[1]-y_range[0]
-    # for q in range(len(line_positions)):
-    #     # Calculate label position
+    # Plot text of the assigned line data
+    y_range = np.max(y)-np.min(y)
+    y_diff = 1.2*y_range
+    y_up = 0
+    for q in range(len(line_positions)):
+        
+        # Calculate label position
+        y_up += y_diff / (len(line_positions)+1)
 
-    #     y_up += y_diff / (len(line_positions)+1)
+        # Retrieve the label
+        label_q_list = list(print_columns[q])
+        label_q = '\n'.join(label_q_list)
 
-    #     # Retrieve the label
-    #     label_q_list = list(print_columns[q])
+        # Add the text label
+        label = Label(x=line_positions[q], y=np.min(y) + y_up, 
+            text=label_q, text_color="blue", text_align="left", text_baseline="top")
+        p1.add_layout(label)
 
-    #     label_q = '\n'.join(label_q_list)
-
-    #     # Add the text label
-    #     ax1.text(line_positions[q], np.min(y) + y_up, label_q, color='b', va="top")
+    # Customize legend
+    legend = p1.legend[0]
+    legend.location = 'top_left'
+    p1.add_layout(legend, 'above')
 
     # Increase size of x and y ticks
     for p in (p1,p2):
@@ -1154,13 +1172,14 @@ def plot_assigned_lines_bokeh(wavelength_values: np.ndarray,
     # Add HoverTool
     hover_p1 = HoverTool()
     hover_p1.tooltips = [
-        ("Wavelength [𝜇m]", "@x{0.0000}"),
-        ("Intensity", "@y{0.0000}"),
+        ("Wavelength [𝜇m]", "@x{0.000}"),
+        ("Intensity", "@y{0.000}"),
+        (f"Fitted {line_profile.capitalize()}", "@y_fitted{0.000}"),
     ]
     hover_p2 = HoverTool()
     hover_p2.tooltips = [
-        ("Wavelength [𝜇m]", "@x{0.0000}"),
-        ("Residual", "@y{0.0000}"),
+        ("Wavelength [𝜇m]", "@x{0.000}"),
+        ("Residual", "@residual{0.000}"),
     ]
     p1.add_tools(hover_p1)
     p2.add_tools(hover_p2)
@@ -1171,7 +1190,6 @@ def plot_assigned_lines_bokeh(wavelength_values: np.ndarray,
     # Show the plot
     output_notebook()
     show(layout)
-
 
 
 
