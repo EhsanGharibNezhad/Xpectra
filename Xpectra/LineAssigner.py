@@ -214,7 +214,7 @@ class LineAssigner:
 
 
     def parse_file_to_dataframe(self, 
-                                selected_columns: List[str] = ['nu','sw','gamma_air','local_upper_quanta']
+                                selected_columns: List[str] = ['local_iso_id','nu','sw','gamma_air','local_upper_quanta']
                                 ) -> pd.DataFrame:
         """
         Parse an input file into a pandas DataFrame based on specified columns.
@@ -224,7 +224,8 @@ class LineAssigner:
         input_file : str
             Path to the input file to parse.
         selected_columns : list
-            List of column names to select from the input file.
+            List of column names to select from the input file. Default is
+            ['local_iso_id','nu','sw','gamma_air','local_upper_quanta']. 
             
         Returns
         -------
@@ -314,8 +315,7 @@ class LineAssigner:
         
         df = pd.DataFrame(data) 
 
-        self.hitran_description = df
-        display(df)
+        return df
 
 
     def hitran_line_assigner(self,
@@ -323,7 +323,7 @@ class LineAssigner:
                              signal_values: np.ndarray,
                              weights: Union[list,np.ndarray] = None,
                              columns_to_print: List[str] = ["nu", "local_upper_quanta"],
-                             wavelength_range: Union[list, tuple, np.ndarray] = None,,
+                             wavelength_range: Union[list, tuple, np.ndarray] = None,
                              __plot_bokeh__: bool = True,
                              __plot_seaborn__: bool = False):
         """
