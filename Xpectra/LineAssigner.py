@@ -154,17 +154,22 @@ class LineAssigner:
     Parameters
     ----------
     fitted_params : np.ndarray, optional
-        Fitted parameters for spectral peaks.
-    hitran_df : pd.DataFrame, optional
-        DataFrame containing HITRAN data.
+        Fitted parameters of spectral peaks.
+    hitran_file : str, optional
+        File path containing HITRAN data.
     absorber_name : str, optional
         Molecule or atom name.
+
+    
+    hitran : pd.DataFrame
+        DataFrame with columns ['amplitude', 'center', 'wing'].
+    hitran_description : str
+    fitted_hitran : pd.DataFrame
     """
 
     def __init__(
             self,
             fitted_params: Union[np.ndarray, None] = None,
-            #hitran_df: Union[pd.DataFrame, None] = None,
             hitran_file: Union[str, None] = None,
             absorber_name: Union[str, None] = None,
             ):
@@ -314,32 +319,42 @@ class LineAssigner:
 
 
     def hitran_line_assigner(self,
-                             wavelength_values, 
-                             signal_values,
-                             columns_to_print=["nu", "local_upper_quanta"],
+                             wavelength_values: np.ndarray, 
+                             signal_values: np.ndarray,
                              weights: Union[list,np.ndarray] = None,
-                             wavelength_range = None,
-                             __plot_bokeh__ = True,
-                             __plot_seaborn__ = False):
+                             columns_to_print: List[str] = ["nu", "local_upper_quanta"],
+                             wavelength_range: Union[list, tuple, np.ndarray] = None,,
+                             __plot_bokeh__: bool = True,
+                             __plot_seaborn__: bool = False):
         """
         Find the closest data points in the hitran DataFrame
         to multiple sets of fitted parameters, with weighted preference for earlier sets.
 
         Parameters
         ----------
-        hitran : pd.DataFrame
-            DataFrame with columns ['amplitude', 'center', 'wing'].
-        fitted_params : np.ndarray
-            2D array where each row contains [amplitude, center, width] for each fitted peak.
+        wavelength_values : np.ndarray
+            Wavelength array in microns.
+        signal_values : np.ndarray
+            Signal arrays (input data).
         weights : list or np.ndarray, optional
             List of weights for each set of fitted parameters. Default is None,
             which gives equal weight to each set.
+        columns_to_print: list, optional
+            List of column names from HITRAN dataframe to display on assigned lines if 
+            plotted. Default is ["nu", "local_upper_quanta"]. 
+        wavelength_range : list-like, optional
+            List-like object (list, tuple, or np.ndarray) of length 2 representing 
+            wavelength range for plotting. Default is None. 
+        __plot_bokeh__ : bool, optional
+            Default is True.
+        __plot_seaborn__ : bool, optional
+            Default is False.
 
         Returns
         -------
-        closest_data_points : list of np.ndarray # CHANGE TO DATAFRAME
-            List of arrays containing [amplitude, center, wing] of the closest data points
-            in hitran DataFrame for each set of fitted parameters.
+        fitted_hitran : pd.DataFrame
+            DataFrame containing the closest data points in hitran DataFrame for each 
+            set of fitted parameters.
         """        
 
         hitran = self.hitran
@@ -376,11 +391,11 @@ class LineAssigner:
         if __plot_bokeh__:
             plot_assigned_lines_bokeh(wavelength_values, signal_values, 
                                       fitted_hitran, fitted_params, columns_to_print = columns_to_print,
-                                      wavelength_range=wavelength_range)
+                                      wavelength_range=wavelength_range, absorber_name=self.absorber_name)
         if __plot_seaborn__:
             plot_assigned_lines_seaborn(wavelength_values, signal_values, 
                                         fitted_hitran, fitted_params, columns_to_print = columns_to_print,
-                                        wavelength_range=wavelength_range)
+                                        wavelength_range=wavelength_range, absorber_name=self.absorber_name)
 
 
 

@@ -159,7 +159,7 @@ def plot_spectra_errorbar_bokeh(wavelength_values: np.ndarray,
     signal_values : np.ndarray
         Signal arrays (input data).
     wavelength_range : list-like, optional
-        List-like object (list, tuple, or np.ndarray) with of length 2 representing wavelength range for plotting.
+        List-like object (list, tuple, or np.ndarray) of length 2 representing wavelength range for plotting.
     signal_values_err : np.ndarray, optional
         Error on input data.
     absorber_name : str, optional
@@ -257,7 +257,7 @@ def plot_spectra_errorbar_seaborn(wavelength_values: np.ndarray,
     signal_values : nd.array
         Signal arrays (input data).
     wavelength_range : list-like, optional
-        List-like object (list, tuple, or np.ndarray) with of length 2 representing wavelength range for plotting.
+        List-like object (list, tuple, or np.ndarray) of length 2 representing wavelength range for plotting.
     signal_values_err : nd.array, optional
         Error on input data.
     absorber_name : str, optional
@@ -873,7 +873,8 @@ def plot_assigned_lines_seaborn(wavelength_values: np.ndarray,
                                 columns_to_print: Union[str, List[str]],
                                 wavelength_range: Union[list, tuple, np.ndarray] = None,
                                 line_profile: str = 'gaussian',
-                                fitting_method: str = 'lm'
+                                fitting_method: str = 'lm',
+                                absorber_name: str = None
                                 ) -> None:
 
     """
@@ -949,7 +950,7 @@ def plot_assigned_lines_seaborn(wavelength_values: np.ndarray,
         label=f'Fitted {line_profile.capitalize()}')
     
     ax1.set_ylabel("Signal")
-    ax1.set_title(f"Spectra with Fitted {line_profile.capitalize()} Peaks")
+    ax1.set_title(f"{absorber_name}: Spectrum with Fitted {line_profile.capitalize()} Peaks")
         
     # Create second subplot for residual
     ax2 = fig.add_subplot(gs[2, 0])
@@ -1019,7 +1020,8 @@ def plot_assigned_lines_bokeh(wavelength_values: np.ndarray,
                               columns_to_print: Union[str, List[str]],
                               wavelength_range: Union[list, tuple, np.ndarray] = None,
                               line_profile: str = 'gaussian',
-                              fitting_method: str = 'lm'
+                              fitting_method: str = 'lm',
+                              absorber_name: str = None
                               ) -> None:
 
     """
@@ -1090,7 +1092,7 @@ def plot_assigned_lines_bokeh(wavelength_values: np.ndarray,
     source_p2 = ColumnDataSource(data=dict(x=x, residual=residual))
 
    # Create a new plot with a title and axis labels
-    p1 = figure(title=f"Spectra with Fitted {line_profile.capitalize()} Peaks",
+    p1 = figure(title=f"{absorber_name}: Spectrum with Fitted {line_profile.capitalize()} Peaks",
                y_axis_label="Signal",
                width=800, height=500,
                x_range = x_range,
@@ -1100,7 +1102,7 @@ def plot_assigned_lines_bokeh(wavelength_values: np.ndarray,
     # Add the original spectrum to the plot
     p1.line('x', 'y', legend_label="Original Spectrum", line_width=2, color="black", source=source_p1)
 
-    # Add the baseline corrected spectrum to the plot
+    # Add the fitted spectrum to the plot
     p1.line('x', 'y_fitted', legend_label=f'Fitted {line_profile.capitalize()}', line_width=2, 
         line_dash='dashed', color="red", source=source_p1)
     
@@ -1156,7 +1158,7 @@ def plot_assigned_lines_bokeh(wavelength_values: np.ndarray,
             text=label_q, text_color="blue", text_align="left", text_baseline="top")
         p1.add_layout(label)
 
-    # Customize legend
+    # Customize legends
     legend = p1.legend[0]
     legend.location = 'top_left'
     p1.add_layout(legend, 'above')
