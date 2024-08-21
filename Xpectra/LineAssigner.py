@@ -154,7 +154,7 @@ class LineAssigner:
     Parameters
     ----------
     fitted_params : np.ndarray, optional
-        Fitted parameters of spectral peaks.
+        Fitted parameters of spectral peaks with [center, amplitude, width].
     hitran_file : str, optional
         File path containing HITRAN data.
     absorber_name : str, optional
@@ -163,8 +163,8 @@ class LineAssigner:
     
     hitran : pd.DataFrame
         DataFrame with columns ['amplitude', 'center', 'wing'].
-    hitran_description : str
     fitted_hitran : pd.DataFrame
+
     """
 
     def __init__(
@@ -177,6 +177,50 @@ class LineAssigner:
         self.fitted_params = fitted_params
         self.hitran_file = hitran_file
         self.absorber_name = absorber_name
+
+
+    @staticmethod
+    def parse_hitran_description(hitran_description: str) -> pd.DataFrame:
+        """
+        Parse HITRAN data description and extract column information.
+
+        Parameters
+        ----------
+        hitran_description : str
+            description of HITRAN data fields.
+
+        Returns
+        -------
+        df : pandas.DataFrame 
+            DataFrame containing column name, format specifier, units, and description.
+        """
+        lines = hitran_description.strip().split('\n\n')
+        data = []
+        
+        for line in lines:
+            name = line.split('\n')[0].strip()
+            format_specifier = None
+            units = None
+            description = None
+            
+            for subline in line.split('\n')[1:]:
+                if 'C-style format specifier:' in subline:
+                    format_specifier = subline.split(': ')[1].strip()
+                elif 'Units:' in subline:
+                    units = subline.split(': ')[1].strip()
+                elif 'Description:' in subline:
+                    description = subline.split(': ')[1].strip()
+            
+            data.append({
+                'Column Name': name,
+                'Format Specifier': format_specifier,
+                'Units': units,
+                'Description': description
+            })
+        
+        df = pd.DataFrame(data) 
+
+        return df
 
 
     @staticmethod
@@ -274,57 +318,13 @@ class LineAssigner:
         #return df
 
 
-    @staticmethod
-    def parse_hitran_description(hitran_description: str) -> pd.DataFrame:
-        """
-        Parse HITRAN data description and extract column information.
-
-        Parameters
-        ----------
-        hitran_description : str
-            description of HITRAN data fields.
-
-        Returns
-        -------
-        df : pandas.DataFrame 
-            DataFrame containing column name, format specifier, units, and description.
-        """
-        lines = hitran_description.strip().split('\n\n')
-        data = []
-        
-        for line in lines:
-            name = line.split('\n')[0].strip()
-            format_specifier = None
-            units = None
-            description = None
-            
-            for subline in line.split('\n')[1:]:
-                if 'C-style format specifier:' in subline:
-                    format_specifier = subline.split(': ')[1].strip()
-                elif 'Units:' in subline:
-                    units = subline.split(': ')[1].strip()
-                elif 'Description:' in subline:
-                    description = subline.split(': ')[1].strip()
-            
-            data.append({
-                'Column Name': name,
-                'Format Specifier': format_specifier,
-                'Units': units,
-                'Description': description
-            })
-        
-        df = pd.DataFrame(data) 
-
-        return df
-
-
     def hitran_line_assigner(self,
-                             wavelength_values: np.ndarray, 
-                             signal_values: np.ndarray,
-                             weights: Union[list,np.ndarray] = None,
+                             weights: Union[list,np.ndarray,None] = None,
                              columns_to_print: List[str] = ["nu", "local_upper_quanta"],
-                             wavelength_range: Union[list, tuple, np.ndarray] = None,
-                             __plot_bokeh__: bool = True,
+                             wavelength_values: Union[np.ndarray, None] = None, 
+                             signal_values: Union[np.ndarray, None] = None,
+                             wavelength_range: Union[list, tuple, np.ndarray, None] = None,
+                             __plot_bokeh__: bool = False,
                              __plot_seaborn__: bool = False):
         """
         Find the closest data points in the hitran DataFrame
@@ -332,21 +332,21 @@ class LineAssigner:
 
         Parameters
         ----------
-        wavelength_values : np.ndarray
-            Wavelength array in microns.
-        signal_values : np.ndarray
-            Signal arrays (input data).
         weights : list or np.ndarray, optional
             List of weights for each set of fitted parameters. Default is None,
             which gives equal weight to each set.
         columns_to_print: list, optional
             List of column names from HITRAN dataframe to display on assigned lines if 
             plotted. Default is ["nu", "local_upper_quanta"]. 
+        wavelength_values : np.ndarray, optional
+            Wavelength array in microns. Default is None.
+        signal_values : np.ndarray, optional
+            Signal arrays (input data). Default is None.
         wavelength_range : list-like, optional
             List-like object (list, tuple, or np.ndarray) of length 2 representing 
             wavelength range for plotting. Default is None. 
         __plot_bokeh__ : bool, optional
-            Default is True.
+            Default is False.
         __plot_seaborn__ : bool, optional
             Default is False.
 
@@ -357,7 +357,16 @@ class LineAssigner:
             set of fitted parameters.
         """        
 
+        plot_args = [wavelength_values, signal_values] 
+        if __plot_bokeh__ and any(arg is None for arg in plot_args):
+            raise ValueError("All required arguments (wavelength_values, signal_values) must have a value when __plot_bokeh__ is True.")
+        if __plot_seaborn__ and any(arg is None for arg in plot_args):
+            raise ValueError("All required arguments (wavelength_values, signal_values) must have a value when __plot_seaborn__ is True.")
+
+        if 'hitran' not in self.__dict__:
+            raise AttributeError("The 'hitran' attribute is missing. Ensure that data is loaded by running the 'parse_file_to_dataframe() method.")
         hitran = self.hitran
+
         fitted_params = self.fitted_params
 
         # Find closest data points 
@@ -386,6 +395,11 @@ class LineAssigner:
 
         fitted_hitran = pd.DataFrame(closest_data_points, columns=hitran.columns)
 
+        fitted_hitran['fitted_peak_center'] = fitted_params[:,0]
+        fitted_hitran['fitted_peak_amplitude'] = fitted_params[:,1]
+        fitted_hitran['fitted_peak_width'] = fitted_params[:,2]
+
+        fitted_hitran = fitted_hitran[['local_iso_id', 'nu', 'fitted_peak_center', 'sw', 'fitted_peak_amplitude', 'gamma_air', 'fitted_peak_width', 'local_upper_quanta']]
         self.fitted_hitran = fitted_hitran
         
         if __plot_bokeh__:
@@ -396,6 +410,12 @@ class LineAssigner:
             plot_assigned_lines_seaborn(wavelength_values, signal_values, 
                                         fitted_hitran, fitted_params, columns_to_print = columns_to_print,
                                         wavelength_range=wavelength_range, absorber_name=self.absorber_name)
+
+        return fitted_hitran
+
+
+
+
 
 
 
