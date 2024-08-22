@@ -139,9 +139,9 @@ def print_fitted_parameters_df(fitted_params: np.ndarray,
     display(df)
 
 
-def plot_spectra_errorbar_bokeh(wavelength_values: np.ndarray,
+def plot_spectra_errorbar_bokeh(wavenumber_values: np.ndarray,
                                 signal_values: np.ndarray,
-                                wavelength_range: Union[list, tuple, np.ndarray] = None,
+                                wavenumber_range: Union[list, tuple, np.ndarray] = None,
                                 signal_values_err: np.ndarray = None,
                                 absorber_name: str = None,
                                 y_label: str = "Signal",
@@ -154,12 +154,12 @@ def plot_spectra_errorbar_bokeh(wavelength_values: np.ndarray,
 
     Parameters
     ----------
-    wavelength_values : np.ndarray
-        Wavelength array in microns.
+    wavenumber_values : np.ndarray
+        Wavenumber array in cm^-1.
     signal_values : np.ndarray
         Signal arrays (input data).
-    wavelength_range : list-like, optional
-        List-like object (list, tuple, or np.ndarray) of length 2 representing wavelength range for plotting.
+    wavenumber_range : list-like, optional
+        List-like object (list, tuple, or np.ndarray) with of length 2 representing wavenumber range for plotting.
     signal_values_err : np.ndarray, optional
         Error on input data.
     absorber_name : str, optional
@@ -175,23 +175,23 @@ def plot_spectra_errorbar_bokeh(wavelength_values: np.ndarray,
     """
 
     molecule_name = absorber_name
-    x_obs = wavelength_values
+    x_obs = wavenumber_values
     y_obs = signal_values
     y_obs_err = signal_values_err
 
     # Trim x and y to desired wavelength range
-    if wavelength_range is not None:
+    if wavenumber_range is not None:
         # Make sure range is in correct format
-        if len(wavelength_range) != 2:
-            raise ValueError('wavelength_range must be tuple, list, or array with 2 elements')
+        if len(wavenumber_range) != 2:
+            raise ValueError('wavenumber_range must be tuple, list, or array with 2 elements')
         # Locate indices and splice
-        condition_range = (x_obs > wavelength_range[0]) & (x_obs < wavelength_range[1])
+        condition_range = (x_obs > wavenumber_range[0]) & (x_obs < wavenumber_range[1])
         x_obs = x_obs[condition_range]
         y_obs = y_obs[condition_range]
 
     # Create the figure
     p = figure(title=f"{molecule_name}: Calibrated Laboratory Spectra" if title_label is None else title_label,
-               x_axis_label="Wavelength [𝜇m]",
+               x_axis_label="Wavenumber [cm^-1]",
                y_axis_label=y_label,
                width=1000, height=300,
                y_axis_type="linear",
@@ -227,7 +227,7 @@ def plot_spectra_errorbar_bokeh(wavelength_values: np.ndarray,
     # Add HoverTool
     hover = HoverTool()
     hover.tooltips = [
-        ("Wavenumber (micron)", "@x{0.0000}"),
+        ("Wavenumber [cm^-1]", "@x{0.0000}"),
         ("Intensity", "@y{0.0000}")
         ]
     p.add_tools(hover)
@@ -237,9 +237,9 @@ def plot_spectra_errorbar_bokeh(wavelength_values: np.ndarray,
     show(p)
 
 
-def plot_spectra_errorbar_seaborn(wavelength_values: np.ndarray,
+def plot_spectra_errorbar_seaborn(wavenumber_values: np.ndarray,
                                   signal_values: np.ndarray,
-                                  wavelength_range: Union[list, tuple, np.ndarray] = None,
+                                  wavenumber_range: Union[list, tuple, np.ndarray] = None,
                                   signal_values_err: np.ndarray = None,
                                   absorber_name: str = None,
                                   y_label: str = "Signal",
@@ -252,12 +252,12 @@ def plot_spectra_errorbar_seaborn(wavelength_values: np.ndarray,
 
     Parameters
     ----------
-    wavelength_values : nd.array
-        Wavelength array in microns.
+    wavenumber_values : nd.array
+        Wavenumber array in cm^-1.
     signal_values : nd.array
         Signal arrays (input data).
-    wavelength_range : list-like, optional
-        List-like object (list, tuple, or np.ndarray) of length 2 representing wavelength range for plotting.
+    wavenumber_range : list-like, optional
+        List-like object (list, tuple, or np.ndarray) with of length 2 representing wavenumber range for plotting.
     signal_values_err : nd.array, optional
         Error on input data.
     absorber_name : str, optional
@@ -277,17 +277,17 @@ def plot_spectra_errorbar_seaborn(wavelength_values: np.ndarray,
     rcParams['axes.unicode_minus'] = False
 
     molecule_name = absorber_name
-    x_obs = wavelength_values
+    x_obs = wavenumber_values
     y_obs = signal_values
     y_obs_err = signal_values_err
 
     # Trim x and y to desired wavelength range
-    if wavelength_range is not None:
+    if wavenumber_range is not None:
         # Make sure range is in correct format
-        if len(wavelength_range) != 2:
-            raise ValueError('wavelength_range must be tuple, list, or array with 2 elements')
+        if len(wavenumber_range) != 2:
+            raise ValueError('wavenumber_range must be tuple, list, or array with 2 elements')
         # Locate indices and splice
-        condition_range = (x_obs > wavelength_range[0]) & (x_obs < wavelength_range[1])
+        condition_range = (x_obs > wavenumber_range[0]) & (x_obs < wavenumber_range[1])
         x_obs = x_obs[condition_range]
         y_obs = y_obs[condition_range]
 
@@ -310,7 +310,7 @@ def plot_spectra_errorbar_seaborn(wavelength_values: np.ndarray,
 
         ax1.errorbar(x_obs, y_obs, yerr=[y_obs - lower, upper - y_obs], fmt='none', ecolor='gray', alpha=0.7)
 
-    ax1.set_xlabel("Wavelength [μm]", fontsize=12)
+    ax1.set_xlabel("Wavenumber [cm^-1]", fontsize=12)
     ax1.set_ylabel(y_label, fontsize=12)
     ax1.set_title(f"{molecule_name}: Calibrated Laboratory Spectra" if title_label is None else title_label,
                   fontsize=14)
@@ -323,12 +323,12 @@ def plot_spectra_errorbar_seaborn(wavelength_values: np.ndarray,
     ax2.set_xlim(ax1.get_xlim())
     ax2.set_xticks(ax1.get_xticks())
     ax2.set_xticklabels([f'{10 ** 4 / tick:.3f}' for tick in ax1.get_xticks()])
-    ax2.set_xlabel("Wavenumber [cm$^{-1}$]", fontsize=12)
+    ax2.set_xlabel("Wavenumber [cm^-1]", fontsize=12)
     plt.tight_layout()
     plt.show()
 
 
-def plot_baseline_fitting_seaborn(wavelength_values: np.ndarray, 
+def plot_baseline_fitting_seaborn(wavenumber_values: np.ndarray, 
                                   signal_values: np.ndarray, 
                                   baseline_type: str, 
                                   fitted_baseline_params: np.ndarray, 
@@ -339,8 +339,8 @@ def plot_baseline_fitting_seaborn(wavelength_values: np.ndarray,
 
     Parameters
     ----------
-    wavelength_values : np.ndarray
-        Wavelength array in microns.
+    wavenumber_values : np.ndarray
+        Wavenumber array in cm^-1.
     signal_values : np.ndarray
         Signal arrays (input data).    
     baseline_type : str, {'polynomial', 'sinusoidal', 'spline'}
@@ -351,7 +351,7 @@ def plot_baseline_fitting_seaborn(wavelength_values: np.ndarray,
         Degree of fitted polynomial baseline. 
     """
 
-    x = wavelength_values
+    x = wavenumber_values
     y = signal_values
 
     if baseline_type == 'polynomial':
@@ -398,7 +398,7 @@ def plot_baseline_fitting_seaborn(wavelength_values: np.ndarray,
         ax.tick_params(axis='both', which='minor', direction='in', length=3.5, width=1)  
 
     ax1.set_ylabel("Signal")
-    ax2.set_xlabel("Wavelength [µm]")
+    ax2.set_xlabel("Wavenumber [cm^-1]")
     ax2.set_ylabel("Baseline-Corrected Signal")
 
     ax1.set_title(f"Spectra with Fitted {baseline_type.capitalize()} Baseline")
@@ -409,7 +409,7 @@ def plot_baseline_fitting_seaborn(wavelength_values: np.ndarray,
     plt.show()
 
 
-def plot_baseline_fitting_bokeh(wavelength_values: np.ndarray, 
+def plot_baseline_fitting_bokeh(wavenumber_values: np.ndarray, 
                                 signal_values: np.ndarray, 
                                 baseline_type: str, 
                                 fitted_baseline_params: np.ndarray, 
@@ -420,8 +420,8 @@ def plot_baseline_fitting_bokeh(wavelength_values: np.ndarray,
 
     Parameters
     ----------
-    wavelength_values : np.ndarray
-        Wavelength array in microns.
+    wavenumber_values : np.ndarray
+        Wavenumber array in cm^-1.
     signal_values : np.ndarray
         Signal arrays (input data). 
     baseline_type : str, {'polynomial', 'sinusoidal', 'spline'}
@@ -432,7 +432,7 @@ def plot_baseline_fitting_bokeh(wavelength_values: np.ndarray,
         Degree of fitted polynomial baseline. 
     """
 
-    x = wavelength_values
+    x = wavenumber_values
     y = signal_values
 
     if baseline_type == 'polynomial':
@@ -464,7 +464,6 @@ def plot_baseline_fitting_bokeh(wavelength_values: np.ndarray,
 
     # Create the figure
     p1 = figure(title=f"Spectra with Fitted {baseline_type.capitalize()} Baseline",
-               #x_axis_label="Wavelength [𝜇m]",
                y_axis_label="Signal",
                width=800, height=350,
                x_range=x_range, 
@@ -481,7 +480,7 @@ def plot_baseline_fitting_bokeh(wavelength_values: np.ndarray,
 
     # Create lower plot
     p2 = figure(title=' ',
-               x_axis_label="Wavelength [𝜇m]",
+               x_axis_label="Wavenumber [cm^-1]",
                y_axis_label="Baseline-Corrected Signal",
                width=800, height=350,
                x_range=x_range, 
@@ -508,13 +507,13 @@ def plot_baseline_fitting_bokeh(wavelength_values: np.ndarray,
     # Add HoverTool
     hover_p1 = HoverTool()
     hover_p1.tooltips = [
-        ("Wavelength [𝜇m]", "@x{0.000}"),
+        ("Wavenumber [cm^-1]", "@x{0.000}"),
         ("Intensity", "@y{0.000}"),
         (f"Fitted {baseline_type.capitalize()} Baseline", "@y_baseline{0.000}"),
     ]
     hover_p2 = HoverTool()
     hover_p2.tooltips = [
-        ("Wavelength [𝜇m]", "@x{0.000}"),
+        ("Wavenumber [cm^-1]", "@x{0.000}"),
         ("Baseline-Corrected Intensity", "@y_baseline_corrected{0.000}"),
     ]
     p1.add_tools(hover_p1)
@@ -528,7 +527,7 @@ def plot_baseline_fitting_bokeh(wavelength_values: np.ndarray,
     show(layout)
 
 
-def plot_fitted_als_bokeh(wavelength_values: np.ndarray, 
+def plot_fitted_als_bokeh(wavenumber_values: np.ndarray, 
                           signal_values: np.ndarray,
                           fitted_baseline: np.ndarray,
                           baseline_type: str = 'als'
@@ -539,8 +538,8 @@ def plot_fitted_als_bokeh(wavelength_values: np.ndarray,
 
     Parameters
     ----------
-    wavelength_values : np.ndarray
-        Wavelength array in microns.
+    wavenumber_values : np.ndarray
+        Wavenumber array in cm^-1.
     signal_values : np.ndarray
         Signal arrays (input data). 
     fitted_baseline : np.ndarray
@@ -549,7 +548,7 @@ def plot_fitted_als_bokeh(wavelength_values: np.ndarray,
         Function type of fitted baseline.
 
     """
-    x = wavelength_values
+    x = wavenumber_values
     y = signal_values
     y_baseline = fitted_baseline
     y_baseline_corrected = y - y_baseline
@@ -581,7 +580,7 @@ def plot_fitted_als_bokeh(wavelength_values: np.ndarray,
 
     # Create lower plot
     p2 = figure(title=' ',
-               x_axis_label="Wavelength [𝜇m]",
+               x_axis_label="Wavenumber [cm^-1]",
                y_axis_label="Baseline-Corrected Signal",
                width=800, height=350,
                x_range=x_range, 
@@ -608,13 +607,13 @@ def plot_fitted_als_bokeh(wavelength_values: np.ndarray,
     # Add HoverTool
     hover_p1 = HoverTool()
     hover_p1.tooltips = [
-        ("Wavelength [𝜇m]", "@x{0.000}"),
+        ("Wavenumber [cm^-1]", "@x{0.000}"),
         ("Intensity", "@y{0.000}"),
         (f"Fitted {baseline_type.upper()} Baseline", "@y_baseline{0.000}"),
     ]
     hover_p2 = HoverTool()
     hover_p2.tooltips = [
-        ("Wavelength [𝜇m]", "@x{0.000}"),
+        ("Wavenumber [cm^-1]", "@x{0.000}"),
         ("Baseline-Corrected Intensity", "@y_baseline_corrected{0.000}"),
     ]
     p1.add_tools(hover_p1)
@@ -628,10 +627,10 @@ def plot_fitted_als_bokeh(wavelength_values: np.ndarray,
     show(layout)
 
 
-def plot_fitted_spectrum_bokeh(wavelength_values: np.ndarray, 
+def plot_fitted_spectrum_bokeh(wavenumber_values: np.ndarray, 
                                signal_values: np.ndarray,
                                fitted_params: np.ndarray,
-                               wavelength_range: Union[list, tuple, np.ndarray] = None,
+                               wavenumber_range: Union[list, tuple, np.ndarray] = None,
                                line_profile: str = 'gaussian',
                                fitting_method: str = 'lm'
                                ) -> None:
@@ -640,19 +639,19 @@ def plot_fitted_spectrum_bokeh(wavelength_values: np.ndarray,
 
     Parameters
     ----------
-    wavelength_values : np.ndarray
-        Wavelength array in microns.
+    wavenumber_values : np.ndarray
+        Wavenumber array in cm^-1.
     signal_values : np.ndarray
         Signal arrays (input data). 
     fitted_params : list
         List of fitted parameters of the line profile.
-    wavelength_range : list-like, optional
-        List-like object (list, tuple, or np.ndarray) with of length 2 representing wavelength range for plotting.
+    wavenumber_range : list-like, optional
+        List-like object (list, tuple, or np.ndarray) with of length 2 representing wavenumber range for plotting.
     line_profile : str, {'gaussian', 'lorentzian', 'voigt'}, optional
         Type of line profile to use for fitting. Default is 'gaussian'.
     """
 
-    x = wavelength_values
+    x = wavenumber_values
     y = signal_values
 
     # Calculate fitted y values
@@ -695,12 +694,12 @@ def plot_fitted_spectrum_bokeh(wavelength_values: np.ndarray,
                tools="pan,wheel_zoom,box_zoom,reset")
 
     # Trim x and y to desired wavelength range
-    if wavelength_range is not None:
+    if wavenumber_range is not None:
         # Make sure range is in correct format
-        if len(wavelength_range) != 2:
-            raise ValueError('wavelength_range must be tuple, list, or array with 2 elements')
+        if len(wavenumber_range) != 2:
+            raise ValueError('wavenumber_range must be tuple, list, or array with 2 elements')
         # Locate indices and splice
-        condition_range = (x > wavelength_range[0]) & (x < wavelength_range[1])
+        condition_range = (x > wavenumber_range[0]) & (x < wavenumber_range[1])
         x = x[condition_range]
         y = y[condition_range]
         y_fitted = y_fitted[condition_range]
@@ -714,7 +713,7 @@ def plot_fitted_spectrum_bokeh(wavelength_values: np.ndarray,
     
     # Create lower plot
     p2 = figure(title=' ',
-               x_axis_label="Wavelength [𝜇m]",
+               x_axis_label="Wavenumber [cm^-1]",
                y_axis_label="Residual",
                width=800, height=200,
                x_range=x_range, 
@@ -738,13 +737,13 @@ def plot_fitted_spectrum_bokeh(wavelength_values: np.ndarray,
     # Add HoverTool
     hover_p1 = HoverTool()
     hover_p1.tooltips = [
-        ("Wavelength [𝜇m]", "@x{0.000}"),
+        ("Wavenumber [cm^-1]", "@x{0.000}"),
         ("Intensity", "@y{0.000}"),
         (f"Fitted {line_profile.capitalize()}", "@y_fitted{0.000}"),
     ]
     hover_p2 = HoverTool()
     hover_p2.tooltips = [
-        ("Wavelength [𝜇m]", "@x{0.000}"),
+        ("Wavenumber [cm^-1]", "@x{0.000}"),
         ("Residual", "@residual{0.000}"),
     ]
     p1.add_tools(hover_p1)
@@ -758,10 +757,10 @@ def plot_fitted_spectrum_bokeh(wavelength_values: np.ndarray,
     show(layout)
 
 
-def plot_fitted_spectrum_seaborn(wavelength_values: np.ndarray, 
+def plot_fitted_spectrum_seaborn(wavenumber_values: np.ndarray, 
                                  signal_values: np.ndarray,
                                  fitted_params: np.ndarray,
-                                 wavelength_range: Union[list, tuple, np.ndarray] = None,
+                                 wavenumber_range: Union[list, tuple, np.ndarray] = None,
                                  line_profile: str = 'gaussian',
                                  fitting_method: str = 'lm'
                                  ) -> None:
@@ -770,19 +769,19 @@ def plot_fitted_spectrum_seaborn(wavelength_values: np.ndarray,
 
     Parameters
     ----------
-    wavelength_values : np.ndarray
-        Wavelength array in microns.
+    wavenumber_values : np.ndarray
+        Wavenumber array in cm^-1.
     signal_values : np.ndarray
         Signal arrays (input data). 
     fitted_params : list
         List of fitted parameters of the line profile.
-    wavelength_range : list-like, optional
-        List-like object (list, tuple, or np.ndarray) with of length 2 representing wavelength range for plotting.
+    wavenumber_range : list-like, optional
+        List-like object (list, tuple, or np.ndarray) with of length 2 representing wavenumber range for plotting.
     line_profile : str, {'gaussian', 'lorentzian', 'voigt'}, optional
         Type of line profile to use for fitting. Default is 'gaussian'.
     """
 
-    x = wavelength_values
+    x = wavenumber_values
     y = signal_values
 
     fitted_peak_positions = fitted_params[:,0]
@@ -807,12 +806,12 @@ def plot_fitted_spectrum_seaborn(wavelength_values: np.ndarray,
     rmse_value = np.sqrt(((y_fitted - y) ** 2).mean())
 
     # Trim x and y to desired wavelength range for plotting
-    if wavelength_range is not None:
+    if wavenumber_range is not None:
         # Make sure range is in correct format
-        if len(wavelength_range) != 2:
-            raise ValueError('wavelength_range must be tuple, list, or array with 2 elements')
+        if len(wavenumber_range) != 2:
+            raise ValueError('wavenumber_range must be tuple, list, or array with 2 elements')
         # Locate indices and splice
-        condition_range = (x > wavelength_range[0]) & (x < wavelength_range[1])
+        condition_range = (x > wavenumber_range[0]) & (x < wavenumber_range[1])
         x = x[condition_range]
         y = y[condition_range]
         y_fitted = y_fitted[condition_range]
@@ -840,7 +839,7 @@ def plot_fitted_spectrum_seaborn(wavelength_values: np.ndarray,
         label=f'Residual = (Data) - (Fitted {line_profile.capitalize()} Peaks)',
         color='green')
 
-    ax2.set_xlabel("Wavelength [µm]")
+    ax2.set_xlabel("Wavenumber [cm^-1]")
     ax2.set_ylabel("Residual")
 
     for ax in (ax1, ax2):
@@ -866,12 +865,12 @@ def plot_fitted_spectrum_seaborn(wavelength_values: np.ndarray,
     plt.show()
 
 
-def plot_assigned_lines_seaborn(wavelength_values: np.ndarray, 
+def plot_assigned_lines_seaborn(wavenumber_values: np.ndarray, 
                                 signal_values: np.ndarray, 
                                 fitted_hitran: pd.DataFrame,
                                 fitted_params: np.ndarray,
                                 columns_to_print: Union[str, List[str]],
-                                wavelength_range: Union[list, tuple, np.ndarray] = None,
+                                wavenumber_range: Union[list, tuple, np.ndarray] = None,
                                 line_profile: str = 'gaussian',
                                 fitting_method: str = 'lm',
                                 absorber_name: str = None
@@ -882,8 +881,8 @@ def plot_assigned_lines_seaborn(wavelength_values: np.ndarray,
 
     Parameters
     ----------
-    wavelength_values : np.ndarray
-        Wavelength array in microns.
+    wavenumber_values : np.ndarray
+        Wavenumber array in cm^-1.
     signal_values : np.ndarray
         Signal arrays (input data). 
     fitted_hitran : pd.DataFrame
@@ -892,8 +891,8 @@ def plot_assigned_lines_seaborn(wavelength_values: np.ndarray,
         Fitted parameters of peaks.
     columns_to_print : str or list
         Columns to print corresponding to line positions. 
-    wavelength_range : list-like, optional
-        List-like object (list, tuple, or np.ndarray) with of length 2 representing wavelength range for plotting.
+    wavenumber_range : list-like, optional
+        List-like object (list, tuple, or np.ndarray) with of length 2 representing wavenumber range for plotting.
     line_profile : str, {'gaussian', 'lorentzian', 'voigt'}, optional
         Type of line profile to use for fitting. Default is 'gaussian'.
     """
@@ -901,7 +900,7 @@ def plot_assigned_lines_seaborn(wavelength_values: np.ndarray,
     # option for printing different information
     # add fitted spectrum
 
-    x = wavelength_values
+    x = wavenumber_values
     y = signal_values
 
     line_positions = fitted_hitran["nu"].to_numpy()
@@ -925,12 +924,12 @@ def plot_assigned_lines_seaborn(wavelength_values: np.ndarray,
             y_fitted += amplitude * np.real(wofz(z)).astype(float) / (sigma * np.sqrt(2 * np.pi))
 
     # Trim x and y to desired wavelength range for plotting
-    if wavelength_range is not None:
+    if wavenumber_range is not None:
         # Make sure range is in correct format
-        if len(wavelength_range) != 2:
-            raise ValueError('wavelength_range must be tuple, list, or array with 2 elements')
+        if len(wavenumber_range) != 2:
+            raise ValueError('wavenumber_range must be tuple, list, or array with 2 elements')
         # Locate indices and splice
-        condition_range = (x > wavelength_range[0]) & (x < wavelength_range[1])
+        condition_range = (x > wavenumber_range[0]) & (x < wavenumber_range[1])
         x = x[condition_range]
         y = y[condition_range]
         y_fitted = y_fitted[condition_range]
@@ -959,7 +958,7 @@ def plot_assigned_lines_seaborn(wavelength_values: np.ndarray,
     # Plot residual 
     ax2.plot(x, y_residual, color='k', label=f'Residual = (Data) - (Fitted {line_profile.capitalize()} Peaks)')
 
-    ax2.set_xlabel("Wavelength [µm]")
+    ax2.set_xlabel("Wavenumber [cm^-1]")
     ax2.set_ylabel("Residual")
     
     # Plot assigned HITRAN lines
@@ -1013,12 +1012,12 @@ def plot_assigned_lines_seaborn(wavelength_values: np.ndarray,
 
 
 
-def plot_assigned_lines_bokeh(wavelength_values: np.ndarray, 
+def plot_assigned_lines_bokeh(wavenumber_values: np.ndarray, 
                               signal_values: np.ndarray, 
                               fitted_hitran: pd.DataFrame,
                               fitted_params: np.ndarray,
                               columns_to_print: Union[str, List[str]],
-                              wavelength_range: Union[list, tuple, np.ndarray] = None,
+                              wavenumber_range: Union[list, tuple, np.ndarray] = None,
                               line_profile: str = 'gaussian',
                               fitting_method: str = 'lm',
                               absorber_name: str = None
@@ -1029,8 +1028,8 @@ def plot_assigned_lines_bokeh(wavelength_values: np.ndarray,
 
     Parameters
     ----------
-    wavelength_values : np.ndarray
-        Wavelength array in microns.
+    wavenumber_values : np.ndarray
+        Wavenumber array in cm^-1.
     signal_values : np.ndarray
         Signal arrays (input data). 
     fitted_hitran : pd.DataFrame
@@ -1039,13 +1038,13 @@ def plot_assigned_lines_bokeh(wavelength_values: np.ndarray,
         Fitted parameters of peaks.
     columns_to_print : str or list
         Columns to print corresponding to line positions. 
-    wavelength_range : list-like, optional
-        List-like object (list, tuple, or np.ndarray) with of length 2 representing wavelength range for plotting.
+    wavenumber_range : list-like, optional
+        List-like object (list, tuple, or np.ndarray) with of length 2 representing wavenumber range for plotting.
     line_profile : str, {'gaussian', 'lorentzian', 'voigt'}, optional
         Type of line profile to use for fitting. Default is 'gaussian'.
     """
 
-    x = wavelength_values
+    x = wavenumber_values
     y = signal_values
 
     line_positions = fitted_hitran["nu"].to_numpy()
@@ -1069,12 +1068,12 @@ def plot_assigned_lines_bokeh(wavelength_values: np.ndarray,
             y_fitted += amplitude * np.real(wofz(z)).astype(float) / (sigma * np.sqrt(2 * np.pi))
 
     # Trim x and y to desired wavelength range
-    if wavelength_range is not None:
+    if wavenumber_range is not None:
         # Make sure range is in correct format
-        if len(wavelength_range) != 2:
-            raise ValueError('wavelength_range must be tuple, list, or array with 2 elements')
+        if len(wavenumber_range) != 2:
+            raise ValueError('wavenumber_range must be tuple, list, or array with 2 elements')
         # Locate indices and splice
-        condition_range = (x > wavelength_range[0]) & (x < wavelength_range[1])
+        condition_range = (x > wavenumber_range[0]) & (x < wavenumber_range[1])
         x = x[condition_range]
         y = y[condition_range]
         y_fitted = y_fitted[condition_range]   
@@ -1108,7 +1107,7 @@ def plot_assigned_lines_bokeh(wavelength_values: np.ndarray,
     
     # Create lower plot
     p2 = figure(title=' ',
-               x_axis_label="Wavelength [𝜇m]",
+               x_axis_label="Wavenumber [cm^-1]",
                y_axis_label="Residual",
                width=800, height=200,
                x_range = x_range,
@@ -1174,13 +1173,13 @@ def plot_assigned_lines_bokeh(wavelength_values: np.ndarray,
     # Add HoverTool
     hover_p1 = HoverTool()
     hover_p1.tooltips = [
-        ("Wavelength [𝜇m]", "@x{0.000}"),
+        ("Wavenumber [cm^-1]", "@x{0.000}"),
         ("Intensity", "@y{0.000}"),
         (f"Fitted {line_profile.capitalize()}", "@y_fitted{0.000}"),
     ]
     hover_p2 = HoverTool()
     hover_p2.tooltips = [
-        ("Wavelength [𝜇m]", "@x{0.000}"),
+        ("Wavenumber [cm^-1]", "@x{0.000}"),
         ("Residual", "@residual{0.000}"),
     ]
     p1.add_tools(hover_p1)

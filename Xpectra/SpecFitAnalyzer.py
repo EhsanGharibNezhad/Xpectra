@@ -50,8 +50,8 @@ class SpecFitAnalyzer:
         Signal arrays (input data).
     wavelength_names : List[str], optional
         Names of wavelengths in microns.
-    wavelength_values : np.ndarray, optional
-        Wavelength array in microns.
+    wavenumber_values : np.ndarray, optional
+        Wavenumber array in cm^-1.
     absorber_name : str, optional
         Molecule or atom name.
     """
@@ -60,12 +60,12 @@ class SpecFitAnalyzer:
             self,
             signal_values: Union[np.ndarray, None] = None,
             wavelength_names: Union[List[str], None] = None,
-            wavelength_values: Union[np.ndarray, None] = None,
+            wavenumber_values: Union[np.ndarray, None] = None,
             absorber_name: Union[str, None] = None,
     ):
         self.signal_values = signal_values
         self.wavelength_names = wavelength_names
-        self.wavelength_values = wavelength_values
+        self.wavenumber_values = wavenumber_values
         self.absorber_name = absorber_name
 
 
@@ -94,7 +94,7 @@ class SpecFitAnalyzer:
                      initial_guesses: Union[list, np.ndarray],
                      line_profile: str = 'gaussian',
                      fitting_method: str = 'lm',
-                     wavelength_range: Union[list, tuple, np.ndarray] = None,
+                     wavenumber_range: Union[list, tuple, np.ndarray] = None,
                      __plot_bokeh__: bool = True,
                      __plot_seaborn__: bool = False,
                      __print__: bool = True
@@ -108,8 +108,8 @@ class SpecFitAnalyzer:
             List of initial guesses for parameters of the line profile.
         line_profile : str, {'gaussian', 'lorentzian', 'voigt'}, optional
             Type of line profile to use for fitting. Default is 'gaussian'.
-        wavelength_range : list-like, optional
-            List-like object (list, tuple, or np.ndarray) with of length 2 representing wavelength range to fit within.
+        wavenumber_range : list-like, optional
+            List-like object (list, tuple, or np.ndarray) with of length 2 representing wavenumber range to fit within.
         __plot_bokeh__ : bool
             True or False.
         __plot_seaborn__ : bool
@@ -122,7 +122,7 @@ class SpecFitAnalyzer:
         fitted_params : list
             List of fitted parameters for each peak.
         """
-        x = self.wavelength_values
+        x = self.wavenumber_values
 
         if self.y_baseline_corrected is None:
             y = self.signal_values
@@ -130,12 +130,12 @@ class SpecFitAnalyzer:
             y = self.y_baseline_corrected
 
         # Trim x and y to desired wavelength range for plotting
-        if wavelength_range is not None:
+        if wavenumber_range is not None:
             # Make sure range is in correct format
-            if len(wavelength_range) != 2:
-                raise ValueError('wavelength_range must be tuple, list, or array with 2 elements')
+            if len(wavenumber_range) != 2:
+                raise ValueError('wavenumber_range must be tuple, list, or array with 2 elements')
             # Locate indices and splice
-            condition_range = (x > wavelength_range[0]) & (x < wavelength_range[1])
+            condition_range = (x > wavenumber_range[0]) & (x < wavenumber_range[1])
             x = x[condition_range]
             y = y[condition_range]
 
@@ -216,7 +216,7 @@ class SpecFitAnalyzer:
         params : np.ndarray
             Coefficients of the fitted polynomial.
         """
-        x = self.wavelength_values
+        x = self.wavenumber_values
         y = self.signal_values
 
         # Fit polynomial baseline using least squares
@@ -227,12 +227,12 @@ class SpecFitAnalyzer:
         self.y_baseline_corrected = y - p(x)
 
         if __plot_bokeh__:
-            plot_baseline_fitting_bokeh(self.wavelength_values, self.signal_values, 
+            plot_baseline_fitting_bokeh(self.wavenumber_values, self.signal_values, 
                 self.baseline_type, self.fitted_baseline_params, 
                 baseline_degree=self.baseline_degree)
 
         if __plot_seaborn__:
-            plot_baseline_fitting_seaborn(self.wavelength_values, self.signal_values, 
+            plot_baseline_fitting_seaborn(self.wavenumber_values, self.signal_values, 
                 self.baseline_type, self.fitted_baseline_params, 
                 baseline_degree=self.baseline_degree)
 
@@ -268,7 +268,7 @@ class SpecFitAnalyzer:
         params : np.ndarray
             Parameters of the fitted sinusoidal baseline.
         """
-        x = self.wavelength_values
+        x = self.wavenumber_values
         y = self.signal_values
 
         def sine_wave(x, amplitude, freq, phase, offset):
@@ -280,10 +280,10 @@ class SpecFitAnalyzer:
         self.y_baseline_corrected = y - sine_wave(x,*params)
 
         if __plot_seaborn__:
-            plot_baseline_fitting_seaborn(self.wavelength_values, self.signal_values, 
+            plot_baseline_fitting_seaborn(self.wavenumber_values, self.signal_values, 
                 self.baseline_type, self.fitted_baseline_params)
         if __plot_bokeh__:
-            plot_baseline_fitting_bokeh(self.wavelength_values, self.signal_values, 
+            plot_baseline_fitting_bokeh(self.wavenumber_values, self.signal_values, 
                 self.baseline_type, self.fitted_baseline_params)
         if __print__:
             baseline_info = dict(zip(['Amplitude', 'Frequency', 'Phase', 'Offset'], 
@@ -316,7 +316,7 @@ class SpecFitAnalyzer:
         spline : UnivariateSpline
             The fitted spline object.
         """
-        x = self.wavelength_values
+        x = self.wavenumber_values
         y = self.signal_values
 
         spline = UnivariateSpline(x, y, s=s)
@@ -325,10 +325,10 @@ class SpecFitAnalyzer:
         self.y_baseline_corrected = y - spline(x)
 
         if __plot_seaborn__:
-            plot_baseline_fitting_seaborn(self.wavelength_values, self.signal_values, 
+            plot_baseline_fitting_seaborn(self.wavenumber_values, self.signal_values, 
                 self.baseline_type, self.fitted_baseline_params)
         if __plot_bokeh__:
-            plot_baseline_fitting_bokeh(self.wavelength_values, self.signal_values, 
+            plot_baseline_fitting_bokeh(self.wavenumber_values, self.signal_values, 
                 self.baseline_type, self.fitted_baseline_params)
 
         return spline
@@ -379,7 +379,7 @@ class SpecFitAnalyzer:
             the fitted background vector
 
         """
-        x = self.wavelength_values
+        x = self.wavenumber_values
         y = self.signal_values
 
         L = len(y)
@@ -444,7 +444,7 @@ class SpecFitAnalyzer:
             the fitted background vector
 
         """
-        x = self.wavelength_values
+        x = self.wavenumber_values
         y = self.signal_values
 
         N = len(y)

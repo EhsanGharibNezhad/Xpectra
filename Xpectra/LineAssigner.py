@@ -36,21 +36,21 @@ from .SpecStatVisualizer import *
 
 
 
-def click_and_print(wavelength_values: np.ndarray,
+def click_and_print(wavenumber_values: np.ndarray,
                     signal_values: np.ndarray,
-                    wavelength_range: Union[list, tuple, np.ndarray] = None,
+                    wavenumber_range: Union[list, tuple, np.ndarray] = None,
                     ) -> None:
     """
     Click and print spectral peaks on plotted spectra with error bars using Bokeh.
 
     Parameters
     ----------
-    wavelength_values : np.ndarray
-        Wavelength array in microns.
+    wavenumber_values : np.ndarray, optional
+        Wavenumber array in cm^-1.
     signal_values : np.ndarray
         Signal arrays (input data).
-    wavelength_range : list-like, optional
-        List-like object (list, tuple, or np.ndarray) with of length 2 representing wavelength range for plotting.
+    wavenumber_range : list-like, optional
+        List-like object (list, tuple, or np.ndarray) with of length 2 representing wavenumber range for plotting.
     """
 
     molecule_name = absorber_name
@@ -58,12 +58,12 @@ def click_and_print(wavelength_values: np.ndarray,
     y_obs = signal_values
 
     # Trim x and y to desired wavelength range
-    if wavelength_range is not None:
+    if wavenumber_range is not None:
         # Make sure range is in correct format
-        if len(wavelength_range) != 2:
-            raise ValueError('wavelength_range must be tuple, list, or array with 2 elements')
+        if len(wavenumber_range) != 2:
+            raise ValueError('wavenumber_range must be tuple, list, or array with 2 elements')
         # Locate indices and splice
-        condition_range = (x_obs > wavelength_range[0]) & (x_obs < wavelength_range[1])
+        condition_range = (x_obs > wavenumber_range[0]) & (x_obs < wavenumber_range[1])
         x_obs = x_obs[condition_range]
         y_obs = y_obs[condition_range]
     
@@ -72,14 +72,14 @@ def click_and_print(wavelength_values: np.ndarray,
     
     # Create the figure
     p = figure(title="Click and Print",
-               x_axis_label="Wavelength [𝜇m]",
+               x_axis_label="Wavenumber [cm^-1]",
                y_axis_label="Signal",
                width=1000, height=300,
                y_axis_type="linear",
                tools="pan,wheel_zoom,box_zoom,reset")
 
     # Add HoverTool to the plot
-    hover = HoverTool(tooltips=[("Wavelength", "@x{0.000} µm"), ("Signal", "@y{0.000}")], mode='vline')
+    hover = HoverTool(tooltips=[("Wavenumber [cm^-1]", "@x{0.000} µm"), ("Signal", "@y{0.000}")], mode='vline')
     p.add_tools(hover)
 
     # Add the line plot
@@ -155,13 +155,12 @@ class LineAssigner:
     ----------
     fitted_params : np.ndarray, optional
         Fitted parameters of spectral peaks with [center, amplitude, width].
-    hitran_file : str, optional
+    hitran_par : str, optional
         File path containing HITRAN data.
     absorber_name : str, optional
         Molecule or atom name.
-
     
-    hitran : pd.DataFrame
+    hitran_df : pd.DataFrame
         DataFrame with columns ['amplitude', 'center', 'wing'].
     fitted_hitran : pd.DataFrame
 
@@ -314,14 +313,14 @@ class LineAssigner:
         
         df = pd.DataFrame(parsed_data_list)  # Convert list of dictionaries to DataFrame
         
-        self.hitran = df
-        #return df
+        self.hitran_df = df
+        
 
 
     def hitran_line_assigner(self,
                              weights: Union[list,np.ndarray,None] = None,
                              columns_to_print: List[str] = ["nu", "local_upper_quanta"],
-                             wavelength_values: Union[np.ndarray, None] = None, 
+                             wavenumber_values: Union[np.ndarray, None] = None, 
                              signal_values: Union[np.ndarray, None] = None,
                              wavelength_range: Union[list, tuple, np.ndarray, None] = None,
                              __plot_bokeh__: bool = False,
@@ -338,13 +337,13 @@ class LineAssigner:
         columns_to_print: list, optional
             List of column names from HITRAN dataframe to display on assigned lines if 
             plotted. Default is ["nu", "local_upper_quanta"]. 
-        wavelength_values : np.ndarray, optional
-            Wavelength array in microns. Default is None.
+        wavenumber_values : np.ndarray, optional
+            Wavenumber array in cm^-1. Default is None.
         signal_values : np.ndarray, optional
             Signal arrays (input data). Default is None.
-        wavelength_range : list-like, optional
+        wavenumber_range : list-like, optional
             List-like object (list, tuple, or np.ndarray) of length 2 representing 
-            wavelength range for plotting. Default is None. 
+            wavenumber range for plotting. Default is None. 
         __plot_bokeh__ : bool, optional
             Default is False.
         __plot_seaborn__ : bool, optional
@@ -357,11 +356,11 @@ class LineAssigner:
             set of fitted parameters.
         """        
 
-        plot_args = [wavelength_values, signal_values] 
+        plot_args = [wavenumber_values, signal_values] 
         if __plot_bokeh__ and any(arg is None for arg in plot_args):
-            raise ValueError("All required arguments (wavelength_values, signal_values) must have a value when __plot_bokeh__ is True.")
+            raise ValueError("All required arguments (wavenumber_values, signal_values) must have a value when __plot_bokeh__ is True.")
         if __plot_seaborn__ and any(arg is None for arg in plot_args):
-            raise ValueError("All required arguments (wavelength_values, signal_values) must have a value when __plot_seaborn__ is True.")
+            raise ValueError("All required arguments (wavenumber_values, signal_values) must have a value when __plot_seaborn__ is True.")
 
         if 'hitran' not in self.__dict__:
             raise AttributeError("The 'hitran' attribute is missing. Ensure that data is loaded by running the 'parse_file_to_dataframe() method.")
@@ -403,13 +402,13 @@ class LineAssigner:
         self.fitted_hitran = fitted_hitran
         
         if __plot_bokeh__:
-            plot_assigned_lines_bokeh(wavelength_values, signal_values, 
+            plot_assigned_lines_bokeh(wavenumber_values, signal_values, 
                                       fitted_hitran, fitted_params, columns_to_print = columns_to_print,
-                                      wavelength_range=wavelength_range, absorber_name=self.absorber_name)
+                                      wavenumber_range=wavenumber_range, absorber_name=self.absorber_name)
         if __plot_seaborn__:
-            plot_assigned_lines_seaborn(wavelength_values, signal_values, 
+            plot_assigned_lines_seaborn(wavenumber_values, signal_values, 
                                         fitted_hitran, fitted_params, columns_to_print = columns_to_print,
-                                        wavelength_range=wavelength_range, absorber_name=self.absorber_name)
+                                        wavenumber_range=wavenumber_range, absorber_name=self.absorber_name)
 
         return fitted_hitran
 
