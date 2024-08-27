@@ -45,7 +45,7 @@ def click_and_print(wavenumber_values: np.ndarray,
 
     Parameters
     ----------
-    wavenumber_values : np.ndarray, optional
+    wavenumber_values : np.ndarray
         Wavenumber array in cm^-1.
     signal_values : np.ndarray
         Signal arrays (input data).
@@ -53,8 +53,7 @@ def click_and_print(wavenumber_values: np.ndarray,
         List-like object (list, tuple, or np.ndarray) with of length 2 representing wavenumber range for plotting.
     """
 
-    molecule_name = absorber_name
-    x_obs = wavelength_values
+    x_obs = wavenumber_values
     y_obs = signal_values
 
     # Trim x and y to desired wavelength range
@@ -257,7 +256,7 @@ class LineAssigner:
 
 
     def parse_file_to_dataframe(self, 
-                                selected_columns: List[str] = ['local_iso_id','nu','sw','gamma_air','local_upper_quanta']
+                                selected_columns: List[str] = ['local_iso_id','nu','sw','gamma_air','local_upper_quanta','ierr']
                                 ) -> pd.DataFrame:
         """
         Parse an input file into a pandas DataFrame based on specified columns.
@@ -318,11 +317,13 @@ class LineAssigner:
 
 
     def hitran_line_assigner(self,
-                             weights: Union[list,np.ndarray,None] = None,
+                             ierr_weights: bool = True,
+                             weights: Union[list,np.ndarray,None] = None, 
                              columns_to_print: List[str] = ["nu", "local_upper_quanta"],
                              wavenumber_values: Union[np.ndarray, None] = None, 
                              signal_values: Union[np.ndarray, None] = None,
-                             wavelength_range: Union[list, tuple, np.ndarray, None] = None,
+                             wavenumber_range: Union[list, tuple, np.ndarray, None] = None,
+                             __print__: bool = False,
                              __plot_bokeh__: bool = False,
                              __plot_seaborn__: bool = False):
         """
@@ -362,24 +363,29 @@ class LineAssigner:
         if __plot_seaborn__ and any(arg is None for arg in plot_args):
             raise ValueError("All required arguments (wavenumber_values, signal_values) must have a value when __plot_seaborn__ is True.")
 
-        if 'hitran' not in self.__dict__:
-            raise AttributeError("The 'hitran' attribute is missing. Ensure that data is loaded by running the 'parse_file_to_dataframe() method.")
-        hitran = self.hitran
+        if 'hitran_df' not in self.__dict__:
+            raise AttributeError("The 'hitran_df' attribute is missing. Ensure that data is loaded by running the 'parse_file_to_dataframe() method.")
+        hitran_df = self.hitran_df
 
         fitted_params = self.fitted_params
 
         # Find closest data points 
         closest_data_points = []
 
-        if weights is None:
-            weights = np.ones(len(fitted_params))
+        # Default ierr weights
+        if ierr_weights:
+            weights = hitran_df["ierr"]
+        # If set to false, input weight array or None is used 
         else:
-            weights = np.array(weights)
-            weights = weights / np.sum(weights)  # Normalize weights to sum to 1
+            if weights is None:
+                weights = np.ones(len(fitted_params))
+            else:
+                weights = np.array(weights)
+                weights = weights / np.sum(weights)  # Normalize weights to sum to 1
 
         for i, params in enumerate(fitted_params):
-            # Calculate distances between each row in hitran and the current fitted parameter set
-            distances = np.sqrt(np.sum((hitran[['nu', 'sw', 'gamma_air']].values - params)**2, axis=1))
+            # Calculate distances between each row in hitran_df and the current fitted parameter set
+            distances = np.sqrt(np.sum((hitran_df[['nu', 'sw', 'gamma_air']].values - params)**2, axis=1))
             
             # Apply weight to the distances
             weighted_distances = distances * weights[i]
@@ -387,12 +393,12 @@ class LineAssigner:
             # Find the index of the minimum weighted distance
             closest_index = np.argmin(weighted_distances)
             
-            # Get the closest data point from hitran
-            closest_data_point = hitran.iloc[closest_index].values
+            # Get the closest data point from hitran_df
+            closest_data_point = hitran_df.iloc[closest_index].values
 
             closest_data_points.append(closest_data_point)
 
-        fitted_hitran = pd.DataFrame(closest_data_points, columns=hitran.columns)
+        fitted_hitran = pd.DataFrame(closest_data_points, columns=hitran_df.columns)
 
         fitted_hitran['fitted_peak_center'] = fitted_params[:,0]
         fitted_hitran['fitted_peak_amplitude'] = fitted_params[:,1]
@@ -409,8 +415,8 @@ class LineAssigner:
             plot_assigned_lines_seaborn(wavenumber_values, signal_values, 
                                         fitted_hitran, fitted_params, columns_to_print = columns_to_print,
                                         wavenumber_range=wavenumber_range, absorber_name=self.absorber_name)
-
-        return fitted_hitran
+        if __print__:
+            display(fitted_hitran)
 
 
 
