@@ -331,6 +331,7 @@ def plot_spectra_errorbar_seaborn(wavenumber_values: np.ndarray,
     ax2.set_xticks(ax1.get_xticks())
     ax2.set_xticklabels([f'{10 ** 4 / tick:.3f}' for tick in ax1.get_xticks()])
     ax2.set_xlabel(r"Wavelength [$\mu$m]", fontsize=12)
+
     plt.tight_layout()
     plt.show()
 
@@ -714,11 +715,12 @@ def plot_fitted_spectrum_bokeh(wavenumber_values: np.ndarray,
         y_fitted = y_fitted[condition_range]
 
     # Add the original or baseline-corrected spectrum to the plot
-    p1.line('x', 'y', legend_label="Spectrum", line_width=2, color="blue", source=source_p1)
+    p1.line('x', 'y', legend_label="Spectrum", line_width=2, color="black", source=source_p1)
 
     # Add the fitted peaks spectrum to the plot
+    fit_color="#ff6100"
     p1.line('x', 'y_fitted', legend_label=f'Fitted {line_profile.capitalize()}', line_width=2, 
-        color="red", source=source_p1)
+        color=fit_color, source=source_p1)
     
     # Create lower plot
     p2 = figure(title=' ',
@@ -730,7 +732,7 @@ def plot_fitted_spectrum_bokeh(wavenumber_values: np.ndarray,
                tools="pan,wheel_zoom,box_zoom,reset")
 
     # Add line plot
-    p2.line('x', 'residual', line_width=1.5, line_color='green',
+    p2.line('x', 'residual', line_width=1.5, line_color='black',
         legend_label=f'Residual = (Data) - (Fitted {line_profile.capitalize()} Peaks)',
         source=source_p2)  
 
@@ -739,13 +741,13 @@ def plot_fitted_spectrum_bokeh(wavenumber_values: np.ndarray,
 
             # Plot fitted peak centers
             vline = Span(location=fitted_peak_positions[q], dimension='height', 
-                line_color='red', line_alpha=0.8, line_width=2)
+                line_color=fit_color, line_alpha=0.8, line_width=1)
             p.add_layout(vline)
 
     # Manually add legend entries
     dummy_line1 = p1.line(fitted_peak_positions[0], y[0], legend_label="Fitted Peak Center", 
-        line_color='red', line_alpha=0.8, line_width=1.5)
-    
+        line_color=fit_color, line_alpha=0.8, line_width=1)
+
     # Increase size of x and y ticks
     for p in (p1,p2):
         p.title.text_font_size = '14pt'
@@ -845,9 +847,10 @@ def plot_fitted_spectrum_seaborn(wavenumber_values: np.ndarray,
     # Create first subplot for spectrum
     ax1 = fig.add_subplot(gs[:2,0])
     # Plot original spectrum
-    ax1.plot(x, y, label="Original Spectrum", color="blue")
+    ax1.plot(x, y, label="Original Spectrum", color="black")
     # Plot fitted peaks
-    ax1.plot(x, y_fitted, label=f'Fitted {line_profile.capitalize()}', color="red")
+    fit_color="#ff6100"
+    ax1.plot(x, y_fitted, label=f'Fitted {line_profile.capitalize()}', color=fit_color)
 
     ax1.set_ylabel("Signal")
     ax1.set_title(f"Spectra with Fitted {line_profile.capitalize()} Peaks - RMSE = {rmse_value:.2f}")
@@ -858,7 +861,7 @@ def plot_fitted_spectrum_seaborn(wavenumber_values: np.ndarray,
     # Plot residual 
     ax2.plot(x, y_residual, 
         label=f'Residual = (Data) - (Fitted {line_profile.capitalize()} Peaks)',
-        color='green')
+        color='black')
 
     ax2.set_xlabel(r"Wavenumber [cm$^{-1}$]")
     ax2.set_ylabel("Residual")
@@ -866,9 +869,9 @@ def plot_fitted_spectrum_seaborn(wavenumber_values: np.ndarray,
     for ax in (ax1, ax2):
         for i in range(len(fitted_peak_positions)):
             # Plot fitted peak centers
-            ax.axvline(x=fitted_peak_positions[i], color='r', alpha=0.8, lw=0.8)
+            ax.axvline(x=fitted_peak_positions[i], color=fit_color, alpha=0.8, lw=0.8)
 
-    ax1.plot([], [], color='r', alpha=0.8, lw=0.8, label='Fitted Peak Center') # label
+    ax1.plot([], [], color=fit_color, alpha=0.8, lw=0.8, label='Fitted Peak Center') # label
     
     # Set axes ticks, inwards
     for ax in (ax1,ax2):
@@ -928,7 +931,12 @@ def plot_assigned_lines_seaborn(wavenumber_values: np.ndarray,
     y = signal_values
 
     line_positions = fitted_hitran["nu"].to_numpy()
+
+
+
     print_columns = fitted_hitran[columns_to_print].to_numpy(dtype=str)
+
+
     fitted_peak_positions = fitted_params[:,0]
 
     # Calculate fitted y values
@@ -969,7 +977,8 @@ def plot_assigned_lines_seaborn(wavenumber_values: np.ndarray,
     # Plot original spectrum
     ax1.plot(x, y, color='k', alpha=0.8, label="Original Spectrum")
     # Plot fitted peaks
-    ax1.plot(x, y_fitted, color='r', alpha=0.8, lw=0.8,
+    fit_color="#ff6100"
+    ax1.plot(x, y_fitted, color=fit_color, alpha=0.8, lw=0.8,
         label=f'Fitted {line_profile.capitalize()}')
     
     ax1.set_ylabel("Signal")
@@ -993,9 +1002,9 @@ def plot_assigned_lines_seaborn(wavenumber_values: np.ndarray,
             ax.axvline(x=line_positions[q], color='b')  # Plot vertical lines
 
             # Plot fitted peak centers
-            ax.axvline(x=fitted_peak_positions[q], color='r', alpha=0.8)
+            ax.axvline(x=fitted_peak_positions[q], color=fit_color, alpha=0.8)
 
-    ax1.plot([], [], color='r', alpha=0.8, label='Fitted Peak Center') # label     
+    ax1.plot([], [], color=fit_color, alpha=0.8, label='Fitted Peak Center') # label     
     ax1.plot([], [], color='b', label='HITRAN Assignment: \n ' +  ' \n '.join(columns_to_print)) # label 
 
     ax1.legend(loc='center left', bbox_to_anchor=(1, 0.5))
@@ -1005,13 +1014,27 @@ def plot_assigned_lines_seaborn(wavenumber_values: np.ndarray,
     y_up=0
     y_range = ax1.get_ylim()
     y_diff = y_range[1]-y_range[0]
+
+    # define columns to round
+    columns_to_round = ['nu', 'fitted_peak_center', 'fitted_peak_amplitude', 'fitted_peak_width']
+
     for q in range(len(line_positions)):
         # Calculate label position
-
         y_up += y_diff / (len(line_positions)+1)
 
-        # Retrieve the label
+        # Retrieve the label list
         label_q_list = list(print_columns[q])
+        
+        # Check if the column needs rounding
+        round_bool = [i in columns_to_round for i in columns_to_print]
+        round_id = np.where(round_bool)[0]
+
+        if any(round_bool):
+            # Apply rounding to needed values in label_q_list
+            for qi in range(len(label_q_list)):
+                if qi in round_id:
+                    label_q_list[qi] = str(np.round(float(label_q_list[qi]),2))
+
         label_q_pad = [' ' + item for item in label_q_list]
         label_q = '\n'.join(label_q_pad)
 
@@ -1030,6 +1053,7 @@ def plot_assigned_lines_seaborn(wavenumber_values: np.ndarray,
         ax.tick_params(axis='both', which='minor', direction='in', length=4, width=1.1)
         ax.tick_params(axis='x', which='minor', direction='in', top=True)
         ax.tick_params(axis='y', which='minor', direction='in', right=True)   
+
 
     plt.tight_layout()
 
@@ -1127,8 +1151,9 @@ def plot_assigned_lines_bokeh(wavenumber_values: np.ndarray,
     p1.line('x', 'y', legend_label="Original Spectrum", line_width=2, color="black", source=source_p1)
 
     # Add the fitted spectrum to the plot
+    fit_color="#ff6100"
     p1.line('x', 'y_fitted', legend_label=f'Fitted {line_profile.capitalize()}', line_width=1, 
-        color="red", source=source_p1)
+        color=fit_color, source=source_p1)
     
     # Create lower plot
     p2 = figure(title=' ',
@@ -1155,12 +1180,12 @@ def plot_assigned_lines_bokeh(wavenumber_values: np.ndarray,
 
             # Plot fitted peak centers
             vline = Span(location=fitted_peak_positions[q], dimension='height', 
-                line_color='red', line_alpha=0.8, line_width=2)
+                line_color=fit_color, line_alpha=0.8, line_width=2)
             p.add_layout(vline)
 
     # Manually add legend entries
     dummy_line1 = p1.line(fitted_peak_positions[0], y[0], legend_label="Fitted Peak Center", 
-        line_color='red', line_alpha=0.8, line_width=1.5)
+        line_color=fit_color, line_alpha=0.8, line_width=1.5)
     dummy_line2 = p1.line(fitted_peak_positions[0], y[0], legend_label='HITRAN Assignment: \n ' +  ', '.join(columns_to_print), 
         line_width=1.5, line_color='blue')
    

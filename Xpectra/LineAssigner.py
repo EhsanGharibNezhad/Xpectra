@@ -154,10 +154,14 @@ class LineAssigner:
     ----------
     fitted_params : np.ndarray, optional
         Fitted parameters of spectral peaks with [center, amplitude, width].
-    hitran_par : str, optional
+    hitran_file : str, optional
         File path containing HITRAN data.
     absorber_name : str, optional
         Molecule or atom name.
+    wavenumber_values : np.ndarray, optional
+        Wavenumber array in cm^-1
+    signal_values : np.ndarray, optional
+        Signal arrays (input data)
     
     hitran_df : pd.DataFrame
         DataFrame with columns ['amplitude', 'center', 'wing'].
@@ -167,11 +171,15 @@ class LineAssigner:
 
     def __init__(
             self,
-            fitted_params: Union[np.ndarray, None] = None,
+            fitted_params: Union[list, np.ndarray, None] = None,
             hitran_file: Union[str, None] = None,
             absorber_name: Union[str, None] = None,
+            wavenumber_values: Union[np.ndarray, None] = None,
+            signal_values: Union[np.ndarray, None] = None,
             ):
 
+        self.wavenumber_values = wavenumber_values
+        self.signal_values = signal_values
         self.fitted_params = fitted_params
         self.hitran_file = hitran_file
         self.absorber_name = absorber_name
@@ -320,8 +328,6 @@ class LineAssigner:
                              ierr_weights: bool = True,
                              weights: Union[list,np.ndarray,None] = None, 
                              columns_to_print: List[str] = ["nu", "local_upper_quanta"],
-                             wavenumber_values: Union[np.ndarray, None] = None, 
-                             signal_values: Union[np.ndarray, None] = None,
                              wavenumber_range: Union[list, tuple, np.ndarray, None] = None,
                              __print__: bool = False,
                              __plot_bokeh__: bool = False,
@@ -338,10 +344,6 @@ class LineAssigner:
         columns_to_print: list, optional
             List of column names from HITRAN dataframe to display on assigned lines if 
             plotted. Default is ["nu", "local_upper_quanta"]. 
-        wavenumber_values : np.ndarray, optional
-            Wavenumber array in cm^-1. Default is None.
-        signal_values : np.ndarray, optional
-            Signal arrays (input data). Default is None.
         wavenumber_range : list-like, optional
             List-like object (list, tuple, or np.ndarray) of length 2 representing 
             wavenumber range for plotting. Default is None. 
@@ -357,11 +359,12 @@ class LineAssigner:
             set of fitted parameters.
         """        
 
-        plot_args = [wavenumber_values, signal_values] 
+
+        plot_args = [self.wavenumber_values, self.signal_values] 
         if __plot_bokeh__ and any(arg is None for arg in plot_args):
-            raise ValueError("All required arguments (wavenumber_values, signal_values) must have a value when __plot_bokeh__ is True.")
+            raise ValueError("All required attributes (wavenumber_values, signal_values) must have a value when __plot_bokeh__ is True.")
         if __plot_seaborn__ and any(arg is None for arg in plot_args):
-            raise ValueError("All required arguments (wavenumber_values, signal_values) must have a value when __plot_seaborn__ is True.")
+            raise ValueError("All required attributes (wavenumber_values, signal_values) must have a value when __plot_seaborn__ is True.")
 
         if 'hitran_df' not in self.__dict__:
             raise AttributeError("The 'hitran_df' attribute is missing. Ensure that data is loaded by running the 'parse_file_to_dataframe() method.")
@@ -408,11 +411,11 @@ class LineAssigner:
         self.fitted_hitran = fitted_hitran
         
         if __plot_bokeh__:
-            plot_assigned_lines_bokeh(wavenumber_values, signal_values, 
+            plot_assigned_lines_bokeh(self.wavenumber_values, self.signal_values, 
                                       fitted_hitran, fitted_params, columns_to_print = columns_to_print,
                                       wavenumber_range=wavenumber_range, absorber_name=self.absorber_name)
         if __plot_seaborn__:
-            plot_assigned_lines_seaborn(wavenumber_values, signal_values, 
+            plot_assigned_lines_seaborn(self.wavenumber_values, self.signal_values, 
                                         fitted_hitran, fitted_params, columns_to_print = columns_to_print,
                                         wavenumber_range=wavenumber_range, absorber_name=self.absorber_name)
         if __print__:

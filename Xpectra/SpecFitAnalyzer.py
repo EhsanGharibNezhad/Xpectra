@@ -14,6 +14,9 @@ from scipy.sparse.linalg import spsolve, splu
 # Module for performing detailed spectral analysis, including feature extraction, peak identification, and line fitting.
 
 
+import logging
+logging.basicConfig(level=logging.WARNING, format='%(levelname)s: %(message)s')
+
 # Import libraries
 import numpy as np
 import pandas as pd
@@ -29,6 +32,7 @@ from typing import List, Union
 from numpy.polynomial import Polynomial
 
 from .SpecStatVisualizer import *
+
 
 
 
@@ -122,26 +126,34 @@ class SpecFitAnalyzer:
         fitted_params : list
             List of fitted parameters for each peak.
         """
+
+        # Define x 
         x = self.wavenumber_values
 
-        if self.y_baseline_corrected is None:
-            y = self.signal_values
-        else:
+        # Define y
+        try:
             y = self.y_baseline_corrected
+        except AttributeError:
+            logging.warning("'y_baseline_corrected' attribute does not exist. Using baseline-included 'signal_values' attribute instead.")
+            y = self.signal_values
+
+        # Check x and y are not set to default 'None'
+        if x is None or y is None:
+            logging.critical("Class initialized without necessary attributes, 'wavenumber_values' and 'signal_values'. Please assign them.")
+            return
 
         # Trim x and y to desired wavelength range for plotting
         if wavenumber_range is not None:
             # Make sure range is in correct format
-            if len(wavenumber_range) != 2:
-                raise ValueError('wavenumber_range must be tuple, list, or array with 2 elements')
+            if not isinstance(wavenumber_range, (list, tuple, np.ndarray)) or len(wavenumber_range) != 2:
+                logging.critical("'wavenumber_range' must be tuple, list, or array with 2 elements.")
+                return
             # Locate indices and splice
             condition_range = (x > wavenumber_range[0]) & (x < wavenumber_range[1])
             x = x[condition_range]
             y = y[condition_range]
 
-        fitted_params = []
-        covariance_matrices = []
-
+        # Define line_profile_func
         if line_profile == 'gaussian':
             line_profile_func = self.gaussian
         elif line_profile == 'lorentzian':
@@ -149,8 +161,13 @@ class SpecFitAnalyzer:
         elif line_profile == 'voigt':
             line_profile_func = self.voigt
         else:
-            raise ValueError(f"Unknown line profile: {line_profile}")
+            logging.critical(f"Unknown line profile: {line_profile}." +  " Please choose one: {'gaussian', 'lorentzian', 'voigt'}.")
+            return
 
+        fitted_params = []
+        covariance_matrices = []
+
+        # error for initial_guesses shape !
         for guess in initial_guesses:
             params, cov_matrix = curve_fit(line_profile_func, x, y, p0=guess, method=fitting_method, maxfev=1000000)
             fitted_params.append(params)
@@ -158,7 +175,7 @@ class SpecFitAnalyzer:
 
         self.fitted_params = np.array(fitted_params)
         self.covariance_matrices = np.array(covariance_matrices)
-        # FIND ME
+
 
         if __plot_bokeh__ == True:
             plot_fitted_spectrum_bokeh(x,y,fitted_params,
@@ -171,9 +188,31 @@ class SpecFitAnalyzer:
                 fitting_method=fitting_method)
 
         if __print__ == True:
-            print_fitted_parameters_df(fitted_params,covariance_matrices)
+            
+            # Convert lists to arrays
+            guess_arr = np.array(initial_guesses)
+            fit_arr = np.array(fitted_params)
 
-    #         return fitted_params
+            # Create dictionary with fitted vs. guessed params 
+            data = {
+                'center_guess': guess_arr[:,0],
+                'center_fit': fit_arr[:,0],
+                'intensity_guess': guess_arr[:,1],
+                'intensity_fit': fit_arr[:,1],
+                'width_guess': guess_arr[:,2],
+                'width_fit': fit_arr[:,2]
+            }
+
+            # Convert to DataFrame
+            df = pd.DataFrame(data)
+
+            # Show all rows
+            pd.set_option('display.max_rows', None)
+
+            display(df)
+            #print_fitted_parameters_df(fitted_params,covariance_matrices)
+
+
 
 
     @staticmethod
