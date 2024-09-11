@@ -16,6 +16,9 @@ from scipy import stats
 from sklearn.metrics import r2_score, mean_squared_error,  mean_absolute_error
 from scipy.interpolate import RegularGridInterpolator
 from scipy.stats import chi2
+from scipy.signal import find_peaks
+
+
 import os
 
 from typing import List, Union
@@ -32,11 +35,12 @@ from bokeh.plotting import figure, output_notebook, show
 from bokeh.models import CustomJS, ColumnDataSource, TapTool, Div, HoverTool
 from bokeh.layouts import column
 
+
 from .SpecStatVisualizer import *
 
 
 
-def click_and_print(wavenumber_values: np.ndarray,
+def line_finder(wavenumber_values: np.ndarray,
                     signal_values: np.ndarray,
                     wavenumber_range: Union[list, tuple, np.ndarray] = None,
                     ) -> None:
@@ -65,7 +69,12 @@ def click_and_print(wavenumber_values: np.ndarray,
         condition_range = (x_obs > wavenumber_range[0]) & (x_obs < wavenumber_range[1])
         x_obs = x_obs[condition_range]
         y_obs = y_obs[condition_range]
+
+
+    # smooth first!
     
+    peaks, info = find_peaks(y_obs, height=0.05)
+
     # Create a ColumnDataSource
     source = ColumnDataSource(data=dict(x=x_obs, y=y_obs))
     
@@ -84,6 +93,9 @@ def click_and_print(wavenumber_values: np.ndarray,
     # Add the line plot
     p.line('x', 'y', source=source, line_width=2, line_color='green', alpha=0.6,
         legend_label=f"Spectrum")
+
+    # plot peaks
+    p.x(x_obs[peaks], y_obs[peaks], color='red',legend_label=f"Peaks")
 
     # Increase size of x and y ticks
     p.title.text_font_size = '14pt'
