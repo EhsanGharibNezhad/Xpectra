@@ -6,16 +6,15 @@ import matplotlib.pyplot as plt
 import pywt
 from scipy.sparse.linalg import spsolve, splu
 
-
 # Nedded for ALS
 from scipy import sparse
 from scipy.linalg import cholesky
 from scipy.sparse.linalg import spsolve, splu
 # Module for performing detailed spectral analysis, including feature extraction, peak identification, and line fitting.
 
-
 import logging
 logging.basicConfig(level=logging.WARNING, format='%(levelname)s: %(message)s')
+
 
 # Import libraries
 import numpy as np
@@ -28,7 +27,9 @@ from scipy.optimize import curve_fit
 from scipy.special import wofz
 from scipy.stats import chi2
 from sklearn.metrics import r2_score, mean_squared_error, mean_absolute_error
+
 from typing import List, Union
+
 from numpy.polynomial import Polynomial
 
 from .SpecStatVisualizer import *
@@ -512,4 +513,10 @@ class SpecFitAnalyzer:
 
         if __plot__:
             plot_fitted_als_bokeh(x, y, z, baseline_type = 'arpls')
+
+
+
+
+
+
 
