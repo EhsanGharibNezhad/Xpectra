@@ -18,7 +18,7 @@ from scipy.interpolate import RegularGridInterpolator
 from scipy.stats import chi2
 from scipy.signal import find_peaks
 
-
+import re
 import os
 
 from typing import List, Union
@@ -274,6 +274,36 @@ class LineAssigner:
         
         return parsed_data
 
+    @staticmethod
+    def parse_term_symbols(term_list: list) -> list:
+        """
+        Parse and seperate a multi-term column into multiple single-term columns. 
+        
+        Parameters
+        ----------
+        term_list : list
+            List of text to parse.
+
+        Returns
+        -------
+        parsed_terms : list
+            List of parsed data.
+        """ 
+        parsed_terms = []
+        
+        for term in term_list:
+            # Use regular expression to capture number, letters, and the final number separately
+            match = re.match(r"(\d+)([A-Z][a-zA-Z]*\d*)(\s+\d+)", term)
+            if match:
+                # Extract the matched groups and clean them
+                multiplicity = int(match.group(1))
+                term_symbol = match.group(2).strip()
+                number = int(match.group(3).strip())
+                parsed_terms.append([int(multiplicity), term_symbol, int(number)])
+            else:
+                parsed_terms.append([None,None,None])
+        return parsed_terms
+
 
     def parse_file_to_dataframe(self, 
                                 selected_columns: List[str] = ['local_iso_id','nu','sw','gamma_air','local_upper_quanta','ierr']
@@ -332,7 +362,16 @@ class LineAssigner:
         
         df = pd.DataFrame(parsed_data_list)  # Convert list of dictionaries to DataFrame
         
+        if 'local_lower_quanta' in df.columns: 
+            # Seperate terms
+            df[['J_low','sym_low','N_low']] = self.parse_term_symbols(df['local_lower_quanta'])
+        if 'local_upper_quanta' in df.columns:
+            # Seperate terms
+            df[['J_up','sym_up','N_up']] = self.parse_term_symbols(df['local_upper_quanta'])
+        
         self.hitran_df = df
+
+        return df
         
 
 

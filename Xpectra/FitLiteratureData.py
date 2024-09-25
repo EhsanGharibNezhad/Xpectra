@@ -15,9 +15,12 @@ from matplotlib.ticker import ScalarFormatter
 
 from bokeh.io import output_notebook 
 from bokeh.layouts import row, column
-from bokeh.plotting import show,figure
+from bokeh.plotting import show,figure, output_file
 from bokeh.models import ColumnDataSource, Whisker, CustomJS, Legend
 from bokeh.palettes import Category10, Category20, Turbo256
+
+
+from .LineAssigner import *
 
 
 TOOLTIPS = [
@@ -30,7 +33,7 @@ CB_color_cycle = ['#377eb8', '#ff7f00', '#4daf4a',
                   '#999999', '#e41a1c', '#dede00', '#984ea3']
 
 
-class FitLitData:
+class FitLiteratureData:
     """
     Fit and plot literature data.
 
@@ -38,13 +41,19 @@ class FitLitData:
     ----------
     literature_file : str, optional
         Excel spreadsheet containing literature data.
+    hitran_file : str, optional
+        File path containing HITRAN data.
     literature_df : pd.DataFrame, optional
         DataFrame containing literature data.
     """
 
-    def __init__(self, literature_file):
+    def __init__(self, 
+                 literature_file,
+                 hitran_file,
+                 ):
         self.literature_file = literature_file
-
+        self.hitran_file = hitran_file
+        self.line_assigner_instance = LineAssigner(hitran_file = hitran_file) # Warning: from another module and could cause bugs
 
     def pb_excel_reader(self, sheet_name = None):
         """
@@ -112,81 +121,159 @@ class FitLitData:
         return filtered_df
 
 
-    def plot_by_category(self,
-                         category = 'author',
-                         hidden_authors=None,
-                         filters=None, 
-                         dropNAN_authors = True, 
-                         fit_4thPade = True,
-                         __print__=False
+    def parse_hitran_file(self, 
+                        selected_columns = ['molec_id', 'local_iso_id', 
+                        'nu', 'sw', 'gamma_air','gamma_self', 'n_air', 
+                        'local_upper_quanta', 'local_lower_quanta']
                         ):
+        """
+        Using LineAssigner parse_file_to_dataframe, convert HITRAN file to DataFrame.
+        """
+        df = self.line_assigner_instance.parse_file_to_dataframe(selected_columns=selected_columns)
+
+        self.hitran_df = df
+
+        #return df
+
+
+    @staticmethod
+    def calculate_gamma_nT(J_low, sym_low):
+        if sym_low in ['F1', 'F2', 'A1', 'A2', 'E']:
+            # Get the coefficients based on symmetry type
+            coeffs_gamma = pbro[(pbro['sym_low'] == sym_low)&(pbro['coeff'] == 'gamma_L')].loc[:, 'a0':'b4'].values[0]
+            gamma = self.fit_Pbro_Pade(J=J_low, coeffs=coeffs_gamma)
+
+            # Calculate gamma_H2 and gamma_He
+            gamma_H2 = gamma
+            gamma_He = 0.4 * gamma
+
+            coeffs_nT = pbro[(pbro['sym_low'] == sym_low)&(pbro['coeff'] == 'n_T')].loc[:, 'a0':'b4'].values[0]
+            n_T = self.fit_Pbro_Pade(J=J_low, coeffs=coeffs_nT)
+
+            # Optionally print the result
+            # print(J_low, sym_low, gamma_H2, gamma_He)
+            return gamma_H2, gamma_He, n_T
+        else:
+            return 0.05, 0.03, 0.5
+
+    @staticmethod
+    def replace_in_file(file_path, file_path_to_save):
+        i = 0
+        # Open the input file for reading
+        with open(file_path, 'r') as infile, open(file_path_to_save, 'w') as outfile:
+            for line in infile:
+                try:
+                    gamma_h2,gamma_he, n_T = np.round(self.calculate_gamma_nT(int(line[100:102]),line[102:104].replace(' ','')),5)
+                except:
+                    gamma_h2,gamma_he, n_T  = 0.0500, 0.0300, 0.4
+                
+                modified_line = line.replace(
+                        line[35:40], str('%5.4f'%(gamma_h2)).lstrip('0')).replace(
+                        line[40:45], str('%5.3f'%(gamma_he))).replace(
+                        line[55:59], str('%4.2f'%(n_T)))
+
+                # Write the modified line to the output file
+                outfile.write(modified_line)
+
+
+    def plot_with_uncertainty(self,
+                             x_fit = None,
+                             param_to_fit = 'gamma_L [cm-1/atm]',
+                             param_to_fit_uncertainty = 'gamma_uncertainty',
+                             #num_iterations = 5,
+                             x_fit_interation_bound = [5,20],
+                             param_to_sort = 'author',
+                             include_authors = None,
+                             filters = None, 
+                             drop_na_authors = True, 
+                             fit_4thPade = False,
+                             print_fitted_params = True,
+                             show_plot = True,
+                             save_plot = False,
+                             save_path = None
+                             ):
         
         """
-        Plot gamma_L versus J_low color-coded by chosen category with interactive legend.
+        Create a scatter plot with uncertainty bars and optionally fit data using a 4th order Pade equation.
 
-        Parameters
+        Parameters:
         ----------
-        category : str, optional
-            The category, corresponding to a literature_df column, to filter the plot by. Default is 'author'. 
-        hidden_authors : list, optional
-            List of authors to hide from plot. 
-        filters : dict, optional
-            Dictionary of filters 
-        dropNAN_authors : bool, optional
-            Default is True.
+        df : pd.DataFrame, optional
+            The input DataFrame containing columns 'J_low', 'gamma_L [cm-1/atm]', and 'author'.
+        x_fit : list or None, optional 
+            X values for the fit range. Defaults to None.
+        param_to_sort : str, optional
+            Name of column corresponding to parameter to color-code and label in legend.
+        param_to_fit : str, optional
+            Name of column corresponding to parameter to fit.
+        param_to_fit_uncertainty : str, optional
+            Name of column corresponding to uncertainty of parameter to fit.
+        num_iterations : int, optional
+            Number of fitting iterations. Defaults to 5.
+        hidden_authors : list or None, optional
+            Authors to hide from the plot. Defaults to None.
+        filters : dict or None, optional
+            Filters for the DataFrame. Defaults to None.
+        drop_na_authors : bool, optional
+            Drop rows with missing authors if True. Defaults to True.
         fit_4thPade : bool, optional
-            Fit and plot 4th order Pbro Pade equation to each item in category. Default is True.
-        __print__ : bool, optional
-            Default is False.
+            Whether to fit the data using a 4th-order Pade equation. Defaults to True.
+        show_plot : bool, optional
+            Whether to display the plot immediately. Defaults to True.
+        save_plot : bool, optional
+            Whether to save the plot immediately. Defaults to False.
+        save_path : str, optional
+            Location to save plot. Defaults to None. 
         """
 
         df = self.literature_df
 
-        # Ensure the dataframe has all necessary columns
-        if 'J_low' not in df.columns or 'gamma_L [cm-1/atm]' not in df.columns or 'author' not in df.columns:
-            raise ValueError("DataFrame must contain 'J_low', 'gamma_L [cm-1/atm]', and 'author' columns.")
-        
-        if dropNAN_authors:
-            df['author'].dropna(inplace=True)
+        required_columns = ['J_low', param_to_fit, param_to_fit_uncertainty, param_to_sort]
+        for col in required_columns:
+            if col not in df.columns:
+                raise ValueError(f"DataFrame must contain '{col}' column.")
+
+        # Drop rows with missing authors if specified
+        if drop_na_authors:
+            df = df.dropna(subset=['author']).copy()
+
+        if include_authors:
+            df = df[df['author'].isin(include_authors)].copy()
             
-        if hidden_authors is None:
-            hidden_authors = []
-            
+        # Apply any specified filters to the DataFrame
         if filters:
             df = self.filter_dataframe(df, filters)
-          
-        # If uncertainty values are in the DataFrame (replace 'gamma_uncertainty' with the appropriate column name)
-        if 'gamma_uncertainty' in df.columns:
-            df['lower_bound'] = df['gamma_L [cm-1/atm]'] - df['gamma_uncertainty']/2.
-            df['upper_bound'] = df['gamma_L [cm-1/atm]'] + df['gamma_uncertainty']/2.
-        else:
-            df['lower_bound'] = df['gamma_L [cm-1/atm]']
-            df['upper_bound'] = df['gamma_L [cm-1/atm]']
-        
-        # Create a color palette for different items in category
-        category_contents = df[category].dropna().unique()
-        palette = self.get_palette(len(category_contents))
-        color_map = dict(zip(category_contents, palette))
 
-        # Filter the DataFrame to hide specific authors
-        df_visible = df[~df['author'].isin(hidden_authors)]
+        # Handle uncertainties or create a default range
+        if 'gamma_uncertainty' in df.columns:
+            df.loc[:, 'lower_bound'] = df[param_to_fit] - df[param_to_fit_uncertainty] / 2.
+            df.loc[:, 'upper_bound'] = df[param_to_fit] + df[param_to_fit_uncertainty] / 2.
+        else:
+            df.loc[:, 'lower_bound'] = df[param_to_fit]
+            df.loc[:, 'upper_bound'] = df[param_to_fit]
         
-        # Prepare the ColumnDataSource for visible authors
-        df_visible['color'] = df_visible['author'].map(color_map)
-        source_visible = ColumnDataSource(df_visible)
+        # Create a color palette for different items in column
+        column_contents = df[param_to_sort].dropna().unique()
+        palette = self.get_palette(len(column_contents))
+        color_map = dict(zip(column_contents, palette))
+        
+        # Filter out hidden authors
+        # df_visible = df#[['author']] #[~df['author'].isin(hidden_authors)]
+        # df['color'] = df['author'].map(color_map)
+        # source_visible = ColumnDataSource(df)
 
         # Create the figure
-        p = figure(title="Scatter Plot with Uncertainty", x_axis_label='J_low', y_axis_label='gamma_L [cm-1/atm]', 
+        p = figure(title="Scatter Plot with Uncertainty", x_axis_label='J_low', y_axis_label=param_to_fit, 
                    width=900, height=500)
 
         # Plot each symmetry's data with a different color and add error bars
-        for item in category_contents:
+        for item in column_contents:
             
-            category_data = df[df[category] == item]
-            source = ColumnDataSource(category_data)
+            column_data = df[df[param_to_sort] == item]
+            source = ColumnDataSource(column_data)
 
             # Plot circles for the category
-            circle_renderer = p.circle('J_low', 'gamma_L [cm-1/atm]', size=10, color=color_map[item], 
+            circle_renderer = p.circle('J_low', param_to_fit, size=10, color=color_map[item], 
                 legend_label=item, source=source, fill_alpha=0.6)
 
             # Add error bars (Whiskers)
@@ -201,40 +288,75 @@ class FitLitData:
             whisker.visible = cb_obj.visible;
             """))
 
-            if fit_4thPade:
-                
-                popt, pcov = curve_fit(self.fit_Pbro_Pade, category_data['J_low'], category_data['gamma_L [cm-1/atm]'], 
-                                      #sigma =df['gamma_uncertainty'], 
-                                       maxfev=5000)
+        if fit_4thPade:
+            
+            # filter out NaN
+            id_good = ~np.isnan(df['J_low']) & ~np.isnan(df[param_to_fit]) & ~np.isnan(df[param_to_fit_uncertainty]) & ~(df[param_to_fit_uncertainty]==0)
+            x = df['J_low'][id_good].copy().to_numpy()
+            y = df[param_to_fit][id_good].copy().to_numpy()
+            y_err = df[param_to_fit_uncertainty][id_good].copy().to_numpy()
 
-                x_fit = np.arange(category_data['J_low'].min(),category_data['J_low'].max()+1)
-                y_fit = self.fit_Pbro_Pade(x_fit, popt[0], popt[1], popt[2], popt[3],popt[4], popt[5], popt[6], popt[7])
-                # y_fit_err = compute_fit_uncertainty(x_fit, popt, pcov)
+            if x_fit_interation_bound is None:
+                popt, pcov = curve_fit(self.fit_Pbro_Pade, x, y, sigma=y_err, maxfev=50000)     
+            else:
+                # trim to x_fit_interation_bound
+                id_trim = np.where((x > x_fit_interation_bound[0]) & (x < x_fit_interation_bound[1]))[0]
+                x_trim = x[id_trim]
+                y_trim = y[id_trim]
+                y_err_trim = y_err[id_trim]
+                popt, pcov = curve_fit(self.fit_Pbro_Pade, x_trim, y_trim, sigma=y_err_trim, maxfev=50000)
 
-                line = p.line(x_fit, y_fit, 
-                       line_color=color_map[item], line_dash='dashed', name='Fitted - 4th Pade Eq.')
-                
-                # Sync visibility of lines with the circles
-                circle_renderer.js_on_change('visible', CustomJS(args=dict(line=line), code="""
-                line.visible = cb_obj.visible;
-                """))
-        
+            if x_fit is None:
+                x_fit = np.arange(x.min(),x.max()+1)
+            else:
+                x_fit = np.arange(x_fit[0], x_fit[1]+1)
+
+            y_fit = self.fit_Pbro_Pade(x_fit, *popt)
+
+            line = p.line(x_fit, y_fit, line_color='blue', line_dash='dashed', 
+                name='Fitted - 4th Pade Eq.')
+            
+            # Calculate the uncertainties (standard deviations of the parameters)
+            perr = np.sqrt(np.diag(pcov))
+
+            if print_fitted_params:
+                param_labels = ['a0','a1','a2','a3','b1','b2','b3','b4']
+                i=0
+                for param, uncertainty in zip(popt, perr):
+                    print(f"{param_labels[i]}: {round(param,3)} +/- {round(uncertainty,3)}")
+                    i=i+1         
+             
         # Retrieve, sort, & reassign legend items in alphebetical order
         legend_items = sorted(p.legend[0].items, key=lambda item: item.label['value'])
         p.legend[0].items = legend_items
 
         # Style the plot
-        p.legend.title = category.capitalize()
+        p.legend.title = param_to_sort.capitalize()
         p.legend.location = "bottom_left"
-        p.legend.click_policy = "hide"  # Allows clicking on the legend to hide/show data for specific authors
-        p.grid.grid_line_alpha = 0.5
+        p.legend.click_policy = "hide"  
+        p.grid.grid_line_alpha = 0.4
 
-        if __print__:
-            print(zip())
+        if show_plot:
+            # Show the plot
+            output_notebook()
+            show(p)
 
-        # Show the plot
-        output_notebook()
-        show(p)
+        if save_plot:
+            # Save the plot
+            output_file(save_path)
+            save(p)
+
+        if fit_4thPade:
+            # Return fitted 4thPade parameters
+            return np.array(list(popt))  
+
+
+
+
+
+
+
+
 
 
 
