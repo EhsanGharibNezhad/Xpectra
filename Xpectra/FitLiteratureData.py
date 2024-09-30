@@ -19,6 +19,9 @@ from bokeh.plotting import show,figure, output_file
 from bokeh.models import ColumnDataSource, Whisker, CustomJS, Legend
 from bokeh.palettes import Category10, Category20, Turbo256
 
+from multiprocessing import Pool
+
+import time
 
 from .LineAssigner import *
 
@@ -156,29 +159,59 @@ class FitLiteratureData:
         else:
             return 0.05, 0.03, 0.5
 
+
+    @staticmethod
+    def modify_line(line, pb_coeffs):
+        try:
+            gamma_h2,gamma_he, n_T = np.round(FitLiteratureData.calculate_gamma_nT(
+                                                    J_low = int(line[100:102]),
+                                                    sym_low = line[102:104].replace(' ',''), 
+                                                    pb_coeffs = pb_coeffs),5)
+        except:
+            gamma_h2,gamma_he, n_T  = 0.0500, 0.0300, 0.4
+
+        modified_line = line.replace(
+                line[35:40], str('%5.4f'%(gamma_h2)).lstrip('0')).replace(
+                line[40:45], str('%5.3f'%(gamma_he))).replace(
+                line[55:59], str('%4.2f'%(n_T)))
+        
+        return modified_line
+
     @staticmethod
     def replace_in_file(file_path, 
                         file_path_to_save,
-                        pb_coeffs):
+                        pb_coeffs,
+                        ):
 
         # Open the input file for reading
         with open(file_path, 'r') as infile, open(file_path_to_save, 'w') as outfile:
             for line in infile:
-                try:
-                    gamma_h2,gamma_he, n_T = np.round(FitLiteratureData.calculate_gamma_nT(
-                                                    J_low = int(line[100:102]),
-                                                    sym_low = line[102:104].replace(' ',''), 
-                                                    pb_coeffs = pb_coeffs),5)
-                except:
-                    gamma_h2,gamma_he, n_T  = 0.0500, 0.0300, 0.4
-                    
-                modified_line = line.replace(
-                        line[35:40], str('%5.4f'%(gamma_h2)).lstrip('0')).replace(
-                        line[40:45], str('%5.3f'%(gamma_he))).replace(
-                        line[55:59], str('%4.2f'%(n_T)))
+                # Modify line 
+                modified_line = FitLiteratureData.modify_line(line, pb_coeffs)
 
                 # Write the modified line to the output file
                 outfile.write(modified_line)
+
+
+    @staticmethod
+    def replace_in_file_parallel(file_path, 
+                        file_path_to_save,
+                        pb_coeffs,
+                        num_processes=4):
+
+        # Read all lines from the file
+        with open(file_path, 'r') as infile:
+            lines = infile.readlines()
+
+        # Create a pool of workers
+        with Pool(processes=num_processes) as pool:
+            # Distribute the work of processing lines in parallel
+            modified_lines = pool.starmap(FitLiteratureData.modify_line, [(line, pb_coeffs) for line in lines])
+
+        # Write all modified lines to the output file
+        with open(file_path_to_save, 'w') as outfile:
+            outfile.writelines(modified_lines)
+
 
 
     def plot_with_uncertainty(self,
