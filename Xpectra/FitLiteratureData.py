@@ -48,8 +48,8 @@ class FitLiteratureData:
     """
 
     def __init__(self, 
-                 literature_file,
-                 hitran_file,
+                 literature_file = None,
+                 hitran_file = None,
                  ):
         self.literature_file = literature_file
         self.hitran_file = hitran_file
@@ -135,20 +135,20 @@ class FitLiteratureData:
 
         #return df
 
-
     @staticmethod
-    def calculate_gamma_nT(J_low, sym_low):
+    def calculate_gamma_nT(J_low, sym_low, pb_coeffs):
+        pbro = pb_coeffs
         if sym_low in ['F1', 'F2', 'A1', 'A2', 'E']:
             # Get the coefficients based on symmetry type
             coeffs_gamma = pbro[(pbro['sym_low'] == sym_low)&(pbro['coeff'] == 'gamma_L')].loc[:, 'a0':'b4'].values[0]
-            gamma = self.fit_Pbro_Pade(J=J_low, coeffs=coeffs_gamma)
+            gamma = FitLiteratureData.fit_Pbro_Pade(J_low, *coeffs_gamma)
 
             # Calculate gamma_H2 and gamma_He
             gamma_H2 = gamma
             gamma_He = 0.4 * gamma
 
             coeffs_nT = pbro[(pbro['sym_low'] == sym_low)&(pbro['coeff'] == 'n_T')].loc[:, 'a0':'b4'].values[0]
-            n_T = self.fit_Pbro_Pade(J=J_low, coeffs=coeffs_nT)
+            n_T = FitLiteratureData.fit_Pbro_Pade(J_low, *coeffs_nT)
 
             # Optionally print the result
             # print(J_low, sym_low, gamma_H2, gamma_He)
@@ -157,16 +157,21 @@ class FitLiteratureData:
             return 0.05, 0.03, 0.5
 
     @staticmethod
-    def replace_in_file(file_path, file_path_to_save):
-        i = 0
+    def replace_in_file(file_path, 
+                        file_path_to_save,
+                        pb_coeffs):
+
         # Open the input file for reading
         with open(file_path, 'r') as infile, open(file_path_to_save, 'w') as outfile:
             for line in infile:
                 try:
-                    gamma_h2,gamma_he, n_T = np.round(self.calculate_gamma_nT(int(line[100:102]),line[102:104].replace(' ','')),5)
+                    gamma_h2,gamma_he, n_T = np.round(FitLiteratureData.calculate_gamma_nT(
+                                                    J_low = int(line[100:102]),
+                                                    sym_low = line[102:104].replace(' ',''), 
+                                                    pb_coeffs = pb_coeffs),5)
                 except:
                     gamma_h2,gamma_he, n_T  = 0.0500, 0.0300, 0.4
-                
+                    
                 modified_line = line.replace(
                         line[35:40], str('%5.4f'%(gamma_h2)).lstrip('0')).replace(
                         line[40:45], str('%5.3f'%(gamma_he))).replace(
@@ -290,21 +295,23 @@ class FitLiteratureData:
 
         if fit_4thPade:
             
-            # filter out NaN
+            # filter out NaN and avoid divide by 0
             id_good = ~np.isnan(df['J_low']) & ~np.isnan(df[param_to_fit]) & ~np.isnan(df[param_to_fit_uncertainty]) & ~(df[param_to_fit_uncertainty]==0)
             x = df['J_low'][id_good].copy().to_numpy()
             y = df[param_to_fit][id_good].copy().to_numpy()
             y_err = df[param_to_fit_uncertainty][id_good].copy().to_numpy()
 
-            if x_fit_interation_bound is None:
-                popt, pcov = curve_fit(self.fit_Pbro_Pade, x, y, sigma=y_err, maxfev=50000)     
-            else:
-                # trim to x_fit_interation_bound
-                id_trim = np.where((x > x_fit_interation_bound[0]) & (x < x_fit_interation_bound[1]))[0]
-                x_trim = x[id_trim]
-                y_trim = y[id_trim]
-                y_err_trim = y_err[id_trim]
-                popt, pcov = curve_fit(self.fit_Pbro_Pade, x_trim, y_trim, sigma=y_err_trim, maxfev=50000)
+            # if x_fit_interation_bound is None:
+            #     popt, pcov = curve_fit(self.fit_Pbro_Pade, x, y, sigma=y_err, maxfev=50000)     
+            # else:
+            #     # trim to x_fit_interation_bound
+            #     id_trim = np.where((x > x_fit_interation_bound[0]) & (x < x_fit_interation_bound[1]))[0]
+            #     x_trim = x[id_trim]
+            #     y_trim = y[id_trim]
+            #     y_err_trim = y_err[id_trim]
+            #     popt, pcov = curve_fit(self.fit_Pbro_Pade, x_trim, y_trim, sigma=y_err_trim, maxfev=50000)
+
+            popt, pcov = curve_fit(self.fit_Pbro_Pade, x, y, sigma=y_err, maxfev=50000)     
 
             if x_fit is None:
                 x_fit = np.arange(x.min(),x.max()+1)
