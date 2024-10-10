@@ -219,7 +219,7 @@ class FitLiteratureData:
                              param_to_fit = 'gamma_L [cm-1/atm]',
                              param_to_fit_uncertainty = 'gamma_uncertainty',
                              #num_iterations = 5,
-                             x_fit_interation_bound = [5,20],
+                             #x_fit_interation_bound = [5,20],
                              param_to_sort = 'author',
                              include_authors = None,
                              filters = None, 
@@ -228,7 +228,7 @@ class FitLiteratureData:
                              print_fitted_params = True,
                              show_plot = True,
                              save_plot = False,
-                             save_path = None
+                             save_path = None,
                              ):
         
         """
@@ -391,13 +391,36 @@ class FitLiteratureData:
             return np.array(list(popt))  
 
 
+    def plot_literature_hist(self,
+                            hist_param = 'J_low',
+                            hist_param_range = None,
+                            sort_by = 'author',
+                            filters = None,
+                            bins = 15,
+                            stat = 'count'):
+        
+        # Plot hist using seaborn hue to display distribution
 
+        df = self.literature_df
 
+        required_columns = [hist_param, sort_by]
+        for col in required_columns:
+            if col not in df.columns:
+                raise ValueError(f"DataFrame must contain '{col}' column.")
 
+        # Apply any specified filters to the DataFrame
+        if filters:
+            df = self.filter_dataframe(df, filters)
 
+        # Create figure
+        fig = plt.figure(dpi=600)
+        sns.histplot(data=df, x=hist_param, hue=sort_by, element='step', stat=stat, 
+            common_norm=False, bins=bins, alpha=0.5)
 
+        if hist_param_range:
+            plt.xlim(*hist_param_range)
 
-
+        plt.show()
 
 
 
