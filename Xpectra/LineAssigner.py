@@ -293,13 +293,20 @@ class LineAssigner:
         
         for term in term_list:
             # Use regular expression to capture number, letters, and the final number separately
-            match = re.match(r"(\d+)([A-Z][a-zA-Z]*\d*)(\s+\d+)", term)
-            if match:
+            match1 = re.match(r"(\d+)\s*([A-Z][a-zA-Z]*\d*)\s*(\d{1,3})", term)
+            match2 = re.match(r"(\d+)\s+(\d{1,3})\s*([A-Z][a-zA-Z0-9]*)", term) # if ground state, sym at the end
+            if match1:
                 # Extract the matched groups and clean them
-                multiplicity = int(match.group(1))
-                term_symbol = match.group(2).strip()
-                number = int(match.group(3).strip())
-                parsed_terms.append([int(multiplicity), term_symbol, int(number)])
+                J_value = int(match1.group(1))
+                sym_value = match1.group(2).strip()
+                N_value = int(match1.group(3).strip())
+                parsed_terms.append([int(J_value), sym_value, int(N_value)])
+            elif match2:
+                # Extract the matched groups and clean them
+                J_value = int(match2.group(1))
+                N_value = int(match2.group(2).strip())
+                sym_value = match2.group(3).strip()
+                parsed_terms.append([int(J_value), sym_value, int(N_value)])
             else:
                 parsed_terms.append([None,None,None])
         return parsed_terms
