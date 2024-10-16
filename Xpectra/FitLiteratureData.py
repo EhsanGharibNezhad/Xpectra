@@ -138,6 +138,7 @@ class FitLiteratureData:
 
         #return df
 
+
     @staticmethod
     def calculate_gamma_nT(J_low, sym_low, pb_coeffs):
         pbro = pb_coeffs
@@ -160,12 +161,16 @@ class FitLiteratureData:
             return 0.05, 0.03, 0.5
 
 
-    @staticmethod
+    @staticmethod 
     def modify_line(line, pb_coeffs):
+
+        local_lower_quanta = line[112:127].strip()
+        J_low, sym_low, N_low = LineAssigner.parse_term_symbols([local_lower_quanta])[0]
+
         try:
             gamma_h2,gamma_he, n_T = np.round(FitLiteratureData.calculate_gamma_nT(
-                                                    J_low = int(line[100:102]),
-                                                    sym_low = line[102:104].replace(' ',''), 
+                                                    J_low = J_low,
+                                                    sym_low = sym_low, 
                                                     pb_coeffs = pb_coeffs),5)
         except:
             gamma_h2,gamma_he, n_T  = 0.0500, 0.0300, 0.4
@@ -414,13 +419,43 @@ class FitLiteratureData:
 
         # Create figure
         fig = plt.figure(dpi=600)
-        sns.histplot(data=df, x=hist_param, hue=sort_by, element='step', stat=stat, 
+        sns.histplot(data=df, x=hist_param, hue=sort_by, element='step', stat='count', 
             common_norm=False, bins=bins, alpha=0.5)
 
         if hist_param_range:
             plt.xlim(*hist_param_range)
 
         plt.show()
+
+
+    # @staticmethod 
+    # def examine_line(line, filters):
+
+    #     df = pd.DataFrame(line)
+
+    #     # Apply any specified filters to the DataFrame
+    #     if filters:
+    #         df = self.filter_dataframe(df, filters)
+        
+    #     return modified_line
+
+    # @staticmethod
+    # def filter_file_parallel(file_path,
+    #                         filters, 
+    #                         num_processes=4):
+
+
+    #     # Read all lines from the file
+    #     with open(file_path, 'r') as infile:
+    #         lines = infile.readlines()
+
+    #     # Create a pool of workers
+    #     with Pool(processes=num_processes) as pool:
+    #         # Distribute the work of processing lines in parallel
+    #         modified_lines = pool.starmap(FitLiteratureData.examine_line, [(line,filters) for line in lines])
+
+    #     return modified_lines
+
 
 
 
