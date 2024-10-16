@@ -293,8 +293,9 @@ class LineAssigner:
         
         for term in term_list:
             # Use regular expression to capture number, letters, and the final number separately
-            match1 = re.match(r"(\d+)\s*([A-Z][a-zA-Z]*\d*)\s*(\d{1,3})", term)
-            match2 = re.match(r"(\d+)\s+(\d{1,3})\s*([A-Z][a-zA-Z0-9]*)", term) # if ground state, sym at the end
+            match1 = re.match(r"(\d+)\s*([A-Z]\d?)\s*(\d{1,3})", term)
+            match2 = re.match(r"(\d+)\s+(\d{1,3})\s*([A-Z]\d?)", term) # if ground state, sym at the end
+            
             if match1:
                 # Extract the matched groups and clean them
                 J_value = int(match1.group(1))
