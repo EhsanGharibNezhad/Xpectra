@@ -27,7 +27,7 @@ molecular and atomic spectra recorded from laboratory spectroscopic measuremtns 
 The tasks executed by the ``Xpectra`` modules are outlined below:
 
 
-![](docs/figures/Xpectra_modules.png)
+![](docs/figures/Xpectra_modules.jpg)
 
 - *SpecMaster module*: Performs various tasks to process the datasets, including:
 
