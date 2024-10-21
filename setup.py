@@ -23,7 +23,7 @@ version = re.search(r"^_*version_* = ['\"]([^'\"]*)['\"]", vf, re.M).group(1)
 setup(
     name='Xpectra',
     version = version,  # MAJOR.MINOR.PATCH
-    description = 'An End-to-End Python Package for Analyzing Laboratory Spectra through Machine Learning Models For Extrasolar Atmospheres, Generating Statistical Reports, and Visualizing Results',
+    description = 'An End-to-End Python Package for Analyzing Laboratory Spectra For Extrasolar Atmospheres, Generating Statistical Reports, and Visualizing Results',
     long_description = long_description,
     long_description_content_type='text/markdown',
     author = 'Ehsan (Sam) Gharib-Nezhad',
@@ -41,18 +41,15 @@ setup(
                   'Topic :: Software Development :: Libraries :: Python Modules'
   ],
   packages=find_packages(exclude=('tests', 'docs')),
-  install_requires=['numpy==1.26.1',
+  install_requires=['numpy',
                     'bokeh',
-                    'pandas==2.0.3',
-                    'astropy',
+                    'pandas',
                     'matplotlib',
-                    'seaborn==0.12.2',
-                    'sphinx==7.2.6',
-                    'scipy==1.11.1',
+                    'seaborn',
+                    'sphinx==8.1.3',
+                    'scipy',
                     'jupyterlab',
-                    'sphinx',
-                    'spectres==2.2.0',
-                    'scikit-learn==1.3.0',
+                    # 'scikit-learn==1.3.0',
                     ],
     zip_safe = False,
 )
