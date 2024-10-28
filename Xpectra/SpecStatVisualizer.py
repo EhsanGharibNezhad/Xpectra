@@ -41,6 +41,35 @@ import matplotlib.gridspec as gridspec
 from matplotlib.ticker import MaxNLocator
 
 
+
+def print_spectral_info(wavenumber_values: np.ndarray,
+                        signal_values: np.ndarray,
+                        print_title: str = None,
+                        )-> None:
+    """
+    Pretty print information about the spectrum. 
+
+    Parameters
+    ----------   
+    wavenumber_values : np.ndarray, optional
+        Wavenumber array in cm^-1.
+    signal_values : np.ndarray, optional
+        Signal arrays (input data).
+    """ 
+
+    x = wavenumber_values
+    y = signal_values
+    
+    wavenumber_range = (np.min(x), np.max(x))
+    num_points = len(x)
+
+    targets = {r"Wavenumber range (cm-1)" : wavenumber_range, 
+                "Number of points" : num_points}
+
+    print_results_fun(targets, print_title=print_title)
+
+
+
 def print_results_fun(targets: Any, print_title: str = None) -> None:
     """
     Print the outputs in a pretty format using the pprint library.
@@ -246,7 +275,7 @@ def plot_spectra_errorbar_bokeh(wavenumber_values: np.ndarray,
 
 def plot_spectra_errorbar_seaborn(wavenumber_values: np.ndarray,
                                   signal_values: np.ndarray,
-                                  wavenumber_range: Union[list, tuple, np.ndarray] = None,
+                                  wavenumber_range: Union[list, np.ndarray] = None,
                                   signal_values_err: np.ndarray = None,
                                   absorber_name: str = None,
                                   y_label: str = "Signal",
