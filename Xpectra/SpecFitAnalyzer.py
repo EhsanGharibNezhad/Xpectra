@@ -95,6 +95,27 @@ class SpecFitAnalyzer:
         z = ((x - center) + 1j * gamma) / (sigma * np.sqrt(2))
         return amplitude * np.real(wofz(z)).astype(float) / (sigma * np.sqrt(2 * np.pi))
 
+    def check_negative_nan(self):
+        """
+        Check the spectral data for negative or NAN values, and report their location.
+        """
+        x = self.wavenumber_values
+        y = self.signal_values
+
+        id_negative = np.where(y<0)[0]
+        id_nan = np.where(np.isnan(y))[0]
+
+        if len(id_nan) == 0:
+            print('No NAN values.')
+        elif len(id_nan) != 0:
+            print('NAN values found:',id_nan)
+
+        if len(id_negative) == 0:
+            print('No negative values.')
+        elif len(id_negative) != 0:
+            print('Negative values found:',id_negative)
+
+
     def fit_spectrum(self,
                      initial_guesses: Union[list, np.ndarray],
                      line_profile: str = 'gaussian',
