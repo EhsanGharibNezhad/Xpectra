@@ -95,32 +95,53 @@ class SpecFitAnalyzer:
         z = ((x - center) + 1j * gamma) / (sigma * np.sqrt(2))
         return amplitude * np.real(wofz(z)).astype(float) / (sigma * np.sqrt(2 * np.pi))
 
-    def check_negative_nan(self):
+    @staticmethod
+    def check_negative_nan(wavenumber_values: np.ndarray,
+                           signal_values: np.ndarray
+                           ) -> List[np.ndarray]:
         """
         Check the spectral data for negative or NAN values, and report their location.
-        """
-        x = self.wavenumber_values
-        y = self.signal_values
 
+        Parameters
+        ----------        
+        signal_values : np.ndarray, optional
+            Signal arrays (input data).
+        wavenumber_values : np.ndarray, optional
+            Wavenumber array in cm^-1.   
+
+        Returns
+        -------  
+        trimmed_spectrum : list
+            List of 2 arrays containing x_trimmed and y_trimmed
+        """
+
+        x = wavenumber_values
+        y = signal_values
+
+        # Identify negative or nan values
         id_negative = np.where(y<0)[0]
         id_nan = np.where(np.isnan(y))[0]
 
+        # Print results
         if len(id_nan) == 0:
             print('No NAN values.')
         elif len(id_nan) != 0:
             print(f' {len(id_nan)} NAN values found:',id_nan)
-
         if len(id_negative) == 0:
             print('No negative values.')
         elif len(id_negative) != 0:
             print(f'{len(id_negative)} Negative values found:',id_negative)
 
-            # Replace negative values with NAN
-            x_trimmed = np.delete(x, id_negative)
-            y_trimmed = np.delete(y, id_negative)
-            
-            self.x_trimmed = x_trimmed
-            self.y_trimmed = y_trimmed 
+        # Delete any negative or NAN values
+        id_delete = np.unique(np.concatenate((id_negative, id_nan)))
+        x_trimmed = np.delete(x, id_delete)
+        y_trimmed = np.delete(y, id_delete)
+        
+        trimmed_spectrum = [x_trimmed, y_trimmed]
+
+        # Return trimmed values 
+        return trimmed_spectrum
+
 
     def fit_spectrum(self,
                      initial_guesses: Union[list, np.ndarray],
