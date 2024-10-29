@@ -115,6 +115,7 @@ class SpecFitAnalyzer:
         elif len(id_negative) != 0:
             print('Negative values found:',id_negative)
 
+        return id_nan,id_negative
 
     def fit_spectrum(self,
                      initial_guesses: Union[list, np.ndarray],
