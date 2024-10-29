@@ -232,7 +232,7 @@ def plot_spectra_errorbar_bokeh(wavenumber_values: np.ndarray,
                   legend_label=f"{molecule_name}: Laboratory Spectra")
     elif plot_type == 'line':
         # Add the line plot
-        p.line(x_obs, y_obs, line_width=2, line_color='green', alpha=0.6,
+        p.line(x_obs, y_obs, line_width=1.5, line_color='green', alpha=0.6,
                legend_label=f"{molecule_name}: Laboratory Spectra")
 
     if data_type == 'x_y_yerr' and y_obs_err is not None:
@@ -275,13 +275,15 @@ def plot_spectra_errorbar_bokeh(wavenumber_values: np.ndarray,
 
 def plot_spectra_errorbar_seaborn(wavenumber_values: np.ndarray,
                                   signal_values: np.ndarray,
+                                  __reference_data__: str,
                                   wavenumber_range: Union[list, np.ndarray] = None,
                                   signal_values_err: np.ndarray = None,
                                   absorber_name: str = None,
                                   y_label: str = "Signal",
                                   title_label: str = None,
                                   data_type: str = 'x_y_yerr',
-                                  plot_type: str = 'scatter'
+                                  plot_type: str = 'scatter',
+                                  __save_plots__: bool = False,
                                   ) -> None:
     """
     Plot the spectra with error bars using Seaborn.
@@ -293,7 +295,7 @@ def plot_spectra_errorbar_seaborn(wavenumber_values: np.ndarray,
     signal_values : nd.array
         Signal arrays (input data).
     wavenumber_range : list-like, optional
-        List-like object (list, tuple, or np.ndarray) with of length 2 representing wavenumber range for plotting.
+        List-like object (list or np.ndarray) with of length 2 representing wavenumber range for plotting.
     signal_values_err : nd.array, optional
         Error on input data.
     absorber_name : str, optional
@@ -333,7 +335,7 @@ def plot_spectra_errorbar_seaborn(wavenumber_values: np.ndarray,
         sns.scatterplot(x=x_obs, y=y_obs, color='green', s=40, alpha=0.6,
                         label=f"{molecule_name}: Laboratory Spectra", ax=ax1)
     elif plot_type == 'line':
-        sns.lineplot(x=x_obs, y=y_obs, color='green', linewidth=2, alpha=0.6,
+        sns.lineplot(x=x_obs, y=y_obs, color='green', linewidth=1.5, alpha=0.6,
                      label=f"{molecule_name}: Laboratory Spectra", ax=ax1)
 
     if data_type == 'x_y_yerr' and y_obs_err is not None:
@@ -361,6 +363,29 @@ def plot_spectra_errorbar_seaborn(wavenumber_values: np.ndarray,
     ax2.set_xticklabels([f'{10 ** 4 / tick:.3f}' for tick in ax1.get_xticks()])
     ax2.set_xlabel(r"Wavelength [$\mu$m]", fontsize=12)
 
+    # Ticks (wavenumber)
+    ax1.tick_params(axis='both', which='major', direction='in', length=8, width=1.5)
+    ax1.tick_params(axis='y', which='major', direction='in', right=True)
+    ax1.minorticks_on()
+    ax1.tick_params(axis='both', which='minor', direction='in', length=5, width=1.5)
+    ax1.tick_params(axis='y', which='minor', direction='in', right=True)
+
+    # Ticks (wavelength)
+    ax2.tick_params(axis='x', which='major', direction='in', length=8, width=1.5)
+    ax2.minorticks_on()
+    ax2.tick_params(axis='x', which='minor', direction='in', length=5, width=1.5)
+
+    if __save_plots__:
+
+        # Assign file name
+        if title_label is not None:
+            save_file = title_label.replace(" ", "_").lower()
+        elif title_label is None:
+            save_file = f"{molecule_name.lower()}_calb_lab_spectrum"
+
+        plt.savefig(os.path.join(__reference_data__, 'figures', save_file + ".pdf"), 
+            dpi=700, bbox_inches='tight')
+
     plt.tight_layout()
     plt.show()
 
@@ -369,7 +394,7 @@ def plot_baseline_fitting_seaborn(wavenumber_values: np.ndarray,
                                   signal_values: np.ndarray, 
                                   baseline_type: str, 
                                   fitted_baseline_params: np.ndarray, 
-                                  baseline_degree: int = None
+                                  baseline_degree: int = None,
                                   ) -> None:
     """
     Plot the original spectrum and the fitted baseline using Seaborn.
@@ -442,6 +467,17 @@ def plot_baseline_fitting_seaborn(wavenumber_values: np.ndarray,
     
     ax1.legend()
     ax2.legend()
+
+    for ax in (ax1,ax2):
+        # Major ticks:
+        ax.tick_params(axis='both', which='major', direction='in', length=8, width=1.5)
+        ax.tick_params(axis='x', direction='in', top=True)
+        ax.tick_params(axis='y', direction='in', right=True)
+        # Minor ticks:
+        ax.minorticks_on()
+        ax.tick_params(axis='both', which='minor', direction='in', length=5, width=1.5)
+        ax.tick_params(axis='x', which='minor', direction='in', top=True)
+        ax.tick_params(axis='y', which='minor', direction='in', right=True)
 
     plt.show()
 
