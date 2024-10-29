@@ -108,14 +108,19 @@ class SpecFitAnalyzer:
         if len(id_nan) == 0:
             print('No NAN values.')
         elif len(id_nan) != 0:
-            print('NAN values found:',id_nan)
+            print(f' {len(id_nan)} NAN values found:',id_nan)
 
         if len(id_negative) == 0:
             print('No negative values.')
         elif len(id_negative) != 0:
-            print('Negative values found:',id_negative)
+            print(f'{len(id_negative)} Negative values found:',id_negative)
 
-        return id_nan,id_negative
+            # Replace negative values with NAN
+            x_trimmed = np.delete(x, id_negative)
+            y_trimmed = np.delete(y, id_negative)
+            
+            self.x_trimmed = x_trimmed
+            self.y_trimmed = y_trimmed 
 
     def fit_spectrum(self,
                      initial_guesses: Union[list, np.ndarray],
