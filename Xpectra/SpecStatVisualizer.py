@@ -30,8 +30,10 @@ from matplotlib.ticker import AutoMinorLocator, MaxNLocator
 from matplotlib import rcParams
 
 from bokeh.plotting import output_notebook, figure, show
+from bokeh.io import export_png
 from bokeh.models import HoverTool, ColumnDataSource, Range1d, Span, Legend, Label, LinearAxis
 from bokeh.layouts import column
+
 
 import numpy as np
 from numpy.polynomial import Polynomial
@@ -381,7 +383,7 @@ def plot_spectra_errorbar_seaborn(wavenumber_values: np.ndarray,
         if title_label is not None:
             save_file = title_label.replace(" ", "_").lower()
         elif title_label is None:
-            save_file = f"{molecule_name.lower()}_calb_lab_spectrum"
+            save_file = f"calibrated_lab_spectrum"
 
         plt.savefig(os.path.join(__reference_data__, 'figures', save_file + ".pdf"), 
             dpi=700, bbox_inches='tight')
@@ -603,7 +605,7 @@ def plot_baseline_fitting_bokeh(wavenumber_values: np.ndarray,
 def plot_fitted_als_bokeh(wavenumber_values: np.ndarray, 
                           signal_values: np.ndarray,
                           fitted_baseline: np.ndarray,
-                          baseline_type: str = 'als'
+                          baseline_type: str = 'als',
                           ) -> None:
 
     """
@@ -638,7 +640,7 @@ def plot_fitted_als_bokeh(wavenumber_values: np.ndarray,
     # Create the figure
     p1 = figure(title=f"Spectra with Fitted {baseline_type.upper()} Baseline",
                y_axis_label="Signal",
-               width=800, height=350,
+               width=800, height=400,
                x_range=x_range, 
                y_axis_type="linear",
                tools="pan,wheel_zoom,box_zoom,reset")
@@ -655,7 +657,7 @@ def plot_fitted_als_bokeh(wavenumber_values: np.ndarray,
     p2 = figure(title=' ',
                x_axis_label="Wavenumber [cm^-1]",
                y_axis_label="Baseline-Corrected Signal",
-               width=800, height=350,
+               width=800, height=200,
                x_range=x_range, 
                y_axis_type="linear",
                tools="pan,wheel_zoom,box_zoom,reset")
@@ -698,6 +700,91 @@ def plot_fitted_als_bokeh(wavenumber_values: np.ndarray,
     # Show the plot
     output_notebook()
     show(layout)
+
+
+def plot_fitted_als_seaborn(wavenumber_values: np.ndarray, 
+                            signal_values: np.ndarray, 
+                            fitted_baseline: np.ndarray,
+                            __reference_data__: str = None,
+                            __save_plots__: bool = False,
+                            baseline_type: str = 'als'
+                            ) -> None:
+    """
+    Plot the original spectrum and the fitted baseline using Seaborn.
+
+    Parameters
+    ----------
+    wavenumber_values : np.ndarray
+        Wavenumber array in cm^-1.
+    signal_values : np.ndarray
+        Signal arrays (input data).
+    fitted_baseline : np.ndarray
+        Fitted baseline using baseline_type.            
+    baseline_type : str, {'als', 'arpls'}
+        Function type of fitted baseline.
+    """
+
+    x = wavenumber_values
+    y = signal_values
+    y_baseline = fitted_baseline
+
+    # Create figure
+    fig = plt.figure(figsize=(8, 6), dpi=700)
+    # Create GridSpec object
+    gs = gridspec.GridSpec(2, 1, height_ratios=[2, 1])
+    # Create first subplot for spectrum
+    ax1 = fig.add_subplot(gs[0,0])
+    # Plot original spectrum
+    ax1.plot(x, y, label="Original Spectrum", color="blue",lw=0.9,alpha=0.8)
+    # Plot fitted baseline
+    label = f"Fitted {baseline_type.upper()} Baseline"
+    ax1.plot(x, y_baseline, label=label, color="red")
+    # Create second subplot for residual
+    ax2 = fig.add_subplot(gs[1, 0])
+    y_residual = y - y_baseline
+    # Plot residual 
+    ax2.plot(x, y_residual, 
+        label=f"Baseline correction with {baseline_type.upper()}",
+        color='green', lw=0.9, alpha=0.8)
+    # Plot zero-point
+    ax2.plot(x, np.zeros_like(x), label='Zero point', color="red",linestyle="--") 
+
+    # Axes labels
+    ax1.set_ylabel("Signal")
+    ax2.set_xlabel("Wavenumber [cm^-1]")
+    ax2.set_ylabel("Baseline-Corrected Signal")
+
+    # Title
+    ax1.set_title(f"Spectra with Fitted {baseline_type.upper()} Baseline")
+    
+    ax1.legend() # Turn on legend
+    ax2.legend()
+
+    for ax in (ax1,ax2):
+        # Turn on grid lines with transparency
+        ax.grid(True, alpha=0.5)
+        # Set axes ticks, inwards
+        ax.tick_params(axis='both', which='major', direction='in', length=7, width=1)
+        ax.tick_params(axis='x', direction='in', top=True)
+        ax.tick_params(axis='y', direction='in', right=True)
+        # Minor ticks:
+        ax.minorticks_on()
+        ax.tick_params(axis='both', which='minor', direction='in', length=4, width=1)
+        ax.tick_params(axis='x', which='minor', direction='in', top=True)
+        ax.tick_params(axis='y', which='minor', direction='in', right=True)
+
+    if __save_plots__:
+
+        # Assign file name
+        save_file = f"{baseline_type.lower()}_baseline_corrected_spectrum.pdf"
+
+        plt.savefig(os.path.join(__reference_data__, 'figures', save_file), 
+            dpi=700, bbox_inches='tight')
+
+    plt.show()
+
+
+
 
 
 def plot_fitted_spectrum_bokeh(wavenumber_values: np.ndarray, 
