@@ -16,7 +16,6 @@ from scipy import stats
 from sklearn.metrics import r2_score, mean_squared_error,  mean_absolute_error
 from scipy.interpolate import RegularGridInterpolator
 from scipy.stats import chi2
-from scipy.signal import find_peaks
 
 import re
 import os
@@ -30,11 +29,6 @@ import seaborn as sns
 import matplotlib.pyplot as plt
 from matplotlib.ticker import AutoMinorLocator
 from matplotlib.ticker import MaxNLocator
-
-from bokeh.plotting import figure, output_notebook, show
-from bokeh.models import CustomJS, ColumnDataSource, TapTool, Div, HoverTool
-from bokeh.layouts import column
-
 
 from .SpecStatVisualizer import *
 

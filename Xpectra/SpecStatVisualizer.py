@@ -31,9 +31,8 @@ from matplotlib import rcParams
 
 from bokeh.plotting import output_notebook, figure, show
 from bokeh.io import export_png
-from bokeh.models import HoverTool, ColumnDataSource, Range1d, Span, Legend, Label, LinearAxis
+from bokeh.models import CustomJS, HoverTool, ColumnDataSource, TapTool, Div, Range1d, Span, Legend, Label, LinearAxis
 from bokeh.layouts import column
-
 
 import numpy as np
 from numpy.polynomial import Polynomial
@@ -1392,6 +1391,121 @@ def plot_assigned_lines_bokeh(wavenumber_values: np.ndarray,
 
     # Show the plot
     output_notebook()
+    show(layout)
+
+
+def plot_auto_peaks_bokeh(x_obs, y_obs, peaks):
+
+    # Create a ColumnDataSource
+    source = ColumnDataSource(data=dict(x=x_obs, y=y_obs))
+    
+    # Create the figure
+    p = figure(title="Click and Print",
+               x_axis_label="Wavenumber [cm^-1]",
+               y_axis_label="Signal",
+               width=1000, height=300,
+               y_axis_type="linear",
+               tools="pan,wheel_zoom,box_zoom,reset")
+
+    # Add HoverTool to the plot
+    hover = HoverTool(tooltips=[("Wavenumber [cm^-1]", "@x{0.000} µm"), ("Signal", "@y{0.000}")], mode='vline')
+    p.add_tools(hover)
+
+    # Add the line plot
+    p.line('x', 'y', source=source, line_width=2, line_color='green', alpha=0.6,
+        legend_label=f"Spectrum")
+
+    # plot peaks
+    p.scatter(x_obs[peaks], y_obs[peaks], marker='x',color='red',legend_label=f"Peaks")
+
+    # Increase size of x and y ticks
+    p.title.text_font_size = '14pt'
+    p.xaxis.major_label_text_font_size = '14pt'
+    p.xaxis.axis_label_text_font_size = '14pt'
+    p.yaxis.major_label_text_font_size = '14pt'
+    p.yaxis.axis_label_text_font_size = '14pt'
+
+    show(p)
+
+
+def find_peaks_bokeh(x_obs, y_obs):
+
+        # Create a ColumnDataSource
+    source = ColumnDataSource(data=dict(x=x_obs, y=y_obs))
+    
+    # Create the figure
+    p = figure(title="Click and Print",
+               x_axis_label="Wavenumber [cm^-1]",
+               y_axis_label="Signal",
+               width=1000, height=300,
+               y_axis_type="linear",
+               tools="pan,wheel_zoom,box_zoom,reset")
+
+    # Add HoverTool to the plot
+    hover = HoverTool(tooltips=[("Wavenumber [cm^-1]", "@x{0.000} µm"), ("Signal", "@y{0.000}")], mode='vline')
+    p.add_tools(hover)
+
+    # Add the line plot
+    p.line('x', 'y', source=source, line_width=2, line_color='green', alpha=0.6,
+        legend_label=f"Spectrum")
+
+    # Increase size of x and y ticks
+    p.title.text_font_size = '14pt'
+    p.xaxis.major_label_text_font_size = '14pt'
+    p.xaxis.axis_label_text_font_size = '14pt'
+    p.yaxis.major_label_text_font_size = '14pt'
+    p.yaxis.axis_label_text_font_size = '14pt'
+
+    # Add a Div to display the results
+    div = Div(text="Click to print coordinates.", width=400, height=300)
+
+    # JavaScript callback to save coordinates using hover tool data
+    callback = CustomJS(args=dict(source=source, div=div), code="""
+        // Initialize the global array if not already present
+        if (!window.clickedCoordinates) {
+            window.clickedCoordinates = [];
+        }
+
+        // Get the x and y coordinates of the click event
+        const x = cb_obj.x;
+        const y = cb_obj.y;
+
+        // Find the closest data point in the source data
+        const data = source.data;
+        const x_data = data['x'];
+        const y_data = data['y'];
+
+        // Initialize the minimum distance and corresponding index
+        let minDist = Infinity;
+        let closestIndex = -1;
+
+        // Iterate through the data to find the closest point
+        for (let i = 0; i < x_data.length; i++) {
+            const dist = Math.abs(x - x_data[i]);
+            if (dist < minDist) {
+                minDist = dist;
+                closestIndex = i;
+            }
+        }
+
+        // If a valid closest index is found, store the coordinates
+        if (closestIndex !== -1) {
+            const clickedX = x_data[closestIndex];
+            const clickedY = y_data[closestIndex];
+            window.clickedCoordinates.push({x: clickedX, y: clickedY});
+
+            // Update the Div with the list of all coordinates
+            const coordArray = window.clickedCoordinates.map(coord => `[${coord.x.toFixed(3)}, ${coord.y.toFixed(3)}]`).join(', ');
+            div.text = `Clicked coordinates: [${coordArray}]`;
+        }
+
+        """)
+
+    # Add the callback to the plot
+    p.js_on_event('tap', callback)
+    
+    # Layout and show the plot
+    layout = column(p, div)
     show(layout)
 
 
