@@ -35,10 +35,126 @@ from numpy.polynomial import Polynomial
 from .SpecStatVisualizer import *
 
 
-
-
 # Import local module
 # from io_funs import LoadSave
+
+def line_finder(wavenumber_values: np.ndarray,
+                    signal_values: np.ndarray,
+                    wavenumber_range: Union[list, tuple, np.ndarray] = None,
+                    ) -> None:
+    """
+    Click and print spectral peaks on plotted spectra with error bars using Bokeh.
+
+    Parameters
+    ----------
+    wavenumber_values : np.ndarray
+        Wavenumber array in cm^-1.
+    signal_values : np.ndarray
+        Signal arrays (input data).
+    wavenumber_range : list-like, optional
+        List-like object (list, tuple, or np.ndarray) with of length 2 representing wavenumber range for plotting.
+    """
+
+    x_obs = wavenumber_values
+    y_obs = signal_values
+
+    # Trim x and y to desired wavelength range
+    if wavenumber_range is not None:
+        # Make sure range is in correct format
+        if len(wavenumber_range) != 2:
+            raise ValueError('wavenumber_range must be tuple, list, or array with 2 elements')
+        # Locate indices and splice
+        condition_range = (x_obs > wavenumber_range[0]) & (x_obs < wavenumber_range[1])
+        x_obs = x_obs[condition_range]
+        y_obs = y_obs[condition_range]
+
+
+    # smooth first!
+    
+    peaks, info = find_peaks(y_obs, height=0.05)
+
+    # Create a ColumnDataSource
+    source = ColumnDataSource(data=dict(x=x_obs, y=y_obs))
+    
+    # Create the figure
+    p = figure(title="Click and Print",
+               x_axis_label="Wavenumber [cm^-1]",
+               y_axis_label="Signal",
+               width=1000, height=300,
+               y_axis_type="linear",
+               tools="pan,wheel_zoom,box_zoom,reset")
+
+    # Add HoverTool to the plot
+    hover = HoverTool(tooltips=[("Wavenumber [cm^-1]", "@x{0.000} µm"), ("Signal", "@y{0.000}")], mode='vline')
+    p.add_tools(hover)
+
+    # Add the line plot
+    p.line('x', 'y', source=source, line_width=2, line_color='green', alpha=0.6,
+        legend_label=f"Spectrum")
+
+    # plot peaks
+    p.x(x_obs[peaks], y_obs[peaks], color='red',legend_label=f"Peaks")
+
+    # Increase size of x and y ticks
+    p.title.text_font_size = '14pt'
+    p.xaxis.major_label_text_font_size = '14pt'
+    p.xaxis.axis_label_text_font_size = '14pt'
+    p.yaxis.major_label_text_font_size = '14pt'
+    p.yaxis.axis_label_text_font_size = '14pt'
+
+    # Add a Div to display the results
+    div = Div(text="Click to print coordinates.", width=400, height=300)
+
+    # JavaScript callback to save coordinates using hover tool data
+    callback = CustomJS(args=dict(source=source, div=div), code="""
+        // Initialize the global array if not already present
+        if (!window.clickedCoordinates) {
+            window.clickedCoordinates = [];
+        }
+
+        // Get the x and y coordinates of the click event
+        const x = cb_obj.x;
+        const y = cb_obj.y;
+
+        // Find the closest data point in the source data
+        const data = source.data;
+        const x_data = data['x'];
+        const y_data = data['y'];
+
+        // Initialize the minimum distance and corresponding index
+        let minDist = Infinity;
+        let closestIndex = -1;
+
+        // Iterate through the data to find the closest point
+        for (let i = 0; i < x_data.length; i++) {
+            const dist = Math.abs(x - x_data[i]);
+            if (dist < minDist) {
+                minDist = dist;
+                closestIndex = i;
+            }
+        }
+
+        // If a valid closest index is found, store the coordinates
+        if (closestIndex !== -1) {
+            const clickedX = x_data[closestIndex];
+            const clickedY = y_data[closestIndex];
+            window.clickedCoordinates.push({x: clickedX, y: clickedY});
+
+            // Update the Div with the list of all coordinates
+            const coordArray = window.clickedCoordinates.map(coord => `[${coord.x.toFixed(3)}, ${coord.y.toFixed(3)}]`).join(', ');
+            div.text = `Clicked coordinates: [${coordArray}]`;
+        }
+
+        """)
+
+    # Add the callback to the plot
+    p.js_on_event('tap', callback)
+    
+    # Layout and show the plot
+    layout = column(p, div)
+    show(layout)
+
+
 
 class SpecFitAnalyzer:
     """
@@ -67,11 +183,13 @@ class SpecFitAnalyzer:
             wavelength_names: Union[List[str], None] = None,
             wavenumber_values: Union[np.ndarray, None] = None,
             absorber_name: Union[str, None] = None,
+            __reference_data__: Union[str, None] = None
     ):
         self.signal_values = signal_values
         self.wavelength_names = wavelength_names
         self.wavenumber_values = wavenumber_values
         self.absorber_name = absorber_name
+        self.__reference_data__ = __reference_data__
 
 
     def gaussian(self, x: np.ndarray, center: float, amplitude: float, width: float) -> np.ndarray:
@@ -422,11 +540,14 @@ class SpecFitAnalyzer:
         return spline
 
 
+
     def als(self, 
             lam: float = 1e6, 
             p: float = 0.1, 
             itermax: int = 10, 
-            __plot__: bool = True
+            __plot__: bool = True,
+            __save_plots__: bool = False,
+            __print__: bool = False,
             ) -> None:
 
         r"""
@@ -482,18 +603,27 @@ class SpecFitAnalyzer:
             z = spsolve(Z, w * y)
             w = p * (y > z) + (1 - p) * (y < z)
 
-        self.y_baseline_corrected = y - z
+        y_baseline_corrected_ALS = y - z
+        self.y_baseline_corrected_ALS = y_baseline_corrected_ALS
         self.baseline_type = 'als'
 
         if __plot__:
-            plot_fitted_als_bokeh(x, y, z, baseline_type = 'als')
+            plot_fitted_als_seaborn(wavenumber_values=x, signal_values=y, fitted_baseline=z, 
+                __reference_data__=self.__reference_data__, baseline_type = 'als', 
+                __save_plots__=__save_plots__)
+
+        if __print__:
+            print('Fitting parameters...')
+            print('Metrics...')
 
 
     def arpls(self, 
               lam: float = 1e4, 
               ratio: float = 0.05, 
               itermax: int = 100, 
-              __plot__: bool = True
+              __plot__: bool = True,
+              __save_plots__: bool = False,
+              __print__: bool = False,
               ) -> None:
 
         r"""
@@ -556,11 +686,21 @@ class SpecFitAnalyzer:
                 break
             w = wt
 
-        self.y_baseline_corrected = y - z
+        y_baseline_corrected_ARPLS = y - z
+        self.y_baseline_corrected_ARPLS = y_baseline_corrected_ARPLS
         self.baseline_type = 'arpls'
 
         if __plot__:
-            plot_fitted_als_bokeh(x, y, z, baseline_type = 'arpls')
+            plot_fitted_als_seaborn(wavenumber_values=x, signal_values=y, fitted_baseline=z, 
+                __reference_data__=self.__reference_data__, baseline_type = 'arpls', 
+                __save_plots__=__save_plots__)
+
+        if __print__:
+            print('Fitting parameters...')
+            print('Metrics...')
+            
+            
+
 
 
 
