@@ -82,6 +82,10 @@ def line_finder_auto(wavenumber_values: np.ndarray,
     if __plot__: 
         plot_auto_peaks_bokeh(x_obs, y_obs, peaks)
 
+    peak_centers = x_obs[peaks[::-1]] # reverse peaks
+
+    return peak_centers
+
 
 def line_finder_manual(wavenumber_values: np.ndarray,
                     signal_values: np.ndarray,
@@ -119,7 +123,7 @@ def line_finder_manual(wavenumber_values: np.ndarray,
     y_obs_smoothed = gaussian_filter1d(y_obs, sigma)
 
     if __plot__: 
-        find_peaks_bokeh(x_obs, y_obs, peaks)
+        find_peaks_bokeh(x_obs, y_obs)
 
 class SpecFitAnalyzer:
     """
