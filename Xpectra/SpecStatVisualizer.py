@@ -1393,6 +1393,263 @@ def plot_assigned_lines_bokeh(wavenumber_values: np.ndarray,
     output_notebook()
     show(layout)
 
+# new plot that takes just the peak centers
+def plot_hitran_lines_bokeh(wavenumber_values: np.ndarray, 
+                              signal_values: np.ndarray, 
+                              fitted_hitran: pd.DataFrame,
+                              peak_centers: np.ndarray,
+                              columns_to_print: Union[List[str]],
+                              wavenumber_range: Union[list, tuple, np.ndarray] = None,
+                              line_profile: str = 'gaussian',
+                              fitting_method: str = 'lm',
+                              absorber_name: str = None
+                              ) -> None:
+
+    """
+    Plot the original spectrum and the fitted peaks using Bokeh.
+
+    Parameters
+    ----------
+    wavenumber_values : np.ndarray
+        Wavenumber array in cm^-1.
+    signal_values : np.ndarray
+        Signal arrays (input data). 
+    fitted_hitran : pd.DataFrame
+        Dataframe containing information about the assigned spectral lines, including columns ['amplitude', 'center', 'wing'].
+    fitted_params : np.ndarray
+        Fitted parameters of peaks.
+    columns_to_print : list
+        Columns to print corresponding to line positions. 
+    wavenumber_range : list-like, optional
+        List-like object (list, tuple, or np.ndarray) with of length 2 representing wavenumber range for plotting.
+    line_profile : str, {'gaussian', 'lorentzian', 'voigt'}, optional
+        Type of line profile to use for fitting. Default is 'gaussian'.
+    """
+
+    x = wavenumber_values
+    y = signal_values
+
+    line_positions = fitted_hitran["nu"].to_numpy()
+    print_columns = fitted_hitran[columns_to_print].to_numpy(dtype=str)
+
+    # Trim x and y to desired wavelength range
+    if wavenumber_range is not None:
+        # Make sure range is in correct format
+        if len(wavenumber_range) != 2:
+            raise ValueError('wavenumber_range must be tuple, list, or array with 2 elements')
+        # Locate indices and splice
+        condition_range = (x > wavenumber_range[0]) & (x < wavenumber_range[1])
+        x = x[condition_range]
+        y = y[condition_range]
+
+    # Create ColumnDataSource
+    source = ColumnDataSource(data=dict(x=x, y=y))
+
+    # Create a new plot with a title and axis labels
+    p = figure(title=f"{absorber_name} Spectrum and Fitted HITRAN Lines",
+               y_axis_label="Signal",
+               width=800, height=500,
+               y_axis_type="linear",
+               tools="pan,wheel_zoom,box_zoom,reset")
+
+    # Add the original spectrum to the plot
+    p.line('x', 'y', legend_label="Original Spectrum", line_width=2, color="blue", source=source)
+    
+    # Plot assigned HITRAN lines
+    for q in range(len(line_positions)):
+
+        # Plot assigned HITRAN lines
+        vline = Span(location=line_positions[q], dimension='height', line_width=2,
+            line_color='black')
+        p.add_layout(vline)
+
+        # Plot fitted peak centers
+        vline = Span(location=peak_centers[q], dimension='height', 
+            line_color="red", line_alpha=0.8, line_width=1)
+        p.add_layout(vline)
+
+    # Manually add legend entries
+    dummy_line1 = p.line(peak_centers[0], y[0], legend_label="Peak Center", 
+        line_color="red", line_alpha=0.8, line_width=1)
+    dummy_line2 = p.line(peak_centers[0], y[0], legend_label='HITRAN Assignment: \n ' +  ', '.join(columns_to_print), 
+        line_width=1.5, line_color='black')
+   
+    # Plot text of the assigned line data
+    y_range = np.max(y)-np.min(y)
+    y_diff = 1.2*y_range
+    y_up = 0
+    for q in range(len(line_positions)):
+        
+        # Calculate label position
+        y_up += y_diff / (len(line_positions)+1)
+
+        # Retrieve the label
+        label_q_list = list(print_columns[q])
+        label_q_pad = [' ' + item for item in label_q_list]
+        label_q = '\n'.join(label_q_pad)
+
+        # Add the text label
+        label = Label(x=line_positions[q], y=np.min(y) + y_up, 
+            text=label_q, text_color="black", text_align="left", text_baseline="top")
+        p.add_layout(label)
+
+    # Customize legends
+    legend1 = p.legend[0]
+    legend1.location = 'top_left'
+    p.add_layout(legend1, 'above')
+
+    p.title.text_font_size = '14pt'
+    p.xaxis.major_label_text_font_size = '14pt'
+    p.xaxis.axis_label_text_font_size = '14pt'
+    p.yaxis.major_label_text_font_size = '14pt'
+    p.yaxis.axis_label_text_font_size = '14pt'
+
+    # Add HoverTool
+    hover_p1 = HoverTool()
+    hover_p1.tooltips = [
+        ("Wavenumber [cm^-1]", "@x{0.000}"),
+        ("Intensity", "@y{0.000}"),
+        (f"Fitted {line_profile.capitalize()}", "@y_fitted{0.000}"),
+    ]
+    p.add_tools(hover_p1)
+
+    # Show the plot
+    output_notebook()
+    show(p)
+
+# new plot that takes just the peak centers
+def plot_hitran_lines_seaborn(wavenumber_values: np.ndarray, 
+                              signal_values: np.ndarray, 
+                              fitted_hitran: pd.DataFrame,
+                              peak_centers: np.ndarray,
+                              columns_to_print: Union[List[str]],
+                              wavenumber_range: Union[list, tuple, np.ndarray] = None,
+                              line_profile: str = 'gaussian',
+                              fitting_method: str = 'lm',
+                              absorber_name: str = None,
+                              __save_plot__: bool = False,
+                              __reference_data__ = None,
+                              __show_plot__: bool = True
+                              ) -> None:
+
+    """
+    Plot the original spectrum and the assigned lines using Seaborn.
+
+    Parameters
+    ----------
+    wavenumber_values : np.ndarray
+        Wavenumber array in cm^-1.
+    signal_values : np.ndarray
+        Signal arrays (input data). 
+    fitted_hitran : pd.DataFrame
+        Dataframe containing information about the assigned spectral lines, including columns ['amplitude', 'center', 'wing'].
+    fitted_params : np.ndarray
+        Fitted parameters of peaks.
+    columns_to_print : str or list
+        Columns to print corresponding to line positions. 
+    wavenumber_range : list-like, optional
+        List-like object (list, tuple, or np.ndarray) with of length 2 representing wavenumber range for plotting.
+    line_profile : str, {'gaussian', 'lorentzian', 'voigt'}, optional
+        Type of line profile to use for fitting. Default is 'gaussian'.
+    """
+
+    # option for printing different information
+    # add fitted spectrum
+
+    x = wavenumber_values
+    y = signal_values
+
+    line_positions = fitted_hitran["nu"].to_numpy()
+    print_columns = fitted_hitran[columns_to_print].to_numpy(dtype=str)
+
+    # Trim x and y to desired wavelength range
+    if wavenumber_range is not None:
+        # Make sure range is in correct format
+        if len(wavenumber_range) != 2:
+            raise ValueError('wavenumber_range must be tuple, list, or array with 2 elements')
+        # Locate indices and splice
+        condition_range = (x > wavenumber_range[0]) & (x < wavenumber_range[1])
+        x = x[condition_range]
+        y = y[condition_range]
+
+    # Create figure
+    fig, ax = plt.subplots(figsize=(10, 6), dpi=700)
+
+    # Plot original spectrum
+    ax.plot(x, y, color='blue', alpha=0.8, label="Original Spectrum")
+    
+    ax.set_xlabel(r"Wavenumber [cm$^{-1}$]")
+    ax.set_ylabel("Signal")
+    ax.set_title(f"{absorber_name} Spectrum and Fitted HITRAN Lines")
+    
+    # Plot assigned HITRAN lines
+    for q in range(len(line_positions)):
+        # Plot assigned HITRAN lines
+        ax.axvline(x=line_positions[q], color='k')  # Plot vertical lines
+
+        # Plot fitted peak centers
+        ax.axvline(x=peak_centers[q], color="red", alpha=0.8, lw=0.8)
+
+    ax.plot([], [], color="red", ls='--', lw=0.8, alpha=0.8, label='Peak Center') # label     
+    ax.plot([], [], color='k', label='HITRAN Assignment: \n ' +  ' \n '.join(columns_to_print)) # label 
+
+    ax.legend(loc='center left', bbox_to_anchor=(1, 0.5))
+
+    # label  
+    y_up=0
+    y_range = ax.get_ylim()
+    y_diff = y_range[1]-y_range[0]
+
+    # define columns to round
+    columns_to_round = ['nu', 'fitted_peak_center', 'fitted_peak_amplitude', 'fitted_peak_width']
+
+    for q in range(len(line_positions)):
+        # Calculate label position
+        y_up += y_diff / (len(line_positions)+1)
+
+        # Retrieve the label list
+        label_q_list = list(print_columns[q])
+        
+        # Check if the column needs rounding
+        round_bool = [i in columns_to_round for i in columns_to_print]
+        round_id = np.where(round_bool)[0]
+
+        if any(round_bool):
+            # Apply rounding to needed values in label_q_list
+            for qi in range(len(label_q_list)):
+                if qi in round_id:
+                    label_q_list[qi] = str(np.round(float(label_q_list[qi]),2))
+
+        label_q_pad = [' ' + item for item in label_q_list]
+        label_q = '\n'.join(label_q_pad)
+
+        # Add the text label
+        ax.text(line_positions[q], np.min(y) + y_up, label_q, color='k', va="top")
+
+    # Turn on grid lines with transparency
+    ax.grid(True, alpha=0.25)
+
+    # Set axes ticks, inwards
+    ax.tick_params(axis='both', which='major', direction='in', length=7, width=1.1)
+    ax.tick_params(axis='x', direction='in', top=True)
+    ax.tick_params(axis='y', direction='in', right=True)
+    ax.minorticks_on()
+    ax.tick_params(axis='both', which='minor', direction='in', length=4, width=1.1)
+    ax.tick_params(axis='x', which='minor', direction='in', top=True)
+    ax.tick_params(axis='y', which='minor', direction='in', right=True)   
+
+    if __save_plot__:
+
+        # Assign file name
+        save_file = f"closest_hitran_lines.pdf"
+
+        plt.savefig(os.path.join(__reference_data__, 'figures', save_file), 
+            dpi=700, bbox_inches='tight')
+    
+    if __show_plot__:
+        plt.show()
+    else:
+        plt.clf()
 
 def plot_auto_peaks_bokeh(x_obs, y_obs, peaks):
 
@@ -1400,7 +1657,7 @@ def plot_auto_peaks_bokeh(x_obs, y_obs, peaks):
     source = ColumnDataSource(data=dict(x=x_obs, y=y_obs))
     
     # Create the figure
-    p = figure(title="Click and Print",
+    p = figure(title="Identified Peaks",
                x_axis_label="Wavenumber [cm^-1]",
                y_axis_label="Signal",
                width=1000, height=300,
@@ -1442,7 +1699,7 @@ def find_peaks_bokeh(x_obs, y_obs):
                tools="pan,wheel_zoom,box_zoom,reset")
 
     # Add HoverTool to the plot
-    hover = HoverTool(tooltips=[("Wavenumber [cm^-1]", "@x{0.000} µm"), ("Signal", "@y{0.000}")], mode='vline')
+    hover = HoverTool(tooltips=[("Wavenumber [cm^-1]", "@x{0.000} µm"), ("Signal", "@y{0.000}")], mode='mouse')
     p.add_tools(hover)
 
     # Add the line plot

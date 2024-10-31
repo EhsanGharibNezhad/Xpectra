@@ -258,15 +258,18 @@ class LineAssigner:
         return df
         
 
-
+    # Modified to just use peak centers, and as input argument 
     def hitran_line_assigner(self,
+                             peak_centers,
                              ierr_weights: bool = True,
-                             weights: Union[list,np.ndarray,None] = None, 
+                             weights: Union[list,np.ndarray,None] = None,
                              columns_to_print: List[str] = ["nu", "local_upper_quanta"],
                              wavenumber_range: Union[list, tuple, np.ndarray, None] = None,
                              __print__: bool = False,
                              __plot_bokeh__: bool = False,
-                             __plot_seaborn__: bool = False):
+                             __plot_seaborn__: bool = False,
+                             __save_plot__: bool = False,
+                             __reference_data__: str = None):
         """
         Find the closest data points in the hitran DataFrame
         to multiple sets of fitted parameters, with weighted preference for earlier sets.
@@ -294,7 +297,6 @@ class LineAssigner:
             set of fitted parameters.
         """        
 
-
         plot_args = [self.wavenumber_values, self.signal_values] 
         if __plot_bokeh__ and any(arg is None for arg in plot_args):
             raise ValueError("All required attributes (wavenumber_values, signal_values) must have a value when __plot_bokeh__ is True.")
@@ -305,7 +307,7 @@ class LineAssigner:
             raise AttributeError("The 'hitran_df' attribute is missing. Ensure that data is loaded by running the 'parse_file_to_dataframe() method.")
         hitran_df = self.hitran_df
 
-        fitted_params = self.fitted_params
+        #fitted_params = self.fitted_params
 
         # Find closest data points 
         closest_data_points = []
@@ -316,14 +318,14 @@ class LineAssigner:
         # If set to false, input weight array or None is used 
         else:
             if weights is None:
-                weights = np.ones(len(fitted_params))
+                weights = np.ones(len(peak_centers))
             else:
                 weights = np.array(weights)
                 weights = weights / np.sum(weights)  # Normalize weights to sum to 1
 
-        for i, params in enumerate(fitted_params):
+        for i, center in enumerate(peak_centers):
             # Calculate distances between each row in hitran_df and the current fitted parameter set
-            distances = np.sqrt(np.sum((hitran_df[['nu', 'sw', 'gamma_air']].values - params)**2, axis=1))
+            distances = np.sqrt((hitran_df['nu'].values - center)**2)
             
             # Apply weight to the distances
             weighted_distances = distances * weights[i]
@@ -338,26 +340,128 @@ class LineAssigner:
 
         fitted_hitran = pd.DataFrame(closest_data_points, columns=hitran_df.columns)
 
-        fitted_hitran['fitted_peak_center'] = fitted_params[:,0]
-        fitted_hitran['fitted_peak_amplitude'] = fitted_params[:,1]
-        fitted_hitran['fitted_peak_width'] = fitted_params[:,2]
+        fitted_hitran['peak_center'] = peak_centers
+        # fitted_hitran['fitted_peak_amplitude'] = fitted_params[:,1]
+        # fitted_hitran['fitted_peak_width'] = fitted_params[:,2]
 
-        fitted_hitran = fitted_hitran[['local_iso_id', 'nu', 'fitted_peak_center', 'sw', 'fitted_peak_amplitude', 'gamma_air', 'fitted_peak_width', 'local_upper_quanta']]
+        fitted_hitran = fitted_hitran[['local_iso_id', 'nu', 'peak_center', 'sw', 'gamma_air', 'local_upper_quanta']]
         self.fitted_hitran = fitted_hitran
         
         if __plot_bokeh__:
-            plot_assigned_lines_bokeh(self.wavenumber_values, self.signal_values, 
-                                      fitted_hitran, fitted_params, columns_to_print = columns_to_print,
-                                      wavenumber_range=wavenumber_range, absorber_name=self.absorber_name)
+            plot_hitran_lines_bokeh(self.wavenumber_values, self.signal_values, 
+                                      fitted_hitran, peak_centers, columns_to_print = columns_to_print,
+                                       wavenumber_range=wavenumber_range, absorber_name=self.absorber_name)
         if __plot_seaborn__:
-            plot_assigned_lines_seaborn(self.wavenumber_values, self.signal_values, 
-                                        fitted_hitran, fitted_params, columns_to_print = columns_to_print,
-                                        wavenumber_range=wavenumber_range, absorber_name=self.absorber_name)
+            plot_hitran_lines_seaborn(self.wavenumber_values, self.signal_values, 
+                                      fitted_hitran, peak_centers, columns_to_print = columns_to_print,
+                                       wavenumber_range=wavenumber_range, absorber_name=self.absorber_name)
+        if __save_plot__:
+            plot_hitran_lines_seaborn(self.wavenumber_values, self.signal_values, 
+                                      fitted_hitran, peak_centers, columns_to_print = columns_to_print,
+                                       wavenumber_range=wavenumber_range, absorber_name=self.absorber_name,
+                                       __save_plot__=True, __reference_data__=__reference_data__, __show_plot__=False)
+
+
         if __print__:
             display(fitted_hitran)
 
+    # Original that needs fitted params {center, height, width} as instance attribute 
+    # def hitran_line_assigner(self,
+    #                          ierr_weights: bool = True,
+    #                          weights: Union[list,np.ndarray,None] = None, 
+    #                          columns_to_print: List[str] = ["nu", "local_upper_quanta"],
+    #                          wavenumber_range: Union[list, tuple, np.ndarray, None] = None,
+    #                          __print__: bool = False,
+    #                          __plot_bokeh__: bool = False,
+    #                          __plot_seaborn__: bool = False):
+    #     """
+    #     Find the closest data points in the hitran DataFrame
+    #     to multiple sets of fitted parameters, with weighted preference for earlier sets.
+
+    #     Parameters
+    #     ----------
+    #     weights : list or np.ndarray, optional
+    #         List of weights for each set of fitted parameters. Default is None,
+    #         which gives equal weight to each set.
+    #     columns_to_print: list, optional
+    #         List of column names from HITRAN dataframe to display on assigned lines if 
+    #         plotted. Default is ["nu", "local_upper_quanta"]. 
+    #     wavenumber_range : list-like, optional
+    #         List-like object (list, tuple, or np.ndarray) of length 2 representing 
+    #         wavenumber range for plotting. Default is None. 
+    #     __plot_bokeh__ : bool, optional
+    #         Default is False.
+    #     __plot_seaborn__ : bool, optional
+    #         Default is False.
+
+    #     Returns
+    #     -------
+    #     fitted_hitran : pd.DataFrame
+    #         DataFrame containing the closest data points in hitran DataFrame for each 
+    #         set of fitted parameters.
+    #     """        
 
 
+    #     plot_args = [self.wavenumber_values, self.signal_values] 
+    #     if __plot_bokeh__ and any(arg is None for arg in plot_args):
+    #         raise ValueError("All required attributes (wavenumber_values, signal_values) must have a value when __plot_bokeh__ is True.")
+    #     if __plot_seaborn__ and any(arg is None for arg in plot_args):
+    #         raise ValueError("All required attributes (wavenumber_values, signal_values) must have a value when __plot_seaborn__ is True.")
+
+    #     if 'hitran_df' not in self.__dict__:
+    #         raise AttributeError("The 'hitran_df' attribute is missing. Ensure that data is loaded by running the 'parse_file_to_dataframe() method.")
+    #     hitran_df = self.hitran_df
+
+    #     fitted_params = self.fitted_params
+
+    #     # Find closest data points 
+    #     closest_data_points = []
+
+    #     # Default ierr weights
+    #     if ierr_weights:
+    #         weights = hitran_df["ierr"]
+    #     # If set to false, input weight array or None is used 
+    #     else:
+    #         if weights is None:
+    #             weights = np.ones(len(fitted_params))
+    #         else:
+    #             weights = np.array(weights)
+    #             weights = weights / np.sum(weights)  # Normalize weights to sum to 1
+
+    #     for i, params in enumerate(fitted_params):
+    #         # Calculate distances between each row in hitran_df and the current fitted parameter set
+    #         distances = np.sqrt(np.sum((hitran_df[['nu', 'sw', 'gamma_air']].values - params)**2, axis=1))
+            
+    #         # Apply weight to the distances
+    #         weighted_distances = distances * weights[i]
+
+    #         # Find the index of the minimum weighted distance
+    #         closest_index = np.argmin(weighted_distances)
+            
+    #         # Get the closest data point from hitran_df
+    #         closest_data_point = hitran_df.iloc[closest_index].values
+
+    #         closest_data_points.append(closest_data_point)
+
+    #     fitted_hitran = pd.DataFrame(closest_data_points, columns=hitran_df.columns)
+
+    #     fitted_hitran['fitted_peak_center'] = fitted_params[:,0]
+    #     fitted_hitran['fitted_peak_amplitude'] = fitted_params[:,1]
+    #     fitted_hitran['fitted_peak_width'] = fitted_params[:,2]
+
+    #     fitted_hitran = fitted_hitran[['local_iso_id', 'nu', 'fitted_peak_center', 'sw', 'fitted_peak_amplitude', 'gamma_air', 'fitted_peak_width', 'local_upper_quanta']]
+    #     self.fitted_hitran = fitted_hitran
+        
+    #     if __plot_bokeh__:
+    #         plot_assigned_lines_bokeh(self.wavenumber_values, self.signal_values, 
+    #                                   fitted_hitran, fitted_params, columns_to_print = columns_to_print,
+    #                                   wavenumber_range=wavenumber_range, absorber_name=self.absorber_name)
+    #     if __plot_seaborn__:
+    #         plot_assigned_lines_seaborn(self.wavenumber_values, self.signal_values, 
+    #                                     fitted_hitran, fitted_params, columns_to_print = columns_to_print,
+    #                                     wavenumber_range=wavenumber_range, absorber_name=self.absorber_name)
+    #     if __print__:
+    #         display(fitted_hitran)
 
 
 
