@@ -83,8 +83,9 @@ def line_finder_auto(wavenumber_values: np.ndarray,
         plot_auto_peaks_bokeh(x_obs, y_obs, peaks)
 
     peak_centers = x_obs[peaks[::-1]] # reverse peaks
+    peak_heights = y_obs[peaks[::-1]]
 
-    return peak_centers
+    return peak_centers, peak_heights
 
 
 def line_finder_manual(wavenumber_values: np.ndarray,
@@ -152,13 +153,15 @@ class SpecFitAnalyzer:
             wavelength_names: Union[List[str], None] = None,
             wavenumber_values: Union[np.ndarray, None] = None,
             absorber_name: Union[str, None] = None,
-            __reference_data__: Union[str, None] = None
+            __reference_data__: Union[str, None] = None,
+            y_baseline_corrected: Union[np.ndarray, None] = None,
     ):
         self.signal_values = signal_values
         self.wavelength_names = wavelength_names
         self.wavenumber_values = wavenumber_values
         self.absorber_name = absorber_name
         self.__reference_data__ = __reference_data__
+        self.y_baseline_corrected = y_baseline_corrected
 
 
     def gaussian(self, x: np.ndarray, center: float, amplitude: float, width: float) -> np.ndarray:
@@ -399,7 +402,7 @@ class SpecFitAnalyzer:
         self.fitted_baseline_params = p.convert().coef
         self.baseline_type = 'polynomial'
         self.baseline_degree = degree
-        self.y_baseline_corrected = y - p(x)
+        self.y_baseline_corrected_polynomial = y - p(x)
 
         if __plot_bokeh__:
             plot_baseline_fitting_bokeh(self.wavenumber_values, self.signal_values, 
@@ -452,7 +455,7 @@ class SpecFitAnalyzer:
         params, _ = curve_fit(sine_wave, x, y, p0=initial_guesses, maxfev=1000000)
         self.fitted_baseline_params = params
         self.baseline_type = 'sinusoidal'
-        self.y_baseline_corrected = y - sine_wave(x,*params)
+        self.y_baseline_corrected_sinusoidal = y - sine_wave(x,*params)
 
         if __plot_seaborn__:
             plot_baseline_fitting_seaborn(self.wavenumber_values, self.signal_values, 
@@ -497,7 +500,7 @@ class SpecFitAnalyzer:
         spline = UnivariateSpline(x, y, s=s)
         self.fitted_baseline_params = spline
         self.baseline_type = 'spline'
-        self.y_baseline_corrected = y - spline(x)
+        self.y_baseline_corrected_spline = y - spline(x)
 
         if __plot_seaborn__:
             plot_baseline_fitting_seaborn(self.wavenumber_values, self.signal_values, 
