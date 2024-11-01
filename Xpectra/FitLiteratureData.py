@@ -218,7 +218,6 @@ class FitLiteratureData:
             outfile.writelines(modified_lines)
 
 
-
     def plot_with_uncertainty(self,
                              x_fit = None,
                              param_to_fit = 'gamma_L [cm-1/atm]',
@@ -316,7 +315,7 @@ class FitLiteratureData:
             source = ColumnDataSource(column_data)
 
             # Plot circles for the category
-            circle_renderer = p.circle('J_low', param_to_fit, size=10, color=color_map[item], 
+            circle_renderer = p.scatter('J_low', param_to_fit, size=10, color=color_map[item], 
                 legend_label=item, source=source, fill_alpha=0.6)
 
             # Add error bars (Whiskers)
@@ -402,7 +401,8 @@ class FitLiteratureData:
                             sort_by = 'author',
                             filters = None,
                             bins = 15,
-                            stat = 'count'):
+                            stat = 'count',
+                            dpi = 400):
         
         # Plot hist using seaborn hue to display distribution
 
@@ -418,14 +418,76 @@ class FitLiteratureData:
             df = self.filter_dataframe(df, filters)
 
         # Create figure
-        fig = plt.figure(dpi=600)
+        fig = plt.figure(dpi=dpi)
         sns.histplot(data=df, x=hist_param, hue=sort_by, element='step', stat='count', 
             common_norm=False, bins=bins, alpha=0.5)
 
-        if hist_param_range:
-            plt.xlim(*hist_param_range)
+
+        # Set x-axis limits
+        if not hist_param_range:
+            hist_param_range = df[hist_param].min(), df[hist_param].max()
+        
+        plt.xlim(*hist_param_range)
+
+
+        # Ensure x-axis shows integers only
+        min_x, max_x = plt.xlim()
+        plt.xticks(range(int(min_x), int(max_x) + 1))
 
         plt.show()
+
+
+    def plot_fitted_value(self, 
+                          df_pbro,
+                          y_param = 'gamma_L',
+                          J_range = [0,150]
+                          ):
+        """
+        Plot fitted n or gamma vs J_low, color-coded by symmetry
+
+        Parameters:
+        ----------
+        df_pbro : pd.DataFrame
+            DataFrame containing fitted coefficients.
+        y_param : {'gamma_L', 'n_T'}
+            Parameter to plot on y-axis.
+        J_range 
+
+        """
+
+        J_arr = np.arange(*J_range)
+        # df index
+        indeces = np.where(df_pbro['coeff'] == y_param)[0]
+
+        for index in indeces:
+            coefficients = list(df_pbro.loc[index,'a0':'b4'].values)
+            plt.plot(J_arr, self.fit_Pbro_Pade(J_arr, *coefficients),
+                '.', label= df_pbro.loc[index,'sym_low'])
+
+        plt.xlabel('J_low')
+        plt.ylabel(f'Fitted {y_param}')
+        plt.legend()
+        plt.show()
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
     # @staticmethod 
