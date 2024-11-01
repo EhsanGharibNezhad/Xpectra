@@ -1,16 +1,10 @@
 # Module for generating visualizations of spectral data, such as plots, heatmaps, and interactive charts.
 
-# Import functions/Classes from other modules ====================
-
-# from io_funs import LoadSave
-
 # Import libraries ========================================
 
 # ******* Standard Data Manipulation / Statistical Libraries *****
 import numpy as np
 import pandas as pd
-from scipy.interpolate import interp1d
-# import pickle as pk
 
 from scipy import stats
 from sklearn.metrics import r2_score, mean_squared_error,  mean_absolute_error
@@ -34,7 +28,6 @@ from bokeh.io import export_png
 from bokeh.models import CustomJS, HoverTool, ColumnDataSource, TapTool, Div, Range1d, Span, Legend, Label, LinearAxis
 from bokeh.layouts import column
 
-import numpy as np
 from numpy.polynomial import Polynomial
 
 import matplotlib.pyplot as plt
