@@ -1,5 +1,3 @@
-import pandas as pd
-import numpy as np
 import matplotlib.pyplot as plt
 
 # Needed for wavelet decomposition
@@ -45,7 +43,7 @@ def line_finder_auto(wavenumber_values: np.ndarray,
                     signal_values: np.ndarray,
                     wavenumber_range: Union[list, tuple, np.ndarray] = None,
                     sigma = 2,
-                    __plot__ = True,
+                    __plot__ = True, # find me: add __print__ as well
                     ) -> None:
     """
     Click and print spectral peaks on plotted spectra with error bars using Bokeh.
@@ -90,9 +88,9 @@ def line_finder_auto(wavenumber_values: np.ndarray,
 
 def line_finder_manual(wavenumber_values: np.ndarray,
                     signal_values: np.ndarray,
-                    wavenumber_range: Union[list, tuple, np.ndarray] = None,
+                    wavenumber_range: Union[list, tuple, np.ndarray] = None, # find me - only np.ndarray
                     sigma = 2,
-                    __plot__ = True,
+                    __plot__ = True, # find me - add __print__ parameter as well
                     ) -> None:
     """
     Click and print spectral peaks on plotted spectra with error bars using Bokeh.
@@ -130,9 +128,8 @@ class SpecFitAnalyzer:
     """
     Perform various tasks to process the lab spectra, including:
 
-    - Load the data
-    - Convert the units
-    - Visualize the data
+    - Load/Save
+    - Manipulate & Visualize
     - Label the quantum assignments
 
     Parameters
