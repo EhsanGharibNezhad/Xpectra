@@ -935,7 +935,10 @@ def plot_fitted_spectrum_seaborn(wavenumber_values: np.ndarray,
                                  fitted_params: np.ndarray,
                                  wavenumber_range: Union[list, tuple, np.ndarray] = None,
                                  line_profile: str = 'gaussian',
-                                 fitting_method: str = 'lm'
+                                 fitting_method: str = 'lm',
+                                 __save_plots__: bool = False,
+                                 __reference_data__: str = None,
+                                 __show_plots__: str = True,
                                  ) -> None:
     """
     Plot the original spectrum and the fitted peaks using Bokeh.
@@ -1038,7 +1041,19 @@ def plot_fitted_spectrum_seaborn(wavenumber_values: np.ndarray,
     ax1.legend()
     ax2.legend()
 
-    plt.show()
+    if __save_plots__:
+
+        # Assign file name
+        save_file = f"fitted_{line_profile.lower()}_spectrum.pdf"
+
+        plt.savefig(os.path.join(__reference_data__, 'figures', save_file), 
+            dpi=700, bbox_inches='tight')
+
+
+    if __show_plots__:
+        plt.show()
+    else: 
+        plt.clf()
 
 
 def plot_assigned_lines_seaborn(wavenumber_values: np.ndarray, 

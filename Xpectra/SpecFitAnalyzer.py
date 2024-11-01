@@ -238,9 +238,11 @@ class SpecFitAnalyzer:
                      line_profile: str = 'gaussian',
                      fitting_method: str = 'lm',
                      wavenumber_range: Union[list, tuple, np.ndarray] = None,
-                     __plot_bokeh__: bool = True,
+                     __plot_bokeh__: bool = False,
                      __plot_seaborn__: bool = False,
-                     __print__: bool = True
+                     __save_plots__: bool = False,
+                     __print__: bool = False,
+                     __show_plots__: bool = True,
                      ) -> None:
         """
         Fit a spectrum with multiple peaks using specified line profiles (gaussian, lorentzian, voigt).
@@ -324,7 +326,10 @@ class SpecFitAnalyzer:
         if __plot_seaborn__ == True:
             plot_fitted_spectrum_seaborn(x,y,fitted_params,
                 line_profile=line_profile,
-                fitting_method=fitting_method)
+                fitting_method=fitting_method,
+                __save_plots__ = __save_plots__,
+                __reference_data__ = self.__reference_data__,
+                __show_plots__ = __show_plots__)
 
         if __print__ == True:
             
