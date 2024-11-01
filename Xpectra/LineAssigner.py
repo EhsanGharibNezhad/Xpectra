@@ -340,11 +340,12 @@ class LineAssigner:
 
         fitted_hitran = pd.DataFrame(closest_data_points, columns=hitran_df.columns)
 
-        fitted_hitran['peak_center'] = peak_centers
+        fitted_hitran['peak_centers'] = peak_centers
         # fitted_hitran['fitted_peak_amplitude'] = fitted_params[:,1]
         # fitted_hitran['fitted_peak_width'] = fitted_params[:,2]
 
-        fitted_hitran = fitted_hitran[['local_iso_id', 'nu', 'peak_center', 'sw', 'gamma_air', 'local_upper_quanta']]
+        fitted_hitran = fitted_hitran[['peak_centers', 'nu', 'sw', 'gamma_air', 'local_iso_id', 'J_up', 'sym_up', 'N_up']]
+        
         self.fitted_hitran = fitted_hitran
         
         if __plot_bokeh__:
