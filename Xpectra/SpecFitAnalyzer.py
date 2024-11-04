@@ -185,10 +185,7 @@ class SpecFitAnalyzer:
         z = ((x - center) + 1j * gamma) / (sigma * np.sqrt(2))
         return amplitude * np.real(wofz(z)).astype(float) / (sigma * np.sqrt(2 * np.pi))
 
-    @staticmethod
-    def check_negative_nan(wavenumber_values: np.ndarray,
-                           signal_values: np.ndarray
-                           ) -> List[np.ndarray]:
+    def check_negative_nan(self) -> List[np.ndarray]:
         """
         Check the spectral data for negative or NAN values, and report their location.
 
@@ -205,32 +202,50 @@ class SpecFitAnalyzer:
             List of 2 arrays containing x_trimmed and y_trimmed
         """
 
-        x = wavenumber_values
-        y = signal_values
+        x = self.wavenumber_values
+        y = self.signal_values
 
         # Identify negative or nan values
         id_negative = np.where(y<0)[0]
         id_nan = np.where(np.isnan(y))[0]
 
-        # Print results
+        # Update instance attributes
+        self.negative_indeces = id_negative
+        self.nan_indeces = id_nan
+
+        # Print results:
+        
+        # NAN
         if len(id_nan) == 0:
             print('No NAN values.')
         elif len(id_nan) != 0:
-            print(f' {len(id_nan)} NAN values found:',id_nan)
+            N = len(id_nan)
+            Ntot = len(x)
+            fraction = N/Ntot
+            print(f'{N} NAN values found ({fraction*100}% of data)')
+        
+        # Negative
         if len(id_negative) == 0:
             print('No negative values.')
         elif len(id_negative) != 0:
-            print(f'{len(id_negative)} Negative values found:',id_negative)
+            N = len(id_negative)
+            Ntot = len(x)
+            fraction = N/Ntot
+            print(f'{N} negative values found ({fraction*100:.2f}% of data)')
 
         # Delete any negative or NAN values
         id_delete = np.unique(np.concatenate((id_negative, id_nan)))
-        x_trimmed = np.delete(x, id_delete)
-        y_trimmed = np.delete(y, id_delete)
+        x_cleaned = np.delete(x, id_delete)
+        y_cleaned = np.delete(y, id_delete)
         
-        trimmed_spectrum = [x_trimmed, y_trimmed]
+        cleaned_spectrum = [x_cleaned, y_cleaned]
 
-        # Return trimmed values 
-        return trimmed_spectrum
+        # Update instance attributes
+        self.x_cleaned = x_cleaned
+        self.y_cleaned = y_cleaned
+
+        # Return cleaned values 
+        return cleaned_spectrum
 
 
     def fit_spectrum(self,
@@ -293,6 +308,10 @@ class SpecFitAnalyzer:
             condition_range = (x > wavenumber_range[0]) & (x < wavenumber_range[1])
             x = x[condition_range]
             y = y[condition_range]
+
+        
+        # error: range error with initial guesslines
+
 
         # Define line_profile_func
         if line_profile == 'gaussian':
