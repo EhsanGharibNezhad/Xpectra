@@ -664,11 +664,7 @@ def plot_fitted_als_bokeh(wavenumber_values: np.ndarray,
    # Add line plot
     p2.line('x', 'y_baseline_corrected', line_width=1.5, line_color='green',
         legend_label=f"Baseline correction with {baseline_type.upper()}",
-        source=source_p2)  
-
-    # Add line plot
-    p2.line(x, np.zeros_like(x), line_width=2.5, line_color='red', line_dash='dashed', 
-        legend_label='Zero point')   
+        source=source_p2)   
     
     for p in (p1,p2):
         # Increase size of x and y ticks
@@ -781,7 +777,6 @@ def plot_fitted_als_seaborn(wavenumber_values: np.ndarray,
             dpi=700, bbox_inches='tight')
 
     plt.show()
-
 
 
 
@@ -1781,5 +1776,84 @@ def find_peaks_bokeh(x_obs, y_obs):
     show(layout)
 
 
+def plot_compare_baselines(wavenumber_values: np.ndarray,
+                           corrected_signal_1: np.ndarray,
+                           baseline_type_1: str,
+                           corrected_signal_2: np.ndarray,
+                           baseline_type_2: str,
+                           wavenumber_range: Union[list, tuple, np.ndarray] = None,
+                           fitting_method: str = 'lm'
+                           ) -> None:
+    """
+    Plot the original spectrum and the fitted peaks using Bokeh.
 
+    Parameters
+    ----------
+    wavenumber_values : np.ndarray
+        Wavenumber array in cm^-1.
+    signal_values : np.ndarray
+        Signal arrays (input data). 
+    wavenumber_range : list-like, optional
+        List-like object (list, tuple, or np.ndarray) with of length 2 representing wavenumber range for plotting.
+    line_profile : str, {'gaussian', 'lorentzian', 'voigt'}, optional
+        Type of line profile to use for fitting. Default is 'gaussian'.
+    """
+
+    x = wavenumber_values
+    y1 = corrected_signal_1
+    y2 = corrected_signal_2
+
+    # Trim x and y to desired wavelength range
+    if wavenumber_range is not None:
+        # Make sure range is in correct format
+        if len(wavenumber_range) != 2:
+            raise ValueError('wavenumber_range must be tuple, list, or array with 2 elements')
+        # Locate indices and splice
+        condition_range = (x > wavenumber_range[0]) & (x < wavenumber_range[1])
+        x = x[condition_range]
+        y1 = y1[condition_range]
+        y2 = y2[condition_range]
+
+    # Create ColumnDataSource
+    source = ColumnDataSource(data=dict(x=x, y1=y1, y2=y2))
+
+   # Create a new plot with a title and axis labels
+    p = figure(title=f"Compare Baseline-Corrected Spectra",
+               y_axis_label="Signal",
+               x_axis_label="Wavenumber [cm-1]",
+               width=800, height=400,
+               y_axis_type="linear",
+               tools="pan,wheel_zoom,box_zoom,reset")
+
+    # residual1
+    p.line('x', 'y1', legend_label=f"{baseline_type_1} Corrected Baseline", line_width=1.5, 
+        line_alpha=0.6, color="red", source=source)
+
+    # residual1
+    p.line('x', 'y2', legend_label=f"{baseline_type_2} Corrected Baseline", line_width=1.5, 
+        line_alpha=0.6, color="blue", source=source)
+
+    # Add 0 line
+    p.line(x, np.zeros_like(x), line_width=2, line_color='black', line_dash='dashed', 
+        legend_label='Zero point')  
+
+    # Increase size of x and y ticks
+    p.title.text_font_size = '14pt'
+    p.xaxis.major_label_text_font_size = '14pt'
+    p.xaxis.axis_label_text_font_size = '14pt'
+    p.yaxis.major_label_text_font_size = '14pt'
+    p.yaxis.axis_label_text_font_size = '14pt'
+
+    # Add HoverTool
+    hover = HoverTool()
+    hover.tooltips = [
+        ("Wavenumber [cm-1]", "@x{0.000}"),
+        (f"{baseline_type_1} Corrected Baseline", "@y1{0.000}"),
+        (f"{baseline_type_2} Corrected Baseline", "@y2{0.000}"),
+    ]
+    p.add_tools(hover)
+
+    # Show the plot
+    output_notebook()
+    show(p)
 
