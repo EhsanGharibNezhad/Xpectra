@@ -8,7 +8,6 @@ from scipy.sparse.linalg import spsolve, splu
 from scipy import sparse
 from scipy.linalg import cholesky
 from scipy.sparse.linalg import spsolve, splu
-from scipy.signal import find_peaks
 # Module for performing detailed spectral analysis, including feature extraction, peak identification, and line fitting.
 
 import logging
@@ -25,7 +24,6 @@ from scipy import stats, optimize
 from scipy.optimize import curve_fit
 from scipy.special import wofz
 from scipy.stats import chi2
-from scipy.ndimage import gaussian_filter1d
 
 from sklearn.metrics import r2_score, mean_squared_error, mean_absolute_error
 
@@ -39,51 +37,7 @@ from .SpecStatVisualizer import *
 # Import local module
 # from io_funs import LoadSave
 
-def line_finder_auto(wavenumber_values: np.ndarray,
-                    signal_values: np.ndarray,
-                    wavenumber_range: Union[list, tuple, np.ndarray] = None,
-                    sigma = 2,
-                    __plot__ = True, # find me: add __print__ as well
-                    ) -> None:
-    """
-    Click and print spectral peaks on plotted spectra with error bars using Bokeh.
 
-    Parameters
-    ----------
-    wavenumber_values : np.ndarray
-        Wavenumber array in cm^-1.
-    signal_values : np.ndarray
-        Signal arrays (input data).
-    wavenumber_range : list-like, optional
-        List-like object (list, tuple, or np.ndarray) with of length 2 representing wavenumber range for plotting.
-    """
-
-    x_obs = wavenumber_values
-    y_obs = signal_values
-
-    # Trim x and y to desired wavelength range
-    if wavenumber_range is not None:
-        # Make sure range is in correct format
-        if len(wavenumber_range) != 2:
-            raise ValueError('wavenumber_range must be tuple, list, or array with 2 elements')
-        # Locate indices and splice
-        condition_range = (x_obs > wavenumber_range[0]) & (x_obs < wavenumber_range[1])
-        x_obs = x_obs[condition_range]
-        y_obs = y_obs[condition_range]
-
-
-    # smooth first!
-    y_obs_smoothed = gaussian_filter1d(y_obs, sigma)
-    
-    peaks, info = find_peaks(y_obs_smoothed, height=0.05)
-
-    if __plot__: 
-        plot_auto_peaks_bokeh(x_obs, y_obs, peaks)
-
-    peak_centers = x_obs[peaks[::-1]] # reverse peaks
-    peak_heights = y_obs[peaks[::-1]]
-
-    return peak_centers, peak_heights
 
 
 def line_finder_manual(wavenumber_values: np.ndarray,

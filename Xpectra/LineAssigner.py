@@ -16,6 +16,8 @@ from scipy import stats
 from sklearn.metrics import r2_score, mean_squared_error,  mean_absolute_error
 from scipy.interpolate import RegularGridInterpolator
 from scipy.stats import chi2
+from scipy.ndimage import gaussian_filter1d
+from scipy.signal import find_peaks
 
 import re
 import os
@@ -257,6 +259,78 @@ class LineAssigner:
 
         return df
         
+
+    def line_finder_auto(self,
+                        wavenumber_range: Union[list, tuple, np.ndarray] = None,
+                        sigma: int = 2,
+                        peak_height_min: float = None,
+                        peak_height_max: float = None,
+                        __plot__: bool = True, 
+                        __print__: bool = False
+                        ) -> None:
+        """
+        Click and print spectral peaks on plotted spectra with error bars using Bokeh.
+
+        Parameters
+        ----------
+        wavenumber_values : np.ndarray
+            Wavenumber array in cm^-1.
+        signal_values : np.ndarray
+            Signal arrays (input data).
+        wavenumber_range : list-like, optional
+            List-like object (list, tuple, or np.ndarray) with of length 2 representing wavenumber range for plotting.
+        """
+
+        x_obs = self.wavenumber_values
+        y_obs = self.signal_values
+
+        # Trim x and y to desired wavelength range
+        if wavenumber_range is not None:
+            # Make sure range is in correct format
+            if len(wavenumber_range) != 2:
+                raise ValueError('wavenumber_range must be tuple, list, or array with 2 elements')
+            # Locate indices and splice
+            condition_range = (x_obs > wavenumber_range[0]) & (x_obs < wavenumber_range[1])
+            x_obs = x_obs[condition_range]
+            y_obs = y_obs[condition_range]
+
+        # Apply gaussian smoothing first
+        y_obs_smoothed = gaussian_filter1d(y_obs, sigma)
+        
+        # Define peak height min and max if specified
+        if peak_height_min and peak_height_max:
+            height_range = (peak_height_min, peak_height_max)
+        elif peak_height_min:
+            height_range = (peak_height_min, )
+        elif peak_height_max:
+            height_range = (0, peak_height_max)  
+        else:
+            height_range = None  
+
+        # Find peaks
+        peaks, info = find_peaks(y_obs_smoothed, height=height_range)
+
+
+        if __plot__: 
+            plot_auto_peaks_bokeh(x_obs, y_obs, peaks)
+
+        peak_centers = x_obs[peaks[::-1]] # reverse peaks
+        peak_heights = y_obs[peaks[::-1]]
+
+        # Update instance
+        self.peak_centers_auto = peak_centers
+        self.peak_heights_auto = peak_heights
+
+        if __print__:
+            df = pd.DataFrame({
+                'peak_centers' : peak_centers,
+                'peak_heights' : peak_heights,
+                })
+
+            display(df)
+
+        return peak_centers, peak_heights
+
 
     # Modified to just use peak centers, and as input argument 
     def hitran_line_assigner(self,
