@@ -36,6 +36,7 @@ from matplotlib.ticker import MaxNLocator
 
 
 
+
 def print_spectral_info(wavenumber_values: np.ndarray,
                         signal_values: np.ndarray,
                         print_title: str = None,
@@ -1044,363 +1045,10 @@ def plot_fitted_spectrum_seaborn(wavenumber_values: np.ndarray,
         plt.clf()
 
 
-def plot_assigned_lines_seaborn(wavenumber_values: np.ndarray, 
-                                signal_values: np.ndarray, 
-                                fitted_hitran: pd.DataFrame,
-                                fitted_params: np.ndarray,
-                                columns_to_print: Union[str, List[str]],
-                                wavenumber_range: Union[list, tuple, np.ndarray] = None,
-                                line_profile: str = 'gaussian',
-                                fitting_method: str = 'lm',
-                                absorber_name: str = None
-                                ) -> None:
-
-    """
-    Plot the original spectrum and the assigned lines using Seaborn.
-
-    Parameters
-    ----------
-    wavenumber_values : np.ndarray
-        Wavenumber array in cm^-1.
-    signal_values : np.ndarray
-        Signal arrays (input data). 
-    fitted_hitran : pd.DataFrame
-        Dataframe containing information about the assigned spectral lines, including columns ['amplitude', 'center', 'wing'].
-    fitted_params : np.ndarray
-        Fitted parameters of peaks.
-    columns_to_print : str or list
-        Columns to print corresponding to line positions. 
-    wavenumber_range : list-like, optional
-        List-like object (list, tuple, or np.ndarray) with of length 2 representing wavenumber range for plotting.
-    line_profile : str, {'gaussian', 'lorentzian', 'voigt'}, optional
-        Type of line profile to use for fitting. Default is 'gaussian'.
-    """
-
-    # option for printing different information
-    # add fitted spectrum
-
-    x = wavenumber_values
-    y = signal_values
-
-    line_positions = fitted_hitran["nu"].to_numpy()
-
-
-    print_columns = fitted_hitran[columns_to_print].to_numpy(dtype=str)
-
-
-    fitted_peak_positions = fitted_params[:,0]
-
-    # Calculate fitted y values
-    y_fitted = np.zeros_like(x)
-    for params in fitted_params:
-        if line_profile == 'gaussian':
-            center, amplitude, width = params
-            y_fitted += amplitude * np.exp(-(x - center) ** 2 / (2 * width ** 2))
-        elif line_profile == 'lorentzian':
-            center, amplitude, width = params
-            y_fitted += amplitude / (1 + ((x - center) / width) ** 2)
-        elif line_profile == 'voigt':
-            center, amplitude, wid_g, wid_l = params
-            sigma = wid_g / np.sqrt(2 * np.log(2))
-            gamma = wid_l / 2
-            z = ((x - center) + 1j * gamma) / (sigma * np.sqrt(2))
-            y_fitted += amplitude * np.real(wofz(z)).astype(float) / (sigma * np.sqrt(2 * np.pi))
-
-    # Trim x and y to desired wavelength range for plotting
-    if wavenumber_range is not None:
-        # Make sure range is in correct format
-        if len(wavenumber_range) != 2:
-            raise ValueError('wavenumber_range must be tuple, list, or array with 2 elements')
-        # Locate indices and splice
-        condition_range = (x > wavenumber_range[0]) & (x < wavenumber_range[1])
-        x = x[condition_range]
-        y = y[condition_range]
-        y_fitted = y_fitted[condition_range]
-
-    # Create figure
-    fig = plt.figure(figsize=(10, 6), dpi=700)
-    # Create GridSpec object
-    gs = gridspec.GridSpec(3, 1, height_ratios=[3, 1, 1])
-
-    # Create first subplot for spectrum
-    ax1 = fig.add_subplot(gs[:2,0])
-
-    # Plot original spectrum
-    ax1.plot(x, y, color='blue', alpha=0.8, label="Original Spectrum")
-    # Plot fitted peaks
-    ax1.plot(x, y_fitted, color="red", alpha=0.8, lw=0.8,
-        label=f'Fitted {line_profile.capitalize()}')
-    
-    ax1.set_ylabel("Signal")
-    ax1.set_title(f"{absorber_name}: Spectrum with Fitted {line_profile.capitalize()} Peaks")
-        
-    # Create second subplot for residual
-    ax2 = fig.add_subplot(gs[2, 0])
-    y_residual = y - y_fitted
-
-    # Plot residual 
-    ax2.plot(x, y_residual, color='green', label=f'Residual = (Data) - (Fitted {line_profile.capitalize()} Peaks)')
-
-    ax2.set_xlabel("Wavenumber [cm$^{-1}$]")
-    ax2.set_ylabel("Residual")
-    
-    # Plot assigned HITRAN lines
-    for ax in (ax1, ax2):
-        for q in range(len(line_positions)):
-
-            # Plot assigned HITRAN lines
-            ax.axvline(x=line_positions[q], color='k')  # Plot vertical lines
-
-            # Plot fitted peak centers
-            ax.axvline(x=fitted_peak_positions[q], color="red", alpha=0.8, lw=0.8, ls='--')
-
-    ax1.plot([], [], color="red", ls='--', lw=0.8, alpha=0.8, label='Fitted Peak Center') # label     
-    ax1.plot([], [], color='k', label='HITRAN Assignment: \n ' +  ' \n '.join(columns_to_print)) # label 
-
-    ax1.legend(loc='center left', bbox_to_anchor=(1, 0.5))
-    ax2.legend(loc='center left', bbox_to_anchor=(0, 1.2))
-
-    # label  
-    y_up=0
-    y_range = ax1.get_ylim()
-    y_diff = y_range[1]-y_range[0]
-
-    # define columns to round
-    columns_to_round = ['nu', 'fitted_peak_center', 'fitted_peak_amplitude', 'fitted_peak_width']
-
-    for q in range(len(line_positions)):
-        # Calculate label position
-        y_up += y_diff / (len(line_positions)+1)
-
-        # Retrieve the label list
-        label_q_list = list(print_columns[q])
-        
-        # Check if the column needs rounding
-        round_bool = [i in columns_to_round for i in columns_to_print]
-        round_id = np.where(round_bool)[0]
-
-        if any(round_bool):
-            # Apply rounding to needed values in label_q_list
-            for qi in range(len(label_q_list)):
-                if qi in round_id:
-                    label_q_list[qi] = str(np.round(float(label_q_list[qi]),2))
-
-        label_q_pad = [' ' + item for item in label_q_list]
-        label_q = '\n'.join(label_q_pad)
-
-        # Add the text label
-        ax1.text(line_positions[q], np.min(y) + y_up, label_q, color='k', va="top")
-
-    for ax in (ax1,ax2):
-        # Turn on grid lines with transparency
-        ax.grid(True, alpha=0.25)
-
-        # Set axes ticks, inwards
-        ax.tick_params(axis='both', which='major', direction='in', length=7, width=1.1)
-        ax.tick_params(axis='x', direction='in', top=True)
-        ax.tick_params(axis='y', direction='in', right=True)
-        ax.minorticks_on()
-        ax.tick_params(axis='both', which='minor', direction='in', length=4, width=1.1)
-        ax.tick_params(axis='x', which='minor', direction='in', top=True)
-        ax.tick_params(axis='y', which='minor', direction='in', right=True)   
-
-
-    plt.tight_layout()
-
-    plt.show()
-
-
-
-def plot_assigned_lines_bokeh(wavenumber_values: np.ndarray, 
-                              signal_values: np.ndarray, 
-                              fitted_hitran: pd.DataFrame,
-                              fitted_params: np.ndarray,
-                              columns_to_print: Union[str, List[str]],
-                              wavenumber_range: Union[list, tuple, np.ndarray] = None,
-                              line_profile: str = 'gaussian',
-                              fitting_method: str = 'lm',
-                              absorber_name: str = None
-                              ) -> None:
-
-    """
-    Plot the original spectrum and the fitted peaks using Bokeh.
-
-    Parameters
-    ----------
-    wavenumber_values : np.ndarray
-        Wavenumber array in cm^-1.
-    signal_values : np.ndarray
-        Signal arrays (input data). 
-    fitted_hitran : pd.DataFrame
-        Dataframe containing information about the assigned spectral lines, including columns ['amplitude', 'center', 'wing'].
-    fitted_params : np.ndarray
-        Fitted parameters of peaks.
-    columns_to_print : str or list
-        Columns to print corresponding to line positions. 
-    wavenumber_range : list-like, optional
-        List-like object (list, tuple, or np.ndarray) with of length 2 representing wavenumber range for plotting.
-    line_profile : str, {'gaussian', 'lorentzian', 'voigt'}, optional
-        Type of line profile to use for fitting. Default is 'gaussian'.
-    """
-
-    x = wavenumber_values
-    y = signal_values
-
-    line_positions = fitted_hitran["nu"].to_numpy()
-    print_columns = fitted_hitran[columns_to_print].to_numpy(dtype=str)
-    fitted_peak_positions = fitted_params[:,0]
-
-    # Calculate fitted y values
-    y_fitted = np.zeros_like(x)
-    for params in fitted_params:
-        if line_profile == 'gaussian':
-            center, amplitude, width = params
-            y_fitted += amplitude * np.exp(-(x - center) ** 2 / (2 * width ** 2))
-        elif line_profile == 'lorentzian':
-            center, amplitude, width = params
-            y_fitted += amplitude / (1 + ((x - center) / width) ** 2)
-        elif line_profile == 'voigt':
-            center, amplitude, wid_g, wid_l = params
-            sigma = wid_g / np.sqrt(2 * np.log(2))
-            gamma = wid_l / 2
-            z = ((x - center) + 1j * gamma) / (sigma * np.sqrt(2))
-            y_fitted += amplitude * np.real(wofz(z)).astype(float) / (sigma * np.sqrt(2 * np.pi))
-
-    # Trim x and y to desired wavelength range
-    if wavenumber_range is not None:
-        # Make sure range is in correct format
-        if len(wavenumber_range) != 2:
-            raise ValueError('wavenumber_range must be tuple, list, or array with 2 elements')
-        # Locate indices and splice
-        condition_range = (x > wavenumber_range[0]) & (x < wavenumber_range[1])
-        x = x[condition_range]
-        y = y[condition_range]
-        y_fitted = y_fitted[condition_range]   
-
-    # Calculate residual
-    residual = y - y_fitted
-
-    # Create a shared range object for consistent zoom
-    x_min,x_max = np.min(x),np.max(x)
-    x_padding = (x_max-x_min) * 0.05
-    x_range = Range1d(start=x_min-x_padding, end=x_max+x_padding)
-
-    # Create ColumnDataSource
-    source_p1 = ColumnDataSource(data=dict(x=x, y=y, y_fitted=y_fitted))
-    source_p2 = ColumnDataSource(data=dict(x=x, residual=residual))
-
-   # Create a new plot with a title and axis labels
-    p1 = figure(title=f"{absorber_name}: Spectrum with Fitted {line_profile.capitalize()} Peaks",
-               y_axis_label="Signal",
-               width=800, height=500,
-               x_range = x_range,
-               y_axis_type="linear",
-               tools="pan,wheel_zoom,box_zoom,reset")
-
-    # Add the original spectrum to the plot
-    p1.line('x', 'y', legend_label="Original Spectrum", line_width=2, color="blue", source=source_p1)
-
-    # Add the fitted spectrum to the plot
-    p1.line('x', 'y_fitted', legend_label=f'Fitted {line_profile.capitalize()}', line_width=1, 
-        color="red", source=source_p1)
-    
-    # Create lower plot
-    p2 = figure(title=' ',
-               x_axis_label="Wavenumber [cm^-1]",
-               y_axis_label="Residual",
-               width=800, height=250,
-               x_range = x_range,
-               y_axis_type="linear",
-               tools="pan,wheel_zoom,box_zoom,reset")
-
-    # Add line plot
-    p2.line('x', 'residual', line_width=1.5, line_color='green',
-        legend_label=f'Residual = (Data) - (Fitted {line_profile.capitalize()} Peaks)',
-        source=source_p2)  
-
-    # Plot assigned HITRAN lines
-    for p in (p1,p2):
-        for q in range(len(line_positions)):
-
-            # Plot assigned HITRAN lines
-            vline = Span(location=line_positions[q], dimension='height', line_width=2,
-                line_color='black')
-            p.add_layout(vline)
-
-            # Plot fitted peak centers
-            vline = Span(location=fitted_peak_positions[q], dimension='height', 
-                line_color="red", line_alpha=0.8, line_width=1, line_dash='dashed')
-            p.add_layout(vline)
-
-    # Manually add legend entries
-    dummy_line1 = p1.line(fitted_peak_positions[0], y[0], legend_label="Fitted Peak Center", 
-        line_color="red", line_dash='dashed', line_alpha=0.8, line_width=1)
-    dummy_line2 = p1.line(fitted_peak_positions[0], y[0], legend_label='HITRAN Assignment: \n ' +  ', '.join(columns_to_print), 
-        line_width=1.5, line_color='black')
-   
-    # Plot text of the assigned line data
-    y_range = np.max(y)-np.min(y)
-    y_diff = 1.2*y_range
-    y_up = 0
-    for q in range(len(line_positions)):
-        
-        # Calculate label position
-        y_up += y_diff / (len(line_positions)+1)
-
-        # Retrieve the label
-        label_q_list = list(print_columns[q])
-        label_q_pad = [' ' + item for item in label_q_list]
-        label_q = '\n'.join(label_q_pad)
-
-        # Add the text label
-        label = Label(x=line_positions[q], y=np.min(y) + y_up, 
-            text=label_q, text_color="black", text_align="left", text_baseline="top")
-        p1.add_layout(label)
-
-    # Customize legends
-    legend1 = p1.legend[0]
-    legend1.location = 'top_left'
-    p1.add_layout(legend1, 'above')
-
-    legend2 = p2.legend[0]
-    legend2.location = 'top_left'
-    p2.add_layout(legend2, 'below')
-
-    # Increase size of x and y ticks
-    for p in (p1,p2):
-        p.title.text_font_size = '14pt'
-        p.xaxis.major_label_text_font_size = '14pt'
-        p.xaxis.axis_label_text_font_size = '14pt'
-        p.yaxis.major_label_text_font_size = '14pt'
-        p.yaxis.axis_label_text_font_size = '14pt'
-
-    # Add HoverTool
-    hover_p1 = HoverTool()
-    hover_p1.tooltips = [
-        ("Wavenumber [cm^-1]", "@x{0.000}"),
-        ("Intensity", "@y{0.000}"),
-        (f"Fitted {line_profile.capitalize()}", "@y_fitted{0.000}"),
-    ]
-    hover_p2 = HoverTool()
-    hover_p2.tooltips = [
-        ("Wavenumber [cm^-1]", "@x{0.000}"),
-        ("Residual", "@residual{0.000}"),
-    ]
-    p1.add_tools(hover_p1)
-    p2.add_tools(hover_p2)
-
-    # Combine plots into a column
-    layout = column(p1, p2, sizing_mode="stretch_width", height_policy="min", margin=0)
-
-    # Show the plot
-    output_notebook()
-    show(layout)
-
 # new plot that takes just the peak centers
 def plot_hitran_lines_bokeh(wavenumber_values: np.ndarray, 
                               signal_values: np.ndarray, 
                               fitted_hitran: pd.DataFrame,
-                              peak_centers: np.ndarray,
                               columns_to_print: Union[List[str]],
                               wavenumber_range: Union[list, tuple, np.ndarray] = None,
                               line_profile: str = 'gaussian',
@@ -1432,8 +1080,25 @@ def plot_hitran_lines_bokeh(wavenumber_values: np.ndarray,
     x = wavenumber_values
     y = signal_values
 
-    line_positions = fitted_hitran["nu"].to_numpy()
-    print_columns = fitted_hitran[columns_to_print].to_numpy(dtype=str)
+    peak_centers = fitted_hitran["peak_center"].to_numpy()
+
+    # Identify rows corresponding to found lines
+    id_found = np.where(np.isnan(fitted_hitran["nu"]) == False)
+    # Make iterable array of found lines
+    line_positions = fitted_hitran["nu"].iloc[id_found].to_numpy()
+
+    # Format print columns (so integers don't print as floats)
+    formatted_columns = []
+    for col in columns_to_print:
+        if pd.api.types.is_integer_dtype(fitted_hitran[col]):
+            # Convert integer columns to strings without changing types
+            formatted_columns.append(fitted_hitran[col].astype(str))
+        else:
+            # For other types, convert with float formatting
+            formatted_columns.append(fitted_hitran[col].apply(lambda x: f"{x:.6g}" 
+                if isinstance(x, float) else str(x)))
+    # Make iterable array of text for found lines 
+    print_columns = pd.concat(formatted_columns, axis=1).to_numpy()[id_found]
 
     # Trim x and y to desired wavelength range
     if wavenumber_range is not None:
@@ -1449,7 +1114,7 @@ def plot_hitran_lines_bokeh(wavenumber_values: np.ndarray,
     source = ColumnDataSource(data=dict(x=x, y=y))
 
     # Create a new plot with a title and axis labels
-    p = figure(title=f"{absorber_name} Spectrum and Fitted HITRAN Lines",
+    p = figure(title=f"{absorber_name} Spectrum and Found HITRAN Lines",
                y_axis_label="Signal",
                width=800, height=500,
                y_axis_type="linear",
@@ -1460,15 +1125,14 @@ def plot_hitran_lines_bokeh(wavenumber_values: np.ndarray,
     
     # Plot assigned HITRAN lines
     for q in range(len(line_positions)):
-
-        # Plot assigned HITRAN lines
-        vline = Span(location=line_positions[q], dimension='height', line_width=2,
-            line_color='black')
+        vline = Span(location=line_positions[q], dimension='height', 
+            line_width=2, line_alpha=0.7, line_color='black')
         p.add_layout(vline)
 
-        # Plot fitted peak centers
+    # Plot peak centers
+    for q in range(len(peak_centers)):
         vline = Span(location=peak_centers[q], dimension='height', 
-            line_color="red", line_alpha=0.8, line_width=1)
+            line_color="red", line_dash = 'dashed', line_width=1)
         p.add_layout(vline)
 
     # Manually add legend entries
@@ -1524,7 +1188,6 @@ def plot_hitran_lines_bokeh(wavenumber_values: np.ndarray,
 def plot_hitran_lines_seaborn(wavenumber_values: np.ndarray, 
                               signal_values: np.ndarray, 
                               fitted_hitran: pd.DataFrame,
-                              peak_centers: np.ndarray,
                               columns_to_print: Union[List[str]],
                               wavenumber_range: Union[list, tuple, np.ndarray] = None,
                               line_profile: str = 'gaussian',
@@ -1562,8 +1225,25 @@ def plot_hitran_lines_seaborn(wavenumber_values: np.ndarray,
     x = wavenumber_values
     y = signal_values
 
-    line_positions = fitted_hitran["nu"].to_numpy()
-    print_columns = fitted_hitran[columns_to_print].to_numpy(dtype=str)
+    peak_centers = fitted_hitran["peak_center"].to_numpy()
+
+    # Identify rows corresponding to found lines
+    id_found = np.where(np.isnan(fitted_hitran["nu"]) == False)
+    # Make iterable array of found lines
+    line_positions = fitted_hitran["nu"].iloc[id_found].to_numpy()
+
+    # Format print columns (so integers don't print as floats)
+    formatted_columns = []
+    for col in columns_to_print:
+        if pd.api.types.is_integer_dtype(fitted_hitran[col]):
+            # Convert integer columns to strings without changing types
+            formatted_columns.append(fitted_hitran[col].astype(str))
+        else:
+            # For other types, convert with float formatting
+            formatted_columns.append(fitted_hitran[col].apply(lambda x: f"{x:.6g}" 
+                if isinstance(x, float) else str(x)))
+    # Make iterable array of text for found lines 
+    print_columns = pd.concat(formatted_columns, axis=1).to_numpy()[id_found]
 
     # Trim x and y to desired wavelength range
     if wavenumber_range is not None:
@@ -1583,28 +1263,26 @@ def plot_hitran_lines_seaborn(wavenumber_values: np.ndarray,
     
     ax.set_xlabel(r"Wavenumber [cm$^{-1}$]")
     ax.set_ylabel("Signal")
-    ax.set_title(f"{absorber_name} Spectrum and Fitted HITRAN Lines")
-    
+    ax.set_title(f"{absorber_name} Spectrum and Found HITRAN Lines")
+
     # Plot assigned HITRAN lines
     for q in range(len(line_positions)):
-        # Plot assigned HITRAN lines
-        ax.axvline(x=line_positions[q], color='k')  # Plot vertical lines
+        ax.axvline(x=line_positions[q], color='k', lw=2, alpha=0.7)  # Plot vertical lines
 
-        # Plot fitted peak centers
-        ax.axvline(x=peak_centers[q], color="red", alpha=0.8, lw=0.8)
+    # Plot fitted peak centers
+    for q in range(len(peak_centers)):
+        ax.axvline(x=peak_centers[q], color="red", lw=1, ls='--')
 
-    ax.plot([], [], color="red", ls='--', lw=0.8, alpha=0.8, label='Peak Center') # label     
-    ax.plot([], [], color='k', label='HITRAN Assignment: \n ' +  ' \n '.join(columns_to_print)) # label 
+    # Manual legend entries
+    ax.plot([], [], color="red", ls='--', lw=1, label='Peak Center') # label     
+    ax.plot([], [], color='k', lw=2, alpha=0.7, label='HITRAN Assignment: \n ' +  ' \n '.join(columns_to_print)) # label 
 
     ax.legend(loc='center left', bbox_to_anchor=(1, 0.5))
 
-    # label  
-    y_up=0
-    y_range = ax.get_ylim()
-    y_diff = y_range[1]-y_range[0]
-
-    # define columns to round
-    columns_to_round = ['nu', 'fitted_peak_center', 'fitted_peak_amplitude', 'fitted_peak_width']
+    # Plot text of the assigned line data
+    y_range = np.max(y)-np.min(y)
+    y_diff = 1.2*y_range
+    y_up = 0
 
     for q in range(len(line_positions)):
         # Calculate label position
@@ -1612,17 +1290,6 @@ def plot_hitran_lines_seaborn(wavenumber_values: np.ndarray,
 
         # Retrieve the label list
         label_q_list = list(print_columns[q])
-        
-        # Check if the column needs rounding
-        round_bool = [i in columns_to_round for i in columns_to_print]
-        round_id = np.where(round_bool)[0]
-
-        if any(round_bool):
-            # Apply rounding to needed values in label_q_list
-            for qi in range(len(label_q_list)):
-                if qi in round_id:
-                    label_q_list[qi] = str(np.round(float(label_q_list[qi]),2))
-
         label_q_pad = [' ' + item for item in label_q_list]
         label_q = '\n'.join(label_q_pad)
 
@@ -1675,8 +1342,10 @@ def plot_auto_peaks_bokeh(x_obs, y_obs, peaks):
     p.line('x', 'y', source=source, line_width=2, line_color='green', alpha=0.6,
         legend_label=f"Spectrum")
 
-    # plot peaks
-    p.scatter(x_obs[peaks], y_obs[peaks], marker='x',color='red',legend_label=f"Peaks")
+    # Plot peaks
+    # Overlay small square and larger cross markers
+    p.scatter(x_obs[peaks], y_obs[peaks], marker='square', size=4, color='red') 
+    p.scatter(x_obs[peaks], y_obs[peaks], marker='x', size=15, color='red',legend_label=f"Peaks")
 
     # Increase size of x and y ticks
     p.title.text_font_size = '14pt'
@@ -1850,3 +1519,362 @@ def plot_compare_baselines(wavenumber_values: np.ndarray,
     output_notebook()
     show(p)
 
+
+
+
+
+
+# original - calculates and plots y_fitted and hitran lines
+# def plot_assigned_lines_seaborn(wavenumber_values: np.ndarray, 
+#                                 signal_values: np.ndarray, 
+#                                 fitted_hitran: pd.DataFrame,
+#                                 fitted_params: np.ndarray,
+#                                 columns_to_print: Union[str, List[str]],
+#                                 wavenumber_range: Union[list, tuple, np.ndarray] = None,
+#                                 line_profile: str = 'gaussian',
+#                                 fitting_method: str = 'lm',
+#                                 absorber_name: str = None
+#                                 ) -> None:
+
+#     """
+#     Plot the original spectrum and the assigned lines using Seaborn.
+
+#     Parameters
+#     ----------
+#     wavenumber_values : np.ndarray
+#         Wavenumber array in cm^-1.
+#     signal_values : np.ndarray
+#         Signal arrays (input data). 
+#     fitted_hitran : pd.DataFrame
+#         Dataframe containing information about the assigned spectral lines, including columns ['amplitude', 'center', 'wing'].
+#     fitted_params : np.ndarray
+#         Fitted parameters of peaks.
+#     columns_to_print : str or list
+#         Columns to print corresponding to line positions. 
+#     wavenumber_range : list-like, optional
+#         List-like object (list, tuple, or np.ndarray) with of length 2 representing wavenumber range for plotting.
+#     line_profile : str, {'gaussian', 'lorentzian', 'voigt'}, optional
+#         Type of line profile to use for fitting. Default is 'gaussian'.
+#     """
+
+#     # option for printing different information
+#     # add fitted spectrum
+
+#     x = wavenumber_values
+#     y = signal_values
+
+#     line_positions = fitted_hitran["nu"].to_numpy()
+
+
+#     print_columns = fitted_hitran[columns_to_print].to_numpy(dtype=str)
+
+
+#     fitted_peak_positions = fitted_params[:,0]
+
+#     # Calculate fitted y values
+#     y_fitted = np.zeros_like(x)
+#     for params in fitted_params:
+#         if line_profile == 'gaussian':
+#             center, amplitude, width = params
+#             y_fitted += amplitude * np.exp(-(x - center) ** 2 / (2 * width ** 2))
+#         elif line_profile == 'lorentzian':
+#             center, amplitude, width = params
+#             y_fitted += amplitude / (1 + ((x - center) / width) ** 2)
+#         elif line_profile == 'voigt':
+#             center, amplitude, wid_g, wid_l = params
+#             sigma = wid_g / np.sqrt(2 * np.log(2))
+#             gamma = wid_l / 2
+#             z = ((x - center) + 1j * gamma) / (sigma * np.sqrt(2))
+#             y_fitted += amplitude * np.real(wofz(z)).astype(float) / (sigma * np.sqrt(2 * np.pi))
+
+#     # Trim x and y to desired wavelength range for plotting
+#     if wavenumber_range is not None:
+#         # Make sure range is in correct format
+#         if len(wavenumber_range) != 2:
+#             raise ValueError('wavenumber_range must be tuple, list, or array with 2 elements')
+#         # Locate indices and splice
+#         condition_range = (x > wavenumber_range[0]) & (x < wavenumber_range[1])
+#         x = x[condition_range]
+#         y = y[condition_range]
+#         y_fitted = y_fitted[condition_range]
+
+#     # Create figure
+#     fig = plt.figure(figsize=(10, 6), dpi=700)
+#     # Create GridSpec object
+#     gs = gridspec.GridSpec(3, 1, height_ratios=[3, 1, 1])
+
+#     # Create first subplot for spectrum
+#     ax1 = fig.add_subplot(gs[:2,0])
+
+#     # Plot original spectrum
+#     ax1.plot(x, y, color='blue', alpha=0.8, label="Original Spectrum")
+#     # Plot fitted peaks
+#     ax1.plot(x, y_fitted, color="red", alpha=0.8, lw=0.8,
+#         label=f'Fitted {line_profile.capitalize()}')
+    
+#     ax1.set_ylabel("Signal")
+#     ax1.set_title(f"{absorber_name}: Spectrum with Fitted {line_profile.capitalize()} Peaks")
+        
+#     # Create second subplot for residual
+#     ax2 = fig.add_subplot(gs[2, 0])
+#     y_residual = y - y_fitted
+
+#     # Plot residual 
+#     ax2.plot(x, y_residual, color='green', label=f'Residual = (Data) - (Fitted {line_profile.capitalize()} Peaks)')
+
+#     ax2.set_xlabel("Wavenumber [cm$^{-1}$]")
+#     ax2.set_ylabel("Residual")
+    
+#     # Plot assigned HITRAN lines
+#     for ax in (ax1, ax2):
+#         for q in range(len(line_positions)):
+
+#             # Plot assigned HITRAN lines
+#             ax.axvline(x=line_positions[q], color='k')  # Plot vertical lines
+
+#             # Plot fitted peak centers
+#             ax.axvline(x=fitted_peak_positions[q], color="red", alpha=0.8, lw=0.8, ls='--')
+
+#     ax1.plot([], [], color="red", ls='--', lw=0.8, alpha=0.8, label='Fitted Peak Center') # label     
+#     ax1.plot([], [], color='k', label='HITRAN Assignment: \n ' +  ' \n '.join(columns_to_print)) # label 
+
+#     ax1.legend(loc='center left', bbox_to_anchor=(1, 0.5))
+#     ax2.legend(loc='center left', bbox_to_anchor=(0, 1.2))
+
+#     # label  
+#     y_up=0
+#     y_range = ax1.get_ylim()
+#     y_diff = y_range[1]-y_range[0]
+
+#     # define columns to round
+#     columns_to_round = ['nu', 'fitted_peak_center', 'fitted_peak_amplitude', 'fitted_peak_width']
+
+#     for q in range(len(line_positions)):
+#         # Calculate label position
+#         y_up += y_diff / (len(line_positions)+1)
+
+#         # Retrieve the label list
+#         label_q_list = list(print_columns[q])
+        
+#         # Check if the column needs rounding
+#         round_bool = [i in columns_to_round for i in columns_to_print]
+#         round_id = np.where(round_bool)[0]
+
+#         if any(round_bool):
+#             # Apply rounding to needed values in label_q_list
+#             for qi in range(len(label_q_list)):
+#                 if qi in round_id:
+#                     label_q_list[qi] = str(np.round(float(label_q_list[qi]),2))
+
+#         label_q_pad = [' ' + item for item in label_q_list]
+#         label_q = '\n'.join(label_q_pad)
+
+#         # Add the text label
+#         ax1.text(line_positions[q], np.min(y) + y_up, label_q, color='k', va="top")
+
+#     for ax in (ax1,ax2):
+#         # Turn on grid lines with transparency
+#         ax.grid(True, alpha=0.25)
+
+#         # Set axes ticks, inwards
+#         ax.tick_params(axis='both', which='major', direction='in', length=7, width=1.1)
+#         ax.tick_params(axis='x', direction='in', top=True)
+#         ax.tick_params(axis='y', direction='in', right=True)
+#         ax.minorticks_on()
+#         ax.tick_params(axis='both', which='minor', direction='in', length=4, width=1.1)
+#         ax.tick_params(axis='x', which='minor', direction='in', top=True)
+#         ax.tick_params(axis='y', which='minor', direction='in', right=True)   
+
+
+#     plt.tight_layout()
+
+#     plt.show()
+
+
+
+
+# original - calculates and plots y_fitted and hitran lines
+# def plot_assigned_lines_bokeh(wavenumber_values: np.ndarray, 
+#                               signal_values: np.ndarray, 
+#                               fitted_hitran: pd.DataFrame,
+#                               fitted_params: np.ndarray,
+#                               columns_to_print: Union[str, List[str]],
+#                               wavenumber_range: Union[list, tuple, np.ndarray] = None,
+#                               line_profile: str = 'gaussian',
+#                               fitting_method: str = 'lm',
+#                               absorber_name: str = None
+#                               ) -> None:
+
+#     """
+#     Plot the original spectrum and the fitted peaks using Bokeh.
+
+#     Parameters
+#     ----------
+#     wavenumber_values : np.ndarray
+#         Wavenumber array in cm^-1.
+#     signal_values : np.ndarray
+#         Signal arrays (input data). 
+#     fitted_hitran : pd.DataFrame
+#         Dataframe containing information about the assigned spectral lines, including columns ['amplitude', 'center', 'wing'].
+#     fitted_params : np.ndarray
+#         Fitted parameters of peaks.
+#     columns_to_print : str or list
+#         Columns to print corresponding to line positions. 
+#     wavenumber_range : list-like, optional
+#         List-like object (list, tuple, or np.ndarray) with of length 2 representing wavenumber range for plotting.
+#     line_profile : str, {'gaussian', 'lorentzian', 'voigt'}, optional
+#         Type of line profile to use for fitting. Default is 'gaussian'.
+#     """
+
+#     x = wavenumber_values
+#     y = signal_values
+
+#     line_positions = fitted_hitran["nu"].to_numpy()
+#     print_columns = fitted_hitran[columns_to_print].to_numpy(dtype=str)
+#     fitted_peak_positions = fitted_params[:,0]
+
+#     # Calculate fitted y values
+#     y_fitted = np.zeros_like(x)
+#     for params in fitted_params:
+#         if line_profile == 'gaussian':
+#             center, amplitude, width = params
+#             y_fitted += amplitude * np.exp(-(x - center) ** 2 / (2 * width ** 2))
+#         elif line_profile == 'lorentzian':
+#             center, amplitude, width = params
+#             y_fitted += amplitude / (1 + ((x - center) / width) ** 2)
+#         elif line_profile == 'voigt':
+#             center, amplitude, wid_g, wid_l = params
+#             sigma = wid_g / np.sqrt(2 * np.log(2))
+#             gamma = wid_l / 2
+#             z = ((x - center) + 1j * gamma) / (sigma * np.sqrt(2))
+#             y_fitted += amplitude * np.real(wofz(z)).astype(float) / (sigma * np.sqrt(2 * np.pi))
+
+#     # Trim x and y to desired wavelength range
+#     if wavenumber_range is not None:
+#         # Make sure range is in correct format
+#         if len(wavenumber_range) != 2:
+#             raise ValueError('wavenumber_range must be tuple, list, or array with 2 elements')
+#         # Locate indices and splice
+#         condition_range = (x > wavenumber_range[0]) & (x < wavenumber_range[1])
+#         x = x[condition_range]
+#         y = y[condition_range]
+#         y_fitted = y_fitted[condition_range]   
+
+#     # Calculate residual
+#     residual = y - y_fitted
+
+#     # Create a shared range object for consistent zoom
+#     x_min,x_max = np.min(x),np.max(x)
+#     x_padding = (x_max-x_min) * 0.05
+#     x_range = Range1d(start=x_min-x_padding, end=x_max+x_padding)
+
+#     # Create ColumnDataSource
+#     source_p1 = ColumnDataSource(data=dict(x=x, y=y, y_fitted=y_fitted))
+#     source_p2 = ColumnDataSource(data=dict(x=x, residual=residual))
+
+#    # Create a new plot with a title and axis labels
+#     p1 = figure(title=f"{absorber_name}: Spectrum with Fitted {line_profile.capitalize()} Peaks",
+#                y_axis_label="Signal",
+#                width=800, height=500,
+#                x_range = x_range,
+#                y_axis_type="linear",
+#                tools="pan,wheel_zoom,box_zoom,reset")
+
+#     # Add the original spectrum to the plot
+#     p1.line('x', 'y', legend_label="Original Spectrum", line_width=2, color="blue", source=source_p1)
+
+#     # Add the fitted spectrum to the plot
+#     p1.line('x', 'y_fitted', legend_label=f'Fitted {line_profile.capitalize()}', line_width=1, 
+#         color="red", source=source_p1)
+    
+#     # Create lower plot
+#     p2 = figure(title=' ',
+#                x_axis_label="Wavenumber [cm^-1]",
+#                y_axis_label="Residual",
+#                width=800, height=250,
+#                x_range = x_range,
+#                y_axis_type="linear",
+#                tools="pan,wheel_zoom,box_zoom,reset")
+
+#     # Add line plot
+#     p2.line('x', 'residual', line_width=1.5, line_color='green',
+#         legend_label=f'Residual = (Data) - (Fitted {line_profile.capitalize()} Peaks)',
+#         source=source_p2)  
+
+#     # Plot assigned HITRAN lines
+#     for p in (p1,p2):
+#         for q in range(len(line_positions)):
+
+#             # Plot assigned HITRAN lines
+#             vline = Span(location=line_positions[q], dimension='height', line_width=2,
+#                 line_color='black')
+#             p.add_layout(vline)
+
+#             # Plot fitted peak centers
+#             vline = Span(location=fitted_peak_positions[q], dimension='height', 
+#                 line_color="red", line_alpha=0.8, line_width=1, line_dash='dashed')
+#             p.add_layout(vline)
+
+#     # Manually add legend entries
+#     dummy_line1 = p1.line(fitted_peak_positions[0], y[0], legend_label="Fitted Peak Center", 
+#         line_color="red", line_dash='dashed', line_alpha=0.8, line_width=1)
+#     dummy_line2 = p1.line(fitted_peak_positions[0], y[0], legend_label='HITRAN Assignment: \n ' +  ', '.join(columns_to_print), 
+#         line_width=1.5, line_color='black')
+   
+#     # Plot text of the assigned line data
+#     y_range = np.max(y)-np.min(y)
+#     y_diff = 1.2*y_range
+#     y_up = 0
+#     for q in range(len(line_positions)):
+        
+#         # Calculate label position
+#         y_up += y_diff / (len(line_positions)+1)
+
+#         # Retrieve the label
+#         label_q_list = list(print_columns[q])
+#         label_q_pad = [' ' + item for item in label_q_list]
+#         label_q = '\n'.join(label_q_pad)
+
+#         # Add the text label
+#         label = Label(x=line_positions[q], y=np.min(y) + y_up, 
+#             text=label_q, text_color="black", text_align="left", text_baseline="top")
+#         p1.add_layout(label)
+
+#     # Customize legends
+#     legend1 = p1.legend[0]
+#     legend1.location = 'top_left'
+#     p1.add_layout(legend1, 'above')
+
+#     legend2 = p2.legend[0]
+#     legend2.location = 'top_left'
+#     p2.add_layout(legend2, 'below')
+
+#     # Increase size of x and y ticks
+#     for p in (p1,p2):
+#         p.title.text_font_size = '14pt'
+#         p.xaxis.major_label_text_font_size = '14pt'
+#         p.xaxis.axis_label_text_font_size = '14pt'
+#         p.yaxis.major_label_text_font_size = '14pt'
+#         p.yaxis.axis_label_text_font_size = '14pt'
+
+#     # Add HoverTool
+#     hover_p1 = HoverTool()
+#     hover_p1.tooltips = [
+#         ("Wavenumber [cm^-1]", "@x{0.000}"),
+#         ("Intensity", "@y{0.000}"),
+#         (f"Fitted {line_profile.capitalize()}", "@y_fitted{0.000}"),
+#     ]
+#     hover_p2 = HoverTool()
+#     hover_p2.tooltips = [
+#         ("Wavenumber [cm^-1]", "@x{0.000}"),
+#         ("Residual", "@residual{0.000}"),
+#     ]
+#     p1.add_tools(hover_p1)
+#     p2.add_tools(hover_p2)
+
+#     # Combine plots into a column
+#     layout = column(p1, p2, sizing_mode="stretch_width", height_policy="min", margin=0)
+
+#     # Show the plot
+#     output_notebook()
+#     show(layout)

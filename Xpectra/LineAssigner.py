@@ -33,7 +33,7 @@ from matplotlib.ticker import AutoMinorLocator
 from matplotlib.ticker import MaxNLocator
 
 from .SpecStatVisualizer import *
-
+from .FitLiteratureData import FitLiteratureData
 
 
 class LineAssigner:
@@ -192,7 +192,7 @@ class LineAssigner:
 
 
     def parse_file_to_dataframe(self, 
-                                selected_columns: List[str] = ['local_iso_id','nu','sw','gamma_air','local_upper_quanta','ierr']
+                                selected_columns: Union[List[str], None] = None
                                 ) -> pd.DataFrame:
         """
         Parse an input file into a pandas DataFrame based on specified columns.
@@ -203,7 +203,7 @@ class LineAssigner:
             Path to the input file to parse.
         selected_columns : list
             List of column names to select from the input file. Default is
-            ['local_iso_id','nu','sw','gamma_air','local_upper_quanta']. 
+            None, selecting all columns. 
             
         Returns
         -------
@@ -237,7 +237,10 @@ class LineAssigner:
         }
 
         # Filter columns based on selected_columns
-        columns_to_use = {key: columns[key] for key in selected_columns}
+        if selected_columns:
+            columns_to_use = {key: columns[key] for key in selected_columns}
+        else: 
+            columns_to_use = columns
 
         parsed_data_list = []  # Initialize an empty list to store parsed data dictionaries
         
@@ -334,11 +337,12 @@ class LineAssigner:
 
     # Modified to just use peak centers, and as input argument 
     def hitran_line_assigner(self,
-                             peak_centers,
-                             ierr_weights: bool = True,
+                             filters: dict = None,
+                             ierr_weights: bool = False, # broken if True
                              weights: Union[list,np.ndarray,None] = None,
-                             columns_to_print: List[str] = ["nu", "local_upper_quanta"],
-                             wavenumber_range: Union[list, tuple, np.ndarray, None] = None,
+                             threshold: float = 0.01,
+                             columns_to_print: List[str] = ["nu"],
+                             wavenumber_range: Union[list, np.ndarray, None] = None,
                              __print__: bool = False,
                              __plot_bokeh__: bool = False,
                              __plot_seaborn__: bool = False,
@@ -371,6 +375,13 @@ class LineAssigner:
             set of fitted parameters.
         """        
 
+        if hasattr(self, 'peak_centers_auto'):
+            peak_centers = self.peak_centers_auto
+        elif hasattr(self, 'peak_centers_manual'):
+            peak_centers = self.peak_centers_manual
+        else:
+            raise ValueError("No peak centers found. Please run line_finder_auto or line_finder_manual.")
+
         plot_args = [self.wavenumber_values, self.signal_values] 
         if __plot_bokeh__ and any(arg is None for arg in plot_args):
             raise ValueError("All required attributes (wavenumber_values, signal_values) must have a value when __plot_bokeh__ is True.")
@@ -381,10 +392,9 @@ class LineAssigner:
             raise AttributeError("The 'hitran_df' attribute is missing. Ensure that data is loaded by running the 'parse_file_to_dataframe() method.")
         hitran_df = self.hitran_df
 
-        #fitted_params = self.fitted_params
-
-        # Find closest data points 
-        closest_data_points = []
+        # Apply any specified filters to the DataFrame
+        if filters:
+            hitran_df = FitLiteratureData.filter_dataframe(hitran_df, filters)
 
         # Default ierr weights
         if ierr_weights:
@@ -397,11 +407,14 @@ class LineAssigner:
                 weights = np.array(weights)
                 weights = weights / np.sum(weights)  # Normalize weights to sum to 1
 
+        # Find closest data points 
+        closest_data_points = []
+
         for i, center in enumerate(peak_centers):
             # Calculate distances between each row in hitran_df and the current fitted parameter set
             distances = np.sqrt((hitran_df['nu'].values - center)**2)
-            
-            # Apply weight to the distances
+
+            # Apply weight to the distances 
             weighted_distances = distances * weights[i]
 
             # Find the index of the minimum weighted distance
@@ -410,29 +423,33 @@ class LineAssigner:
             # Get the closest data point from hitran_df
             closest_data_point = hitran_df.iloc[closest_index].values
 
-            closest_data_points.append(closest_data_point)
+            # Data-model difference
+            difference = hitran_df["nu"].iloc[closest_index] - center
+
+            # Check the difference against the threshold
+            if abs(difference) > threshold:
+                closest_data_points.append([np.nan] * len(hitran_df.columns))  # Add placeholder for no match
+            else:
+                closest_data_points.append(closest_data_point)  # Add the closest data point if within threshold
+
 
         fitted_hitran = pd.DataFrame(closest_data_points, columns=hitran_df.columns)
 
-        fitted_hitran['peak_centers'] = peak_centers
-        # fitted_hitran['fitted_peak_amplitude'] = fitted_params[:,1]
-        # fitted_hitran['fitted_peak_width'] = fitted_params[:,2]
-
-        fitted_hitran = fitted_hitran[['peak_centers', 'nu', 'sw', 'gamma_air', 'local_iso_id', 'J_up', 'sym_up', 'N_up']]
+        fitted_hitran['peak_center'] = peak_centers
         
         self.fitted_hitran = fitted_hitran
         
         if __plot_bokeh__:
             plot_hitran_lines_bokeh(self.wavenumber_values, self.signal_values, 
-                                      fitted_hitran, peak_centers, columns_to_print = columns_to_print,
+                                      fitted_hitran, columns_to_print = columns_to_print,
                                        wavenumber_range=wavenumber_range, absorber_name=self.absorber_name)
         if __plot_seaborn__:
             plot_hitran_lines_seaborn(self.wavenumber_values, self.signal_values, 
-                                      fitted_hitran, peak_centers, columns_to_print = columns_to_print,
+                                      fitted_hitran, columns_to_print = columns_to_print,
                                        wavenumber_range=wavenumber_range, absorber_name=self.absorber_name)
         if __save_plot__:
             plot_hitran_lines_seaborn(self.wavenumber_values, self.signal_values, 
-                                      fitted_hitran, peak_centers, columns_to_print = columns_to_print,
+                                      fitted_hitran, columns_to_print = columns_to_print,
                                        wavenumber_range=wavenumber_range, absorber_name=self.absorber_name,
                                        __save_plot__=True, __reference_data__=__reference_data__, __show_plot__=False)
 
