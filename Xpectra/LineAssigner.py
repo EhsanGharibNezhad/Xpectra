@@ -33,7 +33,9 @@ from matplotlib.ticker import AutoMinorLocator
 from matplotlib.ticker import MaxNLocator
 
 from .SpecStatVisualizer import *
-from .FitLiteratureData import FitLiteratureData
+
+from bokeh.io import push_notebook
+
 
 
 class LineAssigner:
@@ -74,6 +76,36 @@ class LineAssigner:
         self.hitran_file = hitran_file
         self.absorber_name = absorber_name
 
+
+    @staticmethod
+    def filter_dataframe(df, filters=None):
+        """
+        Filter the DataFrame based on multiple column value pairs or conditions.
+
+        Parameters:
+        df (pd.DataFrame): The DataFrame to filter.
+        filters (dict): A dictionary where keys are column names and values are lists of values to filter by or conditions.
+
+        Returns:
+        pd.DataFrame: The filtered DataFrame.
+        """
+        if filters is None:
+            return df
+        
+        # Start with the original DataFrame
+        filtered_df = df.copy()
+        
+        # Apply each filter
+        for col, condition in filters.items():
+            if col in filtered_df.columns:
+                if callable(condition):
+                    filtered_df = filtered_df[condition(filtered_df[col])]
+                else:
+                    filtered_df = filtered_df[filtered_df[col].isin(condition)]
+            else:
+                raise ValueError(f"Column '{col}' does not exist in the DataFrame.")
+        
+        return filtered_df
 
     @staticmethod
     def parse_hitran_description(hitran_description: str) -> pd.DataFrame:
@@ -264,7 +296,7 @@ class LineAssigner:
         
 
     def line_finder_auto(self,
-                        wavenumber_range: Union[list, tuple, np.ndarray] = None,
+                        wavenumber_range: Union[list, np.ndarray] = None,
                         sigma: int = 2,
                         peak_height_min: float = None,
                         peak_height_max: float = None,
@@ -281,7 +313,7 @@ class LineAssigner:
         signal_values : np.ndarray
             Signal arrays (input data).
         wavenumber_range : list-like, optional
-            List-like object (list, tuple, or np.ndarray) with of length 2 representing wavenumber range for plotting.
+            List-like object (list or np.ndarray) with of length 2 representing wavenumber range for plotting.
         """
 
         x_obs = self.wavenumber_values
@@ -334,6 +366,131 @@ class LineAssigner:
 
         return peak_centers, peak_heights
 
+
+
+    def find_peaks_bokeh(self, x_obs, y_obs):
+        # Create a ColumnDataSource for the spectrum data
+        source = ColumnDataSource(data=dict(x=x_obs, y=y_obs))
+        
+        # Create a ColumnDataSource for the clicked coordinates
+        clicked_source = ColumnDataSource(data=dict(x=[], y=[]))
+        
+        # Create the figure
+        p = figure(title="Click and Print",
+                   x_axis_label="Wavenumber [cm^-1]",
+                   y_axis_label="Signal",
+                   width=1000, height=300,
+                   y_axis_type="linear",
+                   tools="pan,wheel_zoom,box_zoom,reset")
+
+        # Add HoverTool to the plot
+        hover = HoverTool(tooltips=[("Wavenumber [cm^-1]", "@x{0.000} µm"), ("Signal", "@y{0.000}")], mode='mouse')
+        p.add_tools(hover)
+
+        # Add the line plot
+        p.line('x', 'y', source=source, line_width=2, line_color='green', alpha=0.6,
+               legend_label=f"Spectrum")
+
+        # Increase size of x and y ticks
+        p.title.text_font_size = '14pt'
+        p.xaxis.major_label_text_font_size = '14pt'
+        p.xaxis.axis_label_text_font_size = '14pt'
+        p.yaxis.major_label_text_font_size = '14pt'
+        p.yaxis.axis_label_text_font_size = '14pt'
+
+        # Add a Div to display the results
+        div = Div(text="Click to print coordinates.", width=400, height=300)
+
+        # JavaScript callback to save coordinates
+        callback = CustomJS(args=dict(source=source, clicked_source=clicked_source, div=div), code="""
+            const x = cb_obj.x;
+            const y = cb_obj.y;
+
+            // Find the closest data point in the source data
+            const data = source.data;
+            const x_data = data['x'];
+            const y_data = data['y'];
+
+            // Initialize the minimum distance and corresponding index
+            let minDist = Infinity;
+            let closestIndex = -1;
+
+            // Iterate through the data to find the closest point
+            for (let i = 0; i < x_data.length; i++) {
+                const dist = Math.abs(x - x_data[i]);
+                if (dist < minDist) {
+                    minDist = dist;
+                    closestIndex = i;
+                }
+            }
+
+            // If a valid closest index is found, store the coordinates
+            if (closestIndex !== -1) {
+                const clickedX = x_data[closestIndex];
+                const clickedY = y_data[closestIndex];
+
+                // Push the coordinates to the clicked_source ColumnDataSource
+                clicked_source.data['x'].push(clickedX);
+                clicked_source.data['y'].push(clickedY);
+                clicked_source.change.emit();
+
+                // Update the Div with the list of all coordinates
+                const coordArray = clicked_source.data['x'].map((coord, idx) => `[${coord.toFixed(3)}, ${clicked_source.data['y'][idx].toFixed(3)}]`).join(', ');
+                div.text = `Clicked coordinates: [${coordArray}]`;
+
+                // Manually update the notebook view
+                push_notebook();
+            }
+        """)
+
+        # Add the callback to the plot
+        p.js_on_event('tap', callback)
+        
+        # Layout and show the plot
+        layout = column(p, div)
+        show(layout, notebook_handle=True)
+
+
+
+    def line_finder_manual(self,
+                        wavenumber_range: Union[list, np.ndarray] = None, 
+                        sigma: int = 2,
+                        __print__: bool = False
+                        ) -> None:
+        """
+        Click and print spectral peaks on plotted spectra with error bars using Bokeh.
+
+        Parameters
+        ----------
+        wavenumber_values : np.ndarray
+            Wavenumber array in cm^-1.
+        signal_values : np.ndarray
+            Signal arrays (input data).
+        wavenumber_range : list-like, optional
+            List-like object (list or np.ndarray) with of length 2 representing wavenumber range for plotting.
+        """
+
+        x_obs = self.wavenumber_values
+        y_obs = self.signal_values
+
+        # Trim x and y to desired wavelength range
+        if wavenumber_range is not None:
+            # Make sure range is in correct format
+            if len(wavenumber_range) != 2:
+                raise ValueError('wavenumber_range must be tuple, list, or array with 2 elements')
+            # Locate indices and splice
+            condition_range = (x_obs > wavenumber_range[0]) & (x_obs < wavenumber_range[1])
+            x_obs = x_obs[condition_range]
+            y_obs = y_obs[condition_range]
+
+        # Apply gaussian smoothing first
+        y_obs_smoothed = gaussian_filter1d(y_obs, sigma)
+
+        # Show bokeh plot 
+        self.find_peaks_bokeh(x_obs, y_obs_smoothed)
+
+        if __print__:
+            print('None')
 
     # Modified to just use peak centers, and as input argument 
     def hitran_line_assigner(self,
@@ -394,7 +551,7 @@ class LineAssigner:
 
         # Apply any specified filters to the DataFrame
         if filters:
-            hitran_df = FitLiteratureData.filter_dataframe(hitran_df, filters)
+            hitran_df = self.filter_dataframe(hitran_df, filters)
 
         # Default ierr weights
         if ierr_weights:
