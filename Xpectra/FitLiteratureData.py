@@ -36,6 +36,8 @@ CB_color_cycle = ['#377eb8', '#ff7f00', '#4daf4a',
                   '#999999', '#e41a1c', '#dede00', '#984ea3']
 
 
+output_notebook()
+
 class FitLiteratureData:
     """
     Fit and plot literature data.
@@ -53,16 +55,20 @@ class FitLiteratureData:
     def __init__(self, 
                  literature_file = None,
                  hitran_file = None,
+                 __reference_data__ = None
                  ):
         self.literature_file = literature_file
         self.hitran_file = hitran_file
+        self.__reference_data__ = __reference_data__
         self.line_assigner_instance = LineAssigner(hitran_file = hitran_file) # Warning: from another module and could cause bugs
 
-    def pb_excel_reader(self, sheet_name = None):
+    def pb_excel_reader(self, sheet_name):
         """
         Converts pressure broadening data in an excel spreadsheet to a data frame. 
         """
-        pb = pd.read_excel(self.literature_file, sheet_name = sheet_name)
+        literature_file = os.path.join(self.__reference_data__, 'datasets', sheet_name)
+
+        pb = pd.read_excel(literature_file)
         
         self.literature_df = pb
 
@@ -198,11 +204,16 @@ class FitLiteratureData:
                 outfile.write(modified_line)
 
 
-    @staticmethod
-    def replace_in_file_parallel(file_path, 
-                        file_path_to_save,
-                        pb_coeffs,
-                        num_processes=4):
+    def replace_in_file_parallel(self,
+                                pb_coeffs: pd.DataFrame,
+                                save_name: str = 'output.txt',
+                                num_processes: int = 8
+                                ) -> None:
+
+        file_path = self.hitran_file
+
+        # Create path
+        file_path_to_save = os.path.join(self.__reference_data__, 'outputs', save_name)
 
         # Read all lines from the file
         with open(file_path, 'r') as infile:
@@ -382,7 +393,6 @@ class FitLiteratureData:
 
         if show_plot:
             # Show the plot
-            output_notebook()
             show(p)
 
         if save_plot:
@@ -437,10 +447,12 @@ class FitLiteratureData:
         plt.show()
 
 
-    def plot_fitted_value(self, 
+    def plot_fitted_value_seaborn(self, 
                           df_pbro,
                           y_param = 'gamma_L',
-                          J_range = [0,150]
+                          J_range = [0,150],
+                          __save_plot__: bool = False,
+                          __show_plot__: bool = True
                           ):
         """
         Plot fitted n or gamma vs J_low, color-coded by symmetry
@@ -461,14 +473,77 @@ class FitLiteratureData:
 
         for index in indeces:
             coefficients = list(df_pbro.loc[index,'a0':'b4'].values)
-            plt.plot(J_arr, self.fit_Pbro_Pade(J_arr, *coefficients),
-                '.', label= df_pbro.loc[index,'sym_low'])
+            fitted_values = self.fit_Pbro_Pade(J_arr, *coefficients)
+            plt.plot(J_arr, fitted_values, '.', label= df_pbro.loc[index,'sym_low'])
 
         plt.xlabel('J_low')
         plt.ylabel(f'Fitted {y_param}')
         plt.legend()
-        plt.show()
+        
+        if __save_plot__:
 
+            # Assign file name
+            save_file = f"fitted_{y_param}_4th_pade_results.pdf"
+
+            plt.savefig(os.path.join(self.__reference_data__, 'figures', save_file), 
+                dpi=700, bbox_inches='tight')
+        
+        if __show_plot__:
+            plt.show()
+        else:
+            plt.clf()
+
+    def plot_fitted_value_bokeh(self, 
+                          df_pbro,
+                          y_param = 'gamma_L',
+                          J_range = [0,150],
+                          ):
+        """
+        Plot fitted n or gamma vs J_low, color-coded by symmetry
+
+        Parameters:
+        ----------
+        df_pbro : pd.DataFrame
+            DataFrame containing fitted coefficients.
+        y_param : {'gamma_L', 'n_T'}
+            Parameter to plot on y-axis.
+        J_range 
+
+        """
+
+        J_arr = np.arange(*J_range)
+        # df index
+        indeces = np.where(df_pbro['coeff'] == y_param)[0]
+
+        # Create figure
+        p = figure(title=f'Fitted {y_param}', 
+            x_axis_label='J_low', 
+            y_axis_label=f'Fitted {y_param}',
+            width=800, height=500,
+            tools="pan,wheel_zoom,box_zoom,reset")
+
+        # Call colors
+        colors = Category10[10]
+
+        for i, index in enumerate(indeces):
+            coefficients = list(df_pbro.loc[index,'a0':'b4'].values)
+            fitted_values = self.fit_Pbro_Pade(J_arr, *coefficients)
+            label = df_pbro.loc[index,'sym_low']
+
+            # Create source
+            source = ColumnDataSource(data={'x': J_arr, 'y': fitted_values, 'label': [label] * len(J_arr)})
+
+            color = colors[i % len(colors)]
+
+            # Plot scatter
+            p.scatter('x', 'y', marker='circle', source=source, legend_label=label, color=color, size=8)
+
+        # Show the legend and display plot
+        p.legend.title = 'Symbols'
+        p.legend.location = 'top_left'
+        show(p)
+
+        
 
 
 
