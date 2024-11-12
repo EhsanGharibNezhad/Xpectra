@@ -38,6 +38,13 @@ import logging
 logging.basicConfig(level=logging.WARNING, format='%(levelname)s: %(message)s')
 
 
+
+# Dictionary for formatted formulas
+symbol_dict = {'CH4' : r'CH$_{4}$',
+              'H2O' : r'H$_{2}$O',
+              }
+
+
 def print_spectral_info(wavenumber_values: np.ndarray,
                         signal_values: np.ndarray,
                         print_title: str = None,
@@ -166,7 +173,7 @@ def print_fitted_parameters_df(fitted_params: np.ndarray,
 
 def plot_spectra_errorbar_bokeh(wavenumber_values: np.ndarray,
                                 signal_values: np.ndarray,
-                                wavenumber_range: Union[list, tuple, np.ndarray] = None,
+                                wavenumber_range: Union[list, np.ndarray, None] = None,
                                 signal_values_err: np.ndarray = None,
                                 absorber_name: str = None,
                                 y_label: str = "Signal",
@@ -229,7 +236,8 @@ def plot_spectra_errorbar_bokeh(wavenumber_values: np.ndarray,
         condition_range = (x_obs > min_range) & (x_obs < max_range)
         x_obs = x_obs[condition_range]
         y_obs = y_obs[condition_range]
-        y_obs_err = y_obs_err[condition_range]
+        if y_obs_err:
+            y_obs_err = y_obs_err[condition_range]
 
 
     # Create the figure
@@ -289,8 +297,8 @@ def plot_spectra_errorbar_bokeh(wavenumber_values: np.ndarray,
 
 def plot_spectra_errorbar_seaborn(wavenumber_values: np.ndarray,
                                   signal_values: np.ndarray,
-                                  __reference_data__: str,
-                                  wavenumber_range: Union[list, np.ndarray] = None,
+                                  __reference_data__: Union[str, None] = None,
+                                  wavenumber_range: Union[list, np.ndarray, None] = None,
                                   signal_values_err: np.ndarray = None,
                                   absorber_name: str = None,
                                   y_label: str = "Signal",
@@ -328,7 +336,9 @@ def plot_spectra_errorbar_seaborn(wavenumber_values: np.ndarray,
     rcParams['font.sans-serif'] = ['DejaVu Sans']
     rcParams['axes.unicode_minus'] = False
 
-    molecule_name = absorber_name
+    # Assign formatted option, if available
+    molecule_name = symbol_dict.get(absorber_name, absorber_name)
+
     x_obs = wavenumber_values
     y_obs = signal_values
     y_obs_err = signal_values_err
@@ -358,7 +368,9 @@ def plot_spectra_errorbar_seaborn(wavenumber_values: np.ndarray,
         condition_range = (x_obs > min_range) & (x_obs < max_range)
         x_obs = x_obs[condition_range]
         y_obs = y_obs[condition_range]
-        y_obs_err = y_obs_err[condition_range]
+        
+        if y_obs_err:
+            y_obs_err = y_obs_err[condition_range]
 
 
     fig, ax1 = plt.subplots(figsize=(10, 4),dpi=700)
@@ -815,7 +827,7 @@ def plot_fitted_als_seaborn(wavenumber_values: np.ndarray,
 def plot_fitted_spectrum_bokeh(wavenumber_values: np.ndarray, 
                                signal_values: np.ndarray,
                                fitted_params: np.ndarray,
-                               wavenumber_range: Union[list, np.ndarray] = None,
+                               wavenumber_range: Union[list, np.ndarray, None] = None,
                                line_profile: str = 'gaussian',
                                fitting_method: str = 'lm'
                                ) -> None:
@@ -975,7 +987,7 @@ def plot_fitted_spectrum_bokeh(wavenumber_values: np.ndarray,
 def plot_fitted_spectrum_seaborn(wavenumber_values: np.ndarray, 
                                  signal_values: np.ndarray,
                                  fitted_params: np.ndarray,
-                                 wavenumber_range: Union[list, np.ndarray] = None,
+                                 wavenumber_range: Union[list, np.ndarray, None] = None,
                                  line_profile: str = 'gaussian',
                                  fitting_method: str = 'lm',
                                  __save_plots__: bool = False,
@@ -1119,7 +1131,7 @@ def plot_hitran_lines_bokeh(wavenumber_values: np.ndarray,
                               signal_values: np.ndarray, 
                               fitted_hitran: pd.DataFrame,
                               columns_to_print: Union[List[str]],
-                              wavenumber_range: Union[list, np.ndarray] = None,
+                              wavenumber_range: Union[list, np.ndarray, None] = None,
                               line_profile: str = 'gaussian',
                               fitting_method: str = 'lm',
                               absorber_name: str = None
@@ -1274,7 +1286,7 @@ def plot_hitran_lines_seaborn(wavenumber_values: np.ndarray,
                               signal_values: np.ndarray, 
                               fitted_hitran: pd.DataFrame,
                               columns_to_print: Union[List[str]],
-                              wavenumber_range: Union[list, np.ndarray] = None,
+                              wavenumber_range: Union[list, np.ndarray, None] = None,
                               line_profile: str = 'gaussian',
                               fitting_method: str = 'lm',
                               absorber_name: str = None,
@@ -1304,8 +1316,8 @@ def plot_hitran_lines_seaborn(wavenumber_values: np.ndarray,
         Type of line profile to use for fitting. Default is 'gaussian'.
     """
 
-    # option for printing different information
-    # add fitted spectrum
+    # Assign formatted option, if available
+    molecule_name = symbol_dict.get(absorber_name, absorber_name)
 
     x = wavenumber_values
     y = signal_values
@@ -1365,7 +1377,7 @@ def plot_hitran_lines_seaborn(wavenumber_values: np.ndarray,
     
     ax.set_xlabel(r"Wavenumber [cm$^{-1}$]")
     ax.set_ylabel("Signal")
-    ax.set_title(f"{absorber_name} Spectrum and Found HITRAN Lines")
+    ax.set_title(f"{molecule_name} Spectrum and Found HITRAN Lines")
 
     # Plot assigned HITRAN lines
     for q in range(len(line_positions)):
@@ -1465,7 +1477,7 @@ def plot_compare_baselines(wavenumber_values: np.ndarray,
                            baseline_type_1: str,
                            corrected_signal_2: np.ndarray,
                            baseline_type_2: str,
-                           wavenumber_range: Union[list, np.ndarray] = None,
+                           wavenumber_range: Union[list, np.ndarray, None] = None,
                            fitting_method: str = 'lm'
                            ) -> None:
     """
