@@ -894,7 +894,7 @@ def plot_fitted_spectrum_bokeh(wavenumber_values: np.ndarray,
             logging.warning(f"Maximum value of wavenumber grid of data ({x_max:.3f} cm-1) does not reach maximum of specified range ({max_range:.3f} cm-1).")
 
         # Locate indices and splice
-        condition_range = (x_obs > min_range) & (x_obs < max_range)
+        condition_range = (x > min_range) & (x < max_range)
         x = x[condition_range]
         y = y[condition_range]
         y_fitted = y_fitted[condition_range]
@@ -1057,7 +1057,7 @@ def plot_fitted_spectrum_seaborn(wavenumber_values: np.ndarray,
             logging.warning(f"Maximum value of wavenumber grid of data ({x_max:.3f} cm-1) does not reach maximum of specified range ({max_range:.3f} cm-1).")
 
         # Locate indices and splice
-        condition_range = (x_obs > min_range) & (x_obs < max_range)
+        condition_range = (x > min_range) & (x < max_range)
         x = x[condition_range]
         y = y[condition_range]
         y_fitted = y_fitted[condition_range]
@@ -1203,7 +1203,7 @@ def plot_hitran_lines_bokeh(wavenumber_values: np.ndarray,
             logging.warning(f"Maximum value of wavenumber grid of data ({x_max:.3f} cm-1) does not reach maximum of specified range ({max_range:.3f} cm-1).")
 
         # Locate indices and splice
-        condition_range = (x_obs > min_range) & (x_obs < max_range)
+        condition_range = (x > min_range) & (x < max_range)
         x = x[condition_range]
         y = y[condition_range]
 
@@ -1364,7 +1364,7 @@ def plot_hitran_lines_seaborn(wavenumber_values: np.ndarray,
             logging.warning(f"Maximum value of wavenumber grid of data ({x_max:.3f} cm-1) does not reach maximum of specified range ({max_range:.3f} cm-1).")
 
         # Locate indices and splice
-        condition_range = (x_obs > min_range) & (x_obs < max_range)
+        condition_range = (x > min_range) & (x < max_range)
         x = x[condition_range]
         y = y[condition_range]
 
@@ -1454,7 +1454,7 @@ def plot_auto_peaks_bokeh(x_obs, y_obs, peaks):
 
     # Add the line plot
     p.line('x', 'y', source=source, line_width=2, line_color='green', alpha=0.6,
-        legend_label=f"Spectrum")
+        legend_label=f"Smoothed Spectrum")
 
     # Plot peaks
     # Overlay small square and larger cross markers
@@ -1521,7 +1521,7 @@ def plot_compare_baselines(wavenumber_values: np.ndarray,
             logging.warning(f"Maximum value of wavenumber grid of data ({x_max:.3f} cm-1) does not reach maximum of specified range ({max_range:.3f} cm-1).")
 
         # Locate indices and splice
-        condition_range = (x_obs > min_range) & (x_obs < max_range)
+        condition_range = (x > min_range) & (x < max_range)
         x = x[condition_range]
         y1 = y1[condition_range]
         y2 = y2[condition_range]

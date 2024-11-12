@@ -347,7 +347,7 @@ class LineAssigner:
 
 
         if __plot__: 
-            plot_auto_peaks_bokeh(x_obs, y_obs, peaks)
+            plot_auto_peaks_bokeh(x_obs, y_obs_smoothed, peaks)
 
         peak_centers = x_obs[peaks[::-1]] # reverse peaks
         peak_heights = y_obs[peaks[::-1]]
