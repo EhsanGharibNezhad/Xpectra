@@ -34,7 +34,8 @@ import matplotlib.pyplot as plt
 import matplotlib.gridspec as gridspec
 from matplotlib.ticker import MaxNLocator
 
-
+import logging
+logging.basicConfig(level=logging.WARNING, format='%(levelname)s: %(message)s')
 
 
 def print_spectral_info(wavenumber_values: np.ndarray,
@@ -183,7 +184,7 @@ def plot_spectra_errorbar_bokeh(wavenumber_values: np.ndarray,
     signal_values : np.ndarray
         Signal arrays (input data).
     wavenumber_range : list-like, optional
-        List-like object (list, tuple, or np.ndarray) with of length 2 representing wavenumber range for plotting.
+        Ascending list or np.ndarray with of length 2 representing wavenumber range for plotting.
     signal_values_err : np.ndarray, optional
         Error on input data.
     absorber_name : str, optional
@@ -203,15 +204,33 @@ def plot_spectra_errorbar_bokeh(wavenumber_values: np.ndarray,
     y_obs = signal_values
     y_obs_err = signal_values_err
 
-    # Trim x and y to desired wavelength range
+    # Trim x and y to desired wavelength range, check formatting and values
     if wavenumber_range is not None:
+
+        x_min, x_max = np.min(x_obs), np.max(x_obs)
+        min_range, max_range = wavenumber_range[0], wavenumber_range[1]
+
         # Make sure range is in correct format
         if len(wavenumber_range) != 2:
-            raise ValueError('wavenumber_range must be tuple, list, or array with 2 elements')
+            raise ValueError('wavenumber_range must be list or np.ndarray with 2 elements')
+        if min_range > max_range:
+            raise ValueError('Elements in wavenumber_range must be ascending.')
+        # Raise error if range is completely outside data
+        if max_range < x_min or min_range > x_max:
+            raise ValueError(f'wavenumber_range ({min_range:.3f} - {max_range:.3f} cm-1) is completely outside data range ({x_min:.3f} - {x_max:.3f} cm-1)')
+
+        # Warning if wavenumber range is wider than data 
+        elif x_min > min_range:
+            logging.warning(f"Minimum value of wavenumber grid of data ({x_min:.3f} cm-1) does not reach minimum of specified range ({min_range:.3f} cm-1).")
+        elif x_max < max_range:
+            logging.warning(f"Maximum value of wavenumber grid of data ({x_max:.3f} cm-1) does not reach maximum of specified range ({max_range:.3f} cm-1).")
+
         # Locate indices and splice
-        condition_range = (x_obs > wavenumber_range[0]) & (x_obs < wavenumber_range[1])
+        condition_range = (x_obs > min_range) & (x_obs < max_range)
         x_obs = x_obs[condition_range]
         y_obs = y_obs[condition_range]
+        y_obs_err = y_obs_err[condition_range]
+
 
     # Create the figure
     p = figure(title=f"{molecule_name}: Calibrated Laboratory Spectra" if title_label is None else title_label,
@@ -290,7 +309,7 @@ def plot_spectra_errorbar_seaborn(wavenumber_values: np.ndarray,
     signal_values : nd.array
         Signal arrays (input data).
     wavenumber_range : list-like, optional
-        List-like object (list or np.ndarray) with of length 2 representing wavenumber range for plotting.
+        Ascending list or np.ndarray with of length 2 representing wavenumber range for plotting.
     signal_values_err : nd.array, optional
         Error on input data.
     absorber_name : str, optional
@@ -314,15 +333,33 @@ def plot_spectra_errorbar_seaborn(wavenumber_values: np.ndarray,
     y_obs = signal_values
     y_obs_err = signal_values_err
 
-    # Trim x and y to desired wavelength range
+    # Trim x and y to desired wavelength range, check formatting and values
     if wavenumber_range is not None:
+
+        x_min, x_max = np.min(x_obs), np.max(x_obs)
+        min_range, max_range = wavenumber_range[0], wavenumber_range[1]
+
         # Make sure range is in correct format
         if len(wavenumber_range) != 2:
-            raise ValueError('wavenumber_range must be tuple, list, or array with 2 elements')
+            raise ValueError('wavenumber_range must be list or np.ndarray with 2 elements')
+        if min_range > max_range:
+            raise ValueError('Elements in wavenumber_range must be ascending.')
+        # Raise error if range is completely outside data
+        if max_range < x_min or min_range > x_max:
+            raise ValueError(f'wavenumber_range ({min_range:.3f} - {max_range:.3f} cm-1) is completely outside data range ({x_min:.3f} - {x_max:.3f} cm-1)')
+
+        # Warning if wavenumber range is wider than data 
+        elif x_min > min_range:
+            logging.warning(f"Minimum value of wavenumber grid of data ({x_min:.3f} cm-1) does not reach minimum of specified range ({min_range:.3f} cm-1).")
+        elif x_max < max_range:
+            logging.warning(f"Maximum value of wavenumber grid of data ({x_max:.3f} cm-1) does not reach maximum of specified range ({max_range:.3f} cm-1).")
+
         # Locate indices and splice
-        condition_range = (x_obs > wavenumber_range[0]) & (x_obs < wavenumber_range[1])
+        condition_range = (x_obs > min_range) & (x_obs < max_range)
         x_obs = x_obs[condition_range]
         y_obs = y_obs[condition_range]
+        y_obs_err = y_obs_err[condition_range]
+
 
     fig, ax1 = plt.subplots(figsize=(10, 4),dpi=700)
 
@@ -778,7 +815,7 @@ def plot_fitted_als_seaborn(wavenumber_values: np.ndarray,
 def plot_fitted_spectrum_bokeh(wavenumber_values: np.ndarray, 
                                signal_values: np.ndarray,
                                fitted_params: np.ndarray,
-                               wavenumber_range: Union[list, tuple, np.ndarray] = None,
+                               wavenumber_range: Union[list, np.ndarray] = None,
                                line_profile: str = 'gaussian',
                                fitting_method: str = 'lm'
                                ) -> None:
@@ -794,7 +831,7 @@ def plot_fitted_spectrum_bokeh(wavenumber_values: np.ndarray,
     fitted_params : list
         List of fitted parameters of the line profile.
     wavenumber_range : list-like, optional
-        List-like object (list, tuple, or np.ndarray) with of length 2 representing wavenumber range for plotting.
+        Ascending list or np.ndarray with of length 2 representing wavenumber range for plotting.
     line_profile : str, {'gaussian', 'lorentzian', 'voigt'}, optional
         Type of line profile to use for fitting. Default is 'gaussian'.
     """
@@ -820,6 +857,36 @@ def plot_fitted_spectrum_bokeh(wavenumber_values: np.ndarray,
             z = ((x - center) + 1j * gamma) / (sigma * np.sqrt(2))
             y_fitted += amplitude * np.real(wofz(z)).astype(float) / (sigma * np.sqrt(2 * np.pi))
 
+    # Calculate RMSE
+    rmse_value = np.sqrt(((y_fitted - y) ** 2).mean())
+
+    # Trim x and y to desired wavelength range, check formatting and values
+    if wavenumber_range is not None:
+
+        x_min, x_max = np.min(x), np.max(x)
+        min_range, max_range = wavenumber_range[0], wavenumber_range[1]
+
+        # Make sure range is in correct format
+        if len(wavenumber_range) != 2:
+            raise ValueError('wavenumber_range must be list or np.ndarray with 2 elements')
+        if min_range > max_range:
+            raise ValueError('Elements in wavenumber_range must be ascending.')
+        # Raise error if range is completely outside data
+        if max_range < x_min or min_range > x_max:
+            raise ValueError(f'wavenumber_range ({min_range:.3f} - {max_range:.3f} cm-1) is completely outside data range ({x_min:.3f} - {x_max:.3f} cm-1)')
+
+        # Warning if wavenumber range is wider than data 
+        elif x_min > min_range:
+            logging.warning(f"Minimum value of wavenumber grid of data ({x_min:.3f} cm-1) does not reach minimum of specified range ({min_range:.3f} cm-1).")
+        elif x_max < max_range:
+            logging.warning(f"Maximum value of wavenumber grid of data ({x_max:.3f} cm-1) does not reach maximum of specified range ({max_range:.3f} cm-1).")
+
+        # Locate indices and splice
+        condition_range = (x_obs > min_range) & (x_obs < max_range)
+        x = x[condition_range]
+        y = y[condition_range]
+        y_fitted = y_fitted[condition_range]
+
     # Calculate residual
     residual = y - y_fitted
 
@@ -832,9 +899,6 @@ def plot_fitted_spectrum_bokeh(wavenumber_values: np.ndarray,
     source_p1 = ColumnDataSource(data=dict(x=x, y=y, y_fitted=y_fitted))
     source_p2 = ColumnDataSource(data=dict(x=x, residual=residual))
 
-    # Calculate RMSE
-    rmse_value = np.sqrt(((y_fitted - y) ** 2).mean())
-
    # Create a new plot with a title and axis labels
     p1 = figure(title=f"Spectra with Fitted {line_profile.capitalize()} Peaks - RMSE = {rmse_value:.2f}",
                y_axis_label="Signal",
@@ -842,17 +906,6 @@ def plot_fitted_spectrum_bokeh(wavenumber_values: np.ndarray,
                x_range=x_range, 
                y_axis_type="linear",
                tools="pan,wheel_zoom,box_zoom,reset")
-
-    # Trim x and y to desired wavelength range
-    if wavenumber_range is not None:
-        # Make sure range is in correct format
-        if len(wavenumber_range) != 2:
-            raise ValueError('wavenumber_range must be tuple, list, or array with 2 elements')
-        # Locate indices and splice
-        condition_range = (x > wavenumber_range[0]) & (x < wavenumber_range[1])
-        x = x[condition_range]
-        y = y[condition_range]
-        y_fitted = y_fitted[condition_range]
 
     # Add the original or baseline-corrected spectrum to the plot
     p1.line('x', 'y', legend_label="Spectrum", line_width=2, color="blue", source=source_p1)
@@ -922,7 +975,7 @@ def plot_fitted_spectrum_bokeh(wavenumber_values: np.ndarray,
 def plot_fitted_spectrum_seaborn(wavenumber_values: np.ndarray, 
                                  signal_values: np.ndarray,
                                  fitted_params: np.ndarray,
-                                 wavenumber_range: Union[list, tuple, np.ndarray] = None,
+                                 wavenumber_range: Union[list, np.ndarray] = None,
                                  line_profile: str = 'gaussian',
                                  fitting_method: str = 'lm',
                                  __save_plots__: bool = False,
@@ -941,7 +994,7 @@ def plot_fitted_spectrum_seaborn(wavenumber_values: np.ndarray,
     fitted_params : list
         List of fitted parameters of the line profile.
     wavenumber_range : list-like, optional
-        List-like object (list, tuple, or np.ndarray) with of length 2 representing wavenumber range for plotting.
+        Ascending list or np.ndarray with of length 2 representing wavenumber range for plotting.
     line_profile : str, {'gaussian', 'lorentzian', 'voigt'}, optional
         Type of line profile to use for fitting. Default is 'gaussian'.
     """
@@ -970,13 +1023,29 @@ def plot_fitted_spectrum_seaborn(wavenumber_values: np.ndarray,
     # Calculate RMSE
     rmse_value = np.sqrt(((y_fitted - y) ** 2).mean())
 
-    # Trim x and y to desired wavelength range for plotting
+    # Trim x and y to desired wavelength range, check formatting and values
     if wavenumber_range is not None:
+
+        x_min, x_max = np.min(x), np.max(x)
+        min_range, max_range = wavenumber_range[0], wavenumber_range[1]
+
         # Make sure range is in correct format
         if len(wavenumber_range) != 2:
-            raise ValueError('wavenumber_range must be tuple, list, or array with 2 elements')
+            raise ValueError('wavenumber_range must be list or np.ndarray with 2 elements')
+        if min_range > max_range:
+            raise ValueError('Elements in wavenumber_range must be ascending.')
+        # Raise error if range is completely outside data
+        if max_range < x_min or min_range > x_max:
+            raise ValueError(f'wavenumber_range ({min_range:.3f} - {max_range:.3f} cm-1) is completely outside data range ({x_min:.3f} - {x_max:.3f} cm-1)')
+
+        # Warning if wavenumber range is wider than data 
+        elif x_min > min_range:
+            logging.warning(f"Minimum value of wavenumber grid of data ({x_min:.3f} cm-1) does not reach minimum of specified range ({min_range:.3f} cm-1).")
+        elif x_max < max_range:
+            logging.warning(f"Maximum value of wavenumber grid of data ({x_max:.3f} cm-1) does not reach maximum of specified range ({max_range:.3f} cm-1).")
+
         # Locate indices and splice
-        condition_range = (x > wavenumber_range[0]) & (x < wavenumber_range[1])
+        condition_range = (x_obs > min_range) & (x_obs < max_range)
         x = x[condition_range]
         y = y[condition_range]
         y_fitted = y_fitted[condition_range]
@@ -1050,7 +1119,7 @@ def plot_hitran_lines_bokeh(wavenumber_values: np.ndarray,
                               signal_values: np.ndarray, 
                               fitted_hitran: pd.DataFrame,
                               columns_to_print: Union[List[str]],
-                              wavenumber_range: Union[list, tuple, np.ndarray] = None,
+                              wavenumber_range: Union[list, np.ndarray] = None,
                               line_profile: str = 'gaussian',
                               fitting_method: str = 'lm',
                               absorber_name: str = None
@@ -1072,7 +1141,7 @@ def plot_hitran_lines_bokeh(wavenumber_values: np.ndarray,
     columns_to_print : list
         Columns to print corresponding to line positions. 
     wavenumber_range : list-like, optional
-        List-like object (list, tuple, or np.ndarray) with of length 2 representing wavenumber range for plotting.
+        Ascending list or np.ndarray with of length 2 representing wavenumber range for plotting.
     line_profile : str, {'gaussian', 'lorentzian', 'voigt'}, optional
         Type of line profile to use for fitting. Default is 'gaussian'.
     """
@@ -1100,13 +1169,29 @@ def plot_hitran_lines_bokeh(wavenumber_values: np.ndarray,
     # Make iterable array of text for found lines 
     print_columns = pd.concat(formatted_columns, axis=1).to_numpy()[id_found]
 
-    # Trim x and y to desired wavelength range
+    # Trim x and y to desired wavelength range, check formatting and values
     if wavenumber_range is not None:
+
+        x_min, x_max = np.min(x), np.max(x)
+        min_range, max_range = wavenumber_range[0], wavenumber_range[1]
+
         # Make sure range is in correct format
         if len(wavenumber_range) != 2:
-            raise ValueError('wavenumber_range must be tuple, list, or array with 2 elements')
+            raise ValueError('wavenumber_range must be list or np.ndarray with 2 elements')
+        if min_range > max_range:
+            raise ValueError('Elements in wavenumber_range must be ascending.')
+        # Raise error if range is completely outside data
+        if max_range < x_min or min_range > x_max:
+            raise ValueError(f'wavenumber_range ({min_range:.3f} - {max_range:.3f} cm-1) is completely outside data range ({x_min:.3f} - {x_max:.3f} cm-1)')
+
+        # Warning if wavenumber range is wider than data 
+        elif x_min > min_range:
+            logging.warning(f"Minimum value of wavenumber grid of data ({x_min:.3f} cm-1) does not reach minimum of specified range ({min_range:.3f} cm-1).")
+        elif x_max < max_range:
+            logging.warning(f"Maximum value of wavenumber grid of data ({x_max:.3f} cm-1) does not reach maximum of specified range ({max_range:.3f} cm-1).")
+
         # Locate indices and splice
-        condition_range = (x > wavenumber_range[0]) & (x < wavenumber_range[1])
+        condition_range = (x_obs > min_range) & (x_obs < max_range)
         x = x[condition_range]
         y = y[condition_range]
 
@@ -1189,7 +1274,7 @@ def plot_hitran_lines_seaborn(wavenumber_values: np.ndarray,
                               signal_values: np.ndarray, 
                               fitted_hitran: pd.DataFrame,
                               columns_to_print: Union[List[str]],
-                              wavenumber_range: Union[list, tuple, np.ndarray] = None,
+                              wavenumber_range: Union[list, np.ndarray] = None,
                               line_profile: str = 'gaussian',
                               fitting_method: str = 'lm',
                               absorber_name: str = None,
@@ -1214,7 +1299,7 @@ def plot_hitran_lines_seaborn(wavenumber_values: np.ndarray,
     columns_to_print : str or list
         Columns to print corresponding to line positions. 
     wavenumber_range : list-like, optional
-        List-like object (list, tuple, or np.ndarray) with of length 2 representing wavenumber range for plotting.
+        Ascending list or np.ndarray with of length 2 representing wavenumber range for plotting.
     line_profile : str, {'gaussian', 'lorentzian', 'voigt'}, optional
         Type of line profile to use for fitting. Default is 'gaussian'.
     """
@@ -1245,15 +1330,32 @@ def plot_hitran_lines_seaborn(wavenumber_values: np.ndarray,
     # Make iterable array of text for found lines 
     print_columns = pd.concat(formatted_columns, axis=1).to_numpy()[id_found]
 
-    # Trim x and y to desired wavelength range
+    # Trim x and y to desired wavelength range, check formatting and values
     if wavenumber_range is not None:
+
+        x_min, x_max = np.min(x), np.max(x)
+        min_range, max_range = wavenumber_range[0], wavenumber_range[1]
+
         # Make sure range is in correct format
         if len(wavenumber_range) != 2:
-            raise ValueError('wavenumber_range must be tuple, list, or array with 2 elements')
+            raise ValueError('wavenumber_range must be list or np.ndarray with 2 elements')
+        if min_range > max_range:
+            raise ValueError('Elements in wavenumber_range must be ascending.')
+        # Raise error if range is completely outside data
+        if max_range < x_min or min_range > x_max:
+            raise ValueError(f'wavenumber_range ({min_range:.3f} - {max_range:.3f} cm-1) is completely outside data range ({x_min:.3f} - {x_max:.3f} cm-1)')
+
+        # Warning if wavenumber range is wider than data 
+        elif x_min > min_range:
+            logging.warning(f"Minimum value of wavenumber grid of data ({x_min:.3f} cm-1) does not reach minimum of specified range ({min_range:.3f} cm-1).")
+        elif x_max < max_range:
+            logging.warning(f"Maximum value of wavenumber grid of data ({x_max:.3f} cm-1) does not reach maximum of specified range ({max_range:.3f} cm-1).")
+
         # Locate indices and splice
-        condition_range = (x > wavenumber_range[0]) & (x < wavenumber_range[1])
+        condition_range = (x_obs > min_range) & (x_obs < max_range)
         x = x[condition_range]
         y = y[condition_range]
+
 
     # Create figure
     fig, ax = plt.subplots(figsize=(10, 6), dpi=700)
@@ -1363,7 +1465,7 @@ def plot_compare_baselines(wavenumber_values: np.ndarray,
                            baseline_type_1: str,
                            corrected_signal_2: np.ndarray,
                            baseline_type_2: str,
-                           wavenumber_range: Union[list, tuple, np.ndarray] = None,
+                           wavenumber_range: Union[list, np.ndarray] = None,
                            fitting_method: str = 'lm'
                            ) -> None:
     """
@@ -1376,7 +1478,7 @@ def plot_compare_baselines(wavenumber_values: np.ndarray,
     signal_values : np.ndarray
         Signal arrays (input data). 
     wavenumber_range : list-like, optional
-        List-like object (list, tuple, or np.ndarray) with of length 2 representing wavenumber range for plotting.
+        Ascending list or np.ndarray with of length 2 representing wavenumber range for plotting.
     line_profile : str, {'gaussian', 'lorentzian', 'voigt'}, optional
         Type of line profile to use for fitting. Default is 'gaussian'.
     """
@@ -1385,13 +1487,29 @@ def plot_compare_baselines(wavenumber_values: np.ndarray,
     y1 = corrected_signal_1
     y2 = corrected_signal_2
 
-    # Trim x and y to desired wavelength range
+    # Trim x and y to desired wavelength range, check formatting and values
     if wavenumber_range is not None:
+
+        x_min, x_max = np.min(x), np.max(x)
+        min_range, max_range = wavenumber_range[0], wavenumber_range[1]
+
         # Make sure range is in correct format
         if len(wavenumber_range) != 2:
-            raise ValueError('wavenumber_range must be tuple, list, or array with 2 elements')
+            raise ValueError('wavenumber_range must be list or np.ndarray with 2 elements')
+        if min_range > max_range:
+            raise ValueError('Elements in wavenumber_range must be ascending.')
+        # Raise error if range is completely outside data
+        if max_range < x_min or min_range > x_max:
+            raise ValueError(f'wavenumber_range ({min_range:.3f} - {max_range:.3f} cm-1) is completely outside data range ({x_min:.3f} - {x_max:.3f} cm-1)')
+
+        # Warning if wavenumber range is wider than data 
+        elif x_min > min_range:
+            logging.warning(f"Minimum value of wavenumber grid of data ({x_min:.3f} cm-1) does not reach minimum of specified range ({min_range:.3f} cm-1).")
+        elif x_max < max_range:
+            logging.warning(f"Maximum value of wavenumber grid of data ({x_max:.3f} cm-1) does not reach maximum of specified range ({max_range:.3f} cm-1).")
+
         # Locate indices and splice
-        condition_range = (x > wavenumber_range[0]) & (x < wavenumber_range[1])
+        condition_range = (x_obs > min_range) & (x_obs < max_range)
         x = x[condition_range]
         y1 = y1[condition_range]
         y2 = y2[condition_range]
