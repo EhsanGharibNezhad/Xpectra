@@ -283,12 +283,15 @@ def plot_spectra_errorbar_bokeh(wavenumber_values: np.ndarray,
         ]
     p.add_tools(hover)
 
+    # BROKEN:
+
     # Add a secondary x-axis with the transformation 10^4/x
-    x_transformed = [10**4 / x for x in x_obs]
-    p.extra_x_ranges = {"x_transformed": Range1d(start=min(x_transformed), end=max(x_transformed))}
+    #x_transformed = 10**4 / x_obs
+    #p.extra_x_ranges = {"x_transformed": Range1d(start=max(x_transformed), end=min(x_transformed))}
 
     # Create a new axis and map it to the new range
-    p.add_layout(LinearAxis(x_range_name="x_transformed", axis_label="Wavelength [μm]"), 'above')
+    #p.add_layout(LinearAxis(x_range_name="x_transformed", axis_label="Wavelength [μm]"), 'above')
+
 
     # Show the plot
     output_notebook()
@@ -399,13 +402,32 @@ def plot_spectra_errorbar_seaborn(wavenumber_values: np.ndarray,
     ax1.legend()
     ax1.grid(True)
 
-    # Add a twin x-axis with the transformation 10^4/x
+    # Add a twin x-axis for the transformation 10^4/x
     ax2 = ax1.twiny()
-    x_transformed = 10 ** 4 / x_obs
-    ax2.set_xlim(ax1.get_xlim())
-    ax2.set_xticks(ax1.get_xticks())
-    ax2.set_xticklabels([f'{10 ** 4 / tick:.3f}' for tick in ax1.get_xticks()])
+
+    # Set x ticks
+    xticks = ax1.get_xticks()
+    ax2.set_xticks(xticks) # must define xticks before changing labels
+
+    # Define x limits manually 
+    if wavenumber_range is not None:
+        x_min, x_max = np.min(x_obs), np.max(x_obs) # Defined previously is range specified
+    x_range = x_max - x_min
+    buffer = x_range * 0.05
+    xlim = (x_min-buffer, x_max+buffer)
+    
+    # ax1 xlim, xticks
+    ax1.set_xlim(xlim)
+    ax1.set_xticks(xticks)
+
+    # Add a twin x-axis for the transformation 10^4/x
+    transformed_ticklabels = [f'{(10**4 / tick):.3f}' if tick != 0 else '∞' for tick in xticks]
+    ax2.set_xticklabels(transformed_ticklabels)
     ax2.set_xlabel(r"Wavelength [$\mu$m]", fontsize=12)
+
+    # Reset limits to cut off excess space ticks created
+    ax1.set_xlim(xlim)
+    ax2.set_xlim(xlim)
 
     # Ticks (wavenumber)
     ax1.tick_params(axis='both', which='major', direction='in', length=8, width=1.5)
