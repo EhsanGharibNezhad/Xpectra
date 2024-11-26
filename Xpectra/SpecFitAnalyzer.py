@@ -150,15 +150,13 @@ class SpecFitAnalyzer:
         id_delete = np.unique(np.concatenate((id_negative, id_nan)))
         x_cleaned = np.delete(x, id_delete)
         y_cleaned = np.delete(y, id_delete)
-        
-        cleaned_spectrum = [x_cleaned, y_cleaned]
-
+    
         # Update instance attributes
         self.x_cleaned = x_cleaned
         self.y_cleaned = y_cleaned
 
-        # Return cleaned values 
-        return cleaned_spectrum
+
+        
 
 
     def fit_spectrum(self,
