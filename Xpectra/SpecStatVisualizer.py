@@ -158,8 +158,8 @@ def print_fitted_parameters_df(fitted_params: np.ndarray,
 
         peak_info = {
             'Peak Number': peak_number,
-            'center': round(params[0], 4),
-            'center Error': rounded_errors[0],
+            'Center': round(params[0], 4),
+            'Center Error': rounded_errors[0],
             'Intensity': round(params[1], 3),
             'Intensity Error': rounded_errors[1],
             'Width': round(params[2], 3),

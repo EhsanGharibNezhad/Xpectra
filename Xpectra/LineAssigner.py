@@ -492,7 +492,6 @@ class LineAssigner:
         if __print__:
             print('None')
 
-    # Modified to just use peak centers, and as input argument 
     def hitran_line_assigner(self,
                              filters: dict = None,
                              ierr_weights: bool = False, # broken if True
@@ -504,7 +503,8 @@ class LineAssigner:
                              __plot_bokeh__: bool = False,
                              __plot_seaborn__: bool = False,
                              __save_plot__: bool = False,
-                             __reference_data__: str = None):
+                             __reference_data__: str = None
+                             ):
         """
         Find the closest data points in the hitran DataFrame
         to multiple sets of fitted parameters, with weighted preference for earlier sets.
@@ -581,10 +581,10 @@ class LineAssigner:
             closest_data_point = hitran_df.iloc[closest_index].values
 
             # Data-model difference
-            difference = hitran_df["nu"].iloc[closest_index] - center
+            difference = abs(hitran_df["nu"].iloc[closest_index] - center)
 
             # Check the difference against the threshold
-            if abs(difference) > threshold:
+            if difference > threshold:
                 closest_data_points.append([np.nan] * len(hitran_df.columns))  # Add placeholder for no match
             else:
                 closest_data_points.append(closest_data_point)  # Add the closest data point if within threshold

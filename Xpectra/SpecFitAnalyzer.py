@@ -166,9 +166,9 @@ class SpecFitAnalyzer:
                      wavenumber_range: Union[list, tuple, np.ndarray] = None,
                      __plot_bokeh__: bool = False,
                      __plot_seaborn__: bool = False,
+                     __show_plots__: bool = True,
                      __save_plots__: bool = False,
                      __print__: bool = False,
-                     __show_plots__: bool = True,
                      ) -> None:
         """
         Fit a spectrum with multiple peaks using specified line profiles (gaussian, lorentzian, voigt).
@@ -221,7 +221,7 @@ class SpecFitAnalyzer:
             y = y[condition_range]
 
         
-        # error: range error with initial guesses
+        # error: add range error with initial guesses
 
 
         # Define line_profile_func
@@ -248,12 +248,12 @@ class SpecFitAnalyzer:
         self.covariance_matrices = np.array(covariance_matrices)
 
 
-        if __plot_bokeh__ == True:
+        if __plot_bokeh__:
             plot_fitted_spectrum_bokeh(x,y,fitted_params,
                 line_profile=line_profile,
                 fitting_method=fitting_method)
         
-        if __plot_seaborn__ == True:
+        if __plot_seaborn__:
             plot_fitted_spectrum_seaborn(x,y,fitted_params,
                 line_profile=line_profile,
                 fitting_method=fitting_method,
@@ -261,30 +261,8 @@ class SpecFitAnalyzer:
                 __reference_data__ = self.__reference_data__,
                 __show_plots__ = __show_plots__)
 
-        if __print__ == True:
-            
-            # Convert lists to arrays
-            guess_arr = np.array(initial_guesses)
-            fit_arr = np.array(fitted_params)
-
-            # Create dictionary with fitted vs. guessed params 
-            data = {
-                'center_guess': guess_arr[:,0],
-                'center_fit': fit_arr[:,0],
-                'intensity_guess': guess_arr[:,1],
-                'intensity_fit': fit_arr[:,1],
-                'width_guess': guess_arr[:,2],
-                'width_fit': fit_arr[:,2]
-            }
-
-            # Convert to DataFrame
-            df = pd.DataFrame(data)
-
-            # Show all rows
-            pd.set_option('display.max_rows', None)
-
-            display(df)
-            #print_fitted_parameters_df(fitted_params,covariance_matrices)
+        if __print__:
+            print_fitted_parameters_df(fitted_params,covariance_matrices)
 
 
 
