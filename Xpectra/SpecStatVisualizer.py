@@ -343,13 +343,13 @@ def plot_spectra_errorbar_seaborn(wavenumber_values: np.ndarray,
     molecule_name = symbol_dict.get(absorber_name, absorber_name)
 
     x_obs = wavenumber_values
+    x_min, x_max = np.min(x_obs), np.max(x_obs)
     y_obs = signal_values
     y_obs_err = signal_values_err
 
     # Trim x and y to desired wavelength range, check formatting and values
     if wavenumber_range is not None:
 
-        x_min, x_max = np.min(x_obs), np.max(x_obs)
         min_range, max_range = wavenumber_range[0], wavenumber_range[1]
 
         # Make sure range is in correct format
@@ -410,8 +410,6 @@ def plot_spectra_errorbar_seaborn(wavenumber_values: np.ndarray,
     ax2.set_xticks(xticks) # must define xticks before changing labels
 
     # Define x limits manually 
-    if wavenumber_range is not None:
-        x_min, x_max = np.min(x_obs), np.max(x_obs) # Defined previously is range specified
     x_range = x_max - x_min
     buffer = x_range * 0.05
     xlim = (x_min-buffer, x_max+buffer)
