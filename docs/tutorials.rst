@@ -3,35 +3,70 @@ Tutorials
 
 
 
-Explore Laboratory Spectra
+1. Explore Laboratory Spectra
+------------------------------
+.. toctree::
+   :maxdepth: 1
+
+    Explore Laboratory Spectra  <tutorials/1_Explore_Lab_Spectra.ipynb>
+
+
+
+
+2. Correct Spectral Baseline
+-----------------------------
+.. toctree::
+   :maxdepth: 1
+
+    Correct Spectral Baseline  <tutorials/2_Correct_Spectral_Baseline.ipynb>
+
+
+
+
+3. Identify Peaks Automatically
+--------------------------------
+.. toctree::
+   :maxdepth: 1
+
+    Identify Peaks Automatically  <tutorials/3_Identify_Peaks_Automatically_HITRAN.ipynb>
+
+
+
+
+4. Identify Peaks Manually
 ---------------------------
 .. toctree::
    :maxdepth: 1
 
-    Explore Laboratory Spectra  <tutorials/1__Explore_Laboratory_Spectra.ipynb>
+    Identify Peaks Manually  <tutorials/4_Identify_Peaks_Manually_HITRAN.ipynb>
 
 
 
 
-Assign Spectral Lines
-------------------------
+5. Calculate Pressure Broadening
+---------------------------------
 .. toctree::
-   :maxdepth: 2
+   :maxdepth: 1
 
-   Assign Spectral Lines  <tutorials/2__Assign_Spectral_Lines.ipynb>
-
-
+    Calculate Pressure Broadening  <tutorials/5_Calculate_Pressure_Broadening.ipynb>
 
 
-Analyze Spectra
-----------------
+
+
+6. Handle Analyze Literature
+-----------------------------
 .. toctree::
-   :maxdepth: 2
+   :maxdepth: 1
 
-   Analyze Spectra  <tutorials/3__Analyze_Spectra.ipynb>
-
-
+    Handle Analyze Literature  <tutorials/6_handle_analyze_literature.ipynb>
 
 
 
+
+7. Update HITRAN Linelist
+--------------------------
+.. toctree::
+   :maxdepth: 1
+
+    Update HITRAN Linelist  <tutorials/7_Update_Hitran_Linelist.ipynb>
 
