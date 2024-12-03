@@ -1,5 +1,3 @@
-import pandas as pd
-import numpy as np
 import matplotlib.pyplot as plt
 
 # Needed for wavelet decomposition
@@ -26,6 +24,7 @@ from scipy import stats, optimize
 from scipy.optimize import curve_fit
 from scipy.special import wofz
 from scipy.stats import chi2
+
 from sklearn.metrics import r2_score, mean_squared_error, mean_absolute_error
 
 from typing import List, Union
@@ -35,19 +34,20 @@ from numpy.polynomial import Polynomial
 from .SpecStatVisualizer import *
 
 
-
-
 # Import local module
 # from io_funs import LoadSave
+
+
+
 
 class SpecFitAnalyzer:
     """
     Perform various tasks to process the lab spectra, including:
 
-    - Load the data
-    - Convert the units
-    - Visualize the data
-    - Label the quantum assignments
+    - Load/Save 
+    - Manipulate & Visualize
+    - Correct Spectral Baseline
+    - Fit Spectral Peaks
 
     Parameters
     ----------
@@ -59,19 +59,56 @@ class SpecFitAnalyzer:
         Wavenumber array in cm^-1.
     absorber_name : str, optional
         Molecule or atom name.
+    __reference_data__ : str, optional
+        Reference data path. 
+    y_baseline_corrected : np.ndarray, optional
+        Baseline-corrected signal. 
+    y_baseline_corrected_polynomial : np.ndarray, optional
+        Polylnomial baseline-corrected signal. 
+    baseline_degree : int, optional
+        Degree of fitted polynomial baseline.
+    y_baseline_corrected_sinusoidal : np.ndarray, optional
+        Sinusoidal baseline-corrected signal. 
+    y_baseline_corrected_spline : np.ndarray, optional
+        Spline baseline-corrected signal.
+    y_baseline_corrected_ALS : np.ndarray, optional
+        ALS baseline-corrected signal.
+    y_baseline_corrected_ARPLS : np.ndarray, optional
+        ARPLS baseline-corrected signal.
+    fitted_baseline_params : any, optional
+        Fitted baseline parameters. 
+    baseline_type : str, optional
+        Baseline-correction method.  
+    fitted_params : np.ndarray, optional
+        Fitted peak parameters according to specified line profile.
+    covariance_matrices : np.ndarray, optional
+        Covariance matrices according to fitted peak parameters. 
+    negative_indeces : np.ndarray, optional
+        Indeces of negative signal values from original spectrum. 
+    nan_indeces : np.ndarray, optional
+        Indeces of NAN signal values from original spectrum. 
+    x_cleaned : np.ndarray, optional
+        Wavenumber values with points containing negative/NAN signal values removed. 
+    y_cleaned : np.ndarray, optional
+        Signal values with points containing negative/NAN signal values removed. 
+
     """
 
     def __init__(
             self,
             signal_values: Union[np.ndarray, None] = None,
-            wavelength_names: Union[List[str], None] = None,
+            wavelength_names: Union[List[str], None] = None, # not used 
             wavenumber_values: Union[np.ndarray, None] = None,
             absorber_name: Union[str, None] = None,
+            __reference_data__: Union[str, None] = None,
+            y_baseline_corrected: Union[np.ndarray, None] = None,
     ):
         self.signal_values = signal_values
         self.wavelength_names = wavelength_names
         self.wavenumber_values = wavenumber_values
         self.absorber_name = absorber_name
+        self.__reference_data__ = __reference_data__
+        self.y_baseline_corrected = y_baseline_corrected
 
 
     def gaussian(self, x: np.ndarray, center: float, amplitude: float, width: float) -> np.ndarray:
@@ -95,14 +132,73 @@ class SpecFitAnalyzer:
         z = ((x - center) + 1j * gamma) / (sigma * np.sqrt(2))
         return amplitude * np.real(wofz(z)).astype(float) / (sigma * np.sqrt(2 * np.pi))
 
+    def check_negative_nan(self) -> None:
+        """
+        Check the spectral data for negative or NAN values, and report their location.
+
+        Parameters
+        ----------        
+        signal_values : np.ndarray, optional
+            Signal arrays (input data).
+        wavenumber_values : np.ndarray, optional
+            Wavenumber array in cm^-1.   
+
+        """
+
+        x = self.wavenumber_values
+        y = self.signal_values
+
+        # Identify negative or nan values
+        id_negative = np.where(y<0)[0]
+        id_nan = np.where(np.isnan(y))[0]
+
+        # Update instance attributes
+        self.negative_indeces = id_negative
+        self.nan_indeces = id_nan
+
+        # Print results:
+        
+        # NAN
+        if len(id_nan) == 0:
+            print('No NAN values.')
+        elif len(id_nan) != 0:
+            N = len(id_nan)
+            Ntot = len(x)
+            fraction = N/Ntot
+            print(f'{N} NAN values found ({fraction*100}% of data)')
+        
+        # Negative
+        if len(id_negative) == 0:
+            print('No negative values.')
+        elif len(id_negative) != 0:
+            N = len(id_negative)
+            Ntot = len(x)
+            fraction = N/Ntot
+            print(f'{N} negative values found ({fraction*100:.2f}% of data)')
+
+        # Delete any negative or NAN values
+        id_delete = np.unique(np.concatenate((id_negative, id_nan)))
+        x_cleaned = np.delete(x, id_delete)
+        y_cleaned = np.delete(y, id_delete)
+    
+        # Update instance attributes
+        self.x_cleaned = x_cleaned
+        self.y_cleaned = y_cleaned
+
+
+        
+
+
     def fit_spectrum(self,
                      initial_guesses: Union[list, np.ndarray],
                      line_profile: str = 'gaussian',
                      fitting_method: str = 'lm',
                      wavenumber_range: Union[list, tuple, np.ndarray] = None,
-                     __plot_bokeh__: bool = True,
+                     __plot_bokeh__: bool = False,
                      __plot_seaborn__: bool = False,
-                     __print__: bool = True
+                     __show_plots__: bool = True,
+                     __save_plots__: bool = False,
+                     __print__: bool = False,
                      ) -> None:
         """
         Fit a spectrum with multiple peaks using specified line profiles (gaussian, lorentzian, voigt).
@@ -154,6 +250,10 @@ class SpecFitAnalyzer:
             x = x[condition_range]
             y = y[condition_range]
 
+        
+        # error: add range error with initial guesses
+
+
         # Define line_profile_func
         if line_profile == 'gaussian':
             line_profile_func = self.gaussian
@@ -178,40 +278,21 @@ class SpecFitAnalyzer:
         self.covariance_matrices = np.array(covariance_matrices)
 
 
-        if __plot_bokeh__ == True:
+        if __plot_bokeh__:
             plot_fitted_spectrum_bokeh(x,y,fitted_params,
                 line_profile=line_profile,
                 fitting_method=fitting_method)
         
-        if __plot_seaborn__ == True:
+        if __plot_seaborn__:
             plot_fitted_spectrum_seaborn(x,y,fitted_params,
                 line_profile=line_profile,
-                fitting_method=fitting_method)
+                fitting_method=fitting_method,
+                __save_plots__ = __save_plots__,
+                __reference_data__ = self.__reference_data__,
+                __show_plots__ = __show_plots__)
 
-        if __print__ == True:
-            
-            # Convert lists to arrays
-            guess_arr = np.array(initial_guesses)
-            fit_arr = np.array(fitted_params)
-
-            # Create dictionary with fitted vs. guessed params 
-            data = {
-                'center_guess': guess_arr[:,0],
-                'center_fit': fit_arr[:,0],
-                'intensity_guess': guess_arr[:,1],
-                'intensity_fit': fit_arr[:,1],
-                'width_guess': guess_arr[:,2],
-                'width_fit': fit_arr[:,2]
-            }
-
-            # Convert to DataFrame
-            df = pd.DataFrame(data)
-
-            # Show all rows
-            pd.set_option('display.max_rows', None)
-
-            display(df)
-            #print_fitted_parameters_df(fitted_params,covariance_matrices)
+        if __print__:
+            print_fitted_parameters_df(fitted_params,covariance_matrices)
 
 
 
@@ -264,7 +345,7 @@ class SpecFitAnalyzer:
         self.fitted_baseline_params = p.convert().coef
         self.baseline_type = 'polynomial'
         self.baseline_degree = degree
-        self.y_baseline_corrected = y - p(x)
+        self.y_baseline_corrected_polynomial = y - p(x)
 
         if __plot_bokeh__:
             plot_baseline_fitting_bokeh(self.wavenumber_values, self.signal_values, 
@@ -317,7 +398,7 @@ class SpecFitAnalyzer:
         params, _ = curve_fit(sine_wave, x, y, p0=initial_guesses, maxfev=1000000)
         self.fitted_baseline_params = params
         self.baseline_type = 'sinusoidal'
-        self.y_baseline_corrected = y - sine_wave(x,*params)
+        self.y_baseline_corrected_sinusoidal = y - sine_wave(x,*params)
 
         if __plot_seaborn__:
             plot_baseline_fitting_seaborn(self.wavenumber_values, self.signal_values, 
@@ -362,7 +443,7 @@ class SpecFitAnalyzer:
         spline = UnivariateSpline(x, y, s=s)
         self.fitted_baseline_params = spline
         self.baseline_type = 'spline'
-        self.y_baseline_corrected = y - spline(x)
+        self.y_baseline_corrected_spline = y - spline(x)
 
         if __plot_seaborn__:
             plot_baseline_fitting_seaborn(self.wavenumber_values, self.signal_values, 
@@ -374,11 +455,14 @@ class SpecFitAnalyzer:
         return spline
 
 
+
     def als(self, 
             lam: float = 1e6, 
             p: float = 0.1, 
             itermax: int = 10, 
-            __plot__: bool = True
+            __plot__: bool = True,
+            __save_plots__: bool = False,
+            __print__: bool = False,
             ) -> None:
 
         r"""
@@ -434,18 +518,27 @@ class SpecFitAnalyzer:
             z = spsolve(Z, w * y)
             w = p * (y > z) + (1 - p) * (y < z)
 
-        self.y_baseline_corrected = y - z
+        y_baseline_corrected_ALS = y - z
+        self.y_baseline_corrected_ALS = y_baseline_corrected_ALS
         self.baseline_type = 'als'
 
         if __plot__:
-            plot_fitted_als_bokeh(x, y, z, baseline_type = 'als')
+            plot_fitted_als_seaborn(wavenumber_values=x, signal_values=y, fitted_baseline=z, 
+                __reference_data__=self.__reference_data__, baseline_type = 'als', 
+                __save_plots__=__save_plots__)
+
+        if __print__:
+            print('Fitting parameters...')
+            print('Metrics...')
 
 
     def arpls(self, 
               lam: float = 1e4, 
               ratio: float = 0.05, 
               itermax: int = 100, 
-              __plot__: bool = True
+              __plot__: bool = True,
+              __save_plots__: bool = False,
+              __print__: bool = False,
               ) -> None:
 
         r"""
@@ -508,11 +601,21 @@ class SpecFitAnalyzer:
                 break
             w = wt
 
-        self.y_baseline_corrected = y - z
+        y_baseline_corrected_ARPLS = y - z
+        self.y_baseline_corrected_ARPLS = y_baseline_corrected_ARPLS
         self.baseline_type = 'arpls'
 
         if __plot__:
-            plot_fitted_als_bokeh(x, y, z, baseline_type = 'arpls')
+            plot_fitted_als_seaborn(wavenumber_values=x, signal_values=y, fitted_baseline=z, 
+                __reference_data__=self.__reference_data__, baseline_type = 'arpls', 
+                __save_plots__=__save_plots__)
+
+        if __print__:
+            print('Fitting parameters...')
+            print('Metrics...')
+            
+            
+
 
 
 
