@@ -22,6 +22,7 @@ from bokeh.palettes import Category10, Category20, Turbo256
 from multiprocessing import Pool
 
 import time
+from typing import List, Union
 
 from .LineAssigner import *
 
@@ -43,13 +44,19 @@ class FitLiteratureData:
     Fit and plot literature data.
 
     Parameters
-    ----------
+    ----------    
     literature_file : str, optional
         Excel spreadsheet containing literature data.
     hitran_file : str, optional
         File path containing HITRAN data.
+    __reference_data__ : str, optional
+        Reference data path. 
+    line_assigner_instance : Xpectra.LineAssigner, optional
+        Instance of LineAssigner class for parsing linelist. 
     literature_df : pd.DataFrame, optional
         DataFrame containing literature data.
+    hitran_df : pd.DataFrame, optional
+        DataFrame containing parsed HITRAN linelist.
     """
 
     def __init__(self, 
@@ -74,12 +81,14 @@ class FitLiteratureData:
 
     @staticmethod
     def fit_Pbro_Pade(J, a0,a1,a2,a3,b1,b2,b3,b4): 
+        # 4th Pade equation. 
         X1 = a0 + (a1 *J) + (a2 *(J**2)) +  (a3* (J**3))
         X2 = 1 + (b1*J) + (b2 *(J**2)) +  (b3 *(J**3))+  (b4* (J**4))
         return (X1/X2)
 
     @staticmethod
     def fit_Pbro_Pade_shifted(J, a0,a1,a2,a3,b1,b2,b3,b4): 
+        # Shifted 4th Pade equation. 
         X1 = a0 + (a1 *J) + (a2 *(J**2)) +  (a3* (J**3))
         X2 = 1 + (b1*J) + (b2 *(J**2)) +  (b3 *(J**3))+  (b4* (J**4))
         min_=np.min(X1/X2)
@@ -91,6 +100,7 @@ class FitLiteratureData:
 
     @staticmethod
     def get_palette(num_categories):
+        # Get color palette based on number of categories. 
         if num_categories <= 10:
             return Category10[10]
         elif num_categories <= 20:
@@ -104,12 +114,17 @@ class FitLiteratureData:
         """
         Filter the DataFrame based on multiple column value pairs or conditions.
 
-        Parameters:
-        df (pd.DataFrame): The DataFrame to filter.
-        filters (dict): A dictionary where keys are column names and values are lists of values to filter by or conditions.
+        Parameters
+        ----------  
+        df : pd.DataFrame)
+            The DataFrame to filter.
+        filters : dict
+            A dictionary where keys are column names and values are lists of values to filter by or conditions.
 
-        Returns:
-        pd.DataFrame: The filtered DataFrame.
+        Returns
+        -------
+        filtered_df : pd.DataFrame
+            The filtered DataFrame.
         """
         if filters is None:
             return df
@@ -146,7 +161,27 @@ class FitLiteratureData:
 
 
     @staticmethod
-    def calculate_gamma_nT(J_low, sym_low, pb_coeffs):
+    def calculate_gamma_nT(J_low: float, 
+                            sym_low: str, 
+                            pb_coeffs: pd.DataFrame
+                            ) -> list:
+        """
+        Calculate gamma_H2, gamma_He, and n_T using fitted 4th pade coefficients for given symmetry and J values. 
+
+        Parameters
+        ----------  
+        J_low : float
+            Lower J number for calculation. 
+        sym_low : str
+            Lower symmetry for calculation. 
+        pb_coeffs : pd.DataFrame
+            DataFrame containing 4th pade coefficients. 
+
+        Returns
+        -------
+        [gamma_H2, gamma_He, n_T] : list
+            Calculated values.
+        """
         pbro = pb_coeffs
         if sym_low in ['F1', 'F2', 'A1', 'A2', 'E']:
             # Get the coefficients based on symmetry type
@@ -230,27 +265,27 @@ class FitLiteratureData:
 
 
     def plot_with_uncertainty(self,
-                             x_fit = None,
-                             param_to_fit = 'gamma_L [cm-1/atm]',
-                             param_to_fit_uncertainty = 'gamma_uncertainty',
+                             x_fit: Union[List, None] = None,
+                             param_to_fit: str = 'gamma_L [cm-1/atm]',
+                             param_to_fit_uncertainty: str = 'gamma_uncertainty',
                              #num_iterations = 5,
                              #x_fit_interation_bound = [5,20],
-                             param_to_sort = 'author',
+                             param_to_sort: str = 'author',
                              include_authors = None,
-                             filters = None, 
-                             drop_na_authors = True, 
-                             fit_4thPade = False,
-                             print_fitted_params = True,
-                             show_plot = True,
-                             save_plot = False,
-                             save_path = None,
+                             filters: Union[dict, None] = None, 
+                             drop_na_authors: bool = True, 
+                             fit_4thPade: bool = False,
+                             print_fitted_params: bool = True,
+                             show_plot: bool = True,
+                             save_plot: bool = False,
+                             save_path: str = None,
                              ):
         
         """
         Create a scatter plot with uncertainty bars and optionally fit data using a 4th order Pade equation.
 
-        Parameters:
-        ----------
+        Parameters
+        ----------    
         df : pd.DataFrame, optional
             The input DataFrame containing columns 'J_low', 'gamma_L [cm-1/atm]', and 'author'.
         x_fit : list or None, optional 
@@ -406,16 +441,37 @@ class FitLiteratureData:
 
 
     def plot_literature_hist(self,
-                            hist_param = 'J_low',
-                            hist_param_range = None,
-                            sort_by = 'author',
-                            filters = None,
-                            bins = 15,
-                            stat = 'count',
-                            dpi = 400):
+                            hist_param: str = 'J_low',
+                            hist_param_range: Union[List, None] = None,
+                            sort_by: str = 'author',
+                            filters: Union[dict, None] = None,
+                            bins: int = 15,
+                            stat: str = 'count',
+                            dpi: int = 400):
         
-        # Plot hist using seaborn hue to display distribution
+        """
+        Plot histogram using seaborn hue of any data from literature, color-coded. 
 
+        Parameters
+        ---------- 
+        hist_param : str, optional
+            Name of DataFrame column for plotting. Default is 'J_low'. 
+        hist_param_range: list, optional
+            Range for x-axis of histogram. Default is None.
+        sort_by : str, optional
+            Name of DataFrame column for sorting. Default is 'author'. 
+        filters : dict, optional
+            Dictionary containing filters for literature DataFrame. 
+        stat : str, optional
+            Aggregate statistic to compute in each bin. Options are {'count', 
+            'frequency', 'probability', 'percent', 'density'}. Default is 'count'.
+        bins : int, optonal
+            Number of bins. Default is 15.
+        dpi: int, optional
+            Resolution of the figure. Default is 400. 
+
+
+        """
         df = self.literature_df
 
         required_columns = [hist_param, sort_by]
@@ -448,22 +504,28 @@ class FitLiteratureData:
 
 
     def plot_fitted_value_seaborn(self, 
-                          df_pbro,
-                          y_param = 'gamma_L',
-                          J_range = [0,150],
+                          df_pbro: pd.DataFrame,
+                          y_param: str = 'gamma_L',
+                          J_range: list = [0,150],
                           __save_plot__: bool = False,
                           __show_plot__: bool = True
                           ):
         """
         Plot fitted n or gamma vs J_low, color-coded by symmetry
 
-        Parameters:
-        ----------
+
+        Parameters
+        ----------    
         df_pbro : pd.DataFrame
             DataFrame containing fitted coefficients.
-        y_param : {'gamma_L', 'n_T'}
-            Parameter to plot on y-axis.
-        J_range 
+        y_param : str, optional
+            Parameter to plot on y-axis, options are {'gamma_L', 'n_T'}.
+        J_range : list, optional
+            J number range to plot. Default is [0,150].
+        __save_plot__ : bool, optional
+            Defaults to False.
+        __show_plot__ : bool, optional
+            Defaults to True.
 
         """
 
@@ -494,21 +556,21 @@ class FitLiteratureData:
             plt.clf()
 
     def plot_fitted_value_bokeh(self, 
-                          df_pbro,
-                          y_param = 'gamma_L',
-                          J_range = [0,150],
+                          df_pbro: pd.DataFrame,
+                          y_param: str = 'gamma_L',
+                          J_range: list = [0,150],
                           ):
         """
         Plot fitted n or gamma vs J_low, color-coded by symmetry
 
-        Parameters:
-        ----------
+        Parameters
+        ----------    
         df_pbro : pd.DataFrame
             DataFrame containing fitted coefficients.
-        y_param : {'gamma_L', 'n_T'}
-            Parameter to plot on y-axis.
-        J_range 
-
+        y_param : str, optional
+            Parameter to plot on y-axis, options are {'gamma_L', 'n_T'}.
+        J_range : list, optional
+            J number range to plot. Default is [0,150].
         """
 
         J_arr = np.arange(*J_range)

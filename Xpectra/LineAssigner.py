@@ -41,6 +41,10 @@ from bokeh.io import push_notebook
 class LineAssigner:
     """
     Perform quantum assignments to fitted spectra. 
+    
+    - Load HITRAN linelist
+    - Find/tabulate spectral peaks
+    - Identify and assign found lines 
 
     Parameters
     ----------
@@ -51,14 +55,19 @@ class LineAssigner:
     absorber_name : str, optional
         Molecule or atom name.
     wavenumber_values : np.ndarray, optional
-        Wavenumber array in cm^-1
+        Wavenumber array in cm-1
     signal_values : np.ndarray, optional
         Signal arrays (input data)
-    
-    hitran_df : pd.DataFrame
-        DataFrame with columns ['amplitude', 'center', 'wing'].
-    fitted_hitran : pd.DataFrame
-
+    hitran_df : pd.DataFrame, optional
+        DataFrame containing parsed HITRAN line list.
+    fitted_hitran : pd.DataFrame, optional
+        DataFrame containing information for identified lines.
+    peak_centers_manual : np.ndarray, optional
+        Manually-found spectral peak locations in wavenumber (cm-1). 
+    peak_centers_auto : np.ndarray, optional
+        Autmoatically-found spectral peak locations in wavenumber (cm-1). 
+    peak_heights_auto : np.ndarray, optional 
+        Autmoatically-found spectral peak heights in signal units. 
     """
 
     def __init__(

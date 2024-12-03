@@ -44,9 +44,10 @@ class SpecFitAnalyzer:
     """
     Perform various tasks to process the lab spectra, including:
 
-    - Load/Save
+    - Load/Save 
     - Manipulate & Visualize
-    - Label the quantum assignments
+    - Correct Spectral Baseline
+    - Fit Spectral Peaks
 
     Parameters
     ----------
@@ -58,12 +59,45 @@ class SpecFitAnalyzer:
         Wavenumber array in cm^-1.
     absorber_name : str, optional
         Molecule or atom name.
+    __reference_data__ : str, optional
+        Reference data path. 
+    y_baseline_corrected : np.ndarray, optional
+        Baseline-corrected signal. 
+    y_baseline_corrected_polynomial : np.ndarray, optional
+        Polylnomial baseline-corrected signal. 
+    baseline_degree : int, optional
+        Degree of fitted polynomial baseline.
+    y_baseline_corrected_sinusoidal : np.ndarray, optional
+        Sinusoidal baseline-corrected signal. 
+    y_baseline_corrected_spline : np.ndarray, optional
+        Spline baseline-corrected signal.
+    y_baseline_corrected_ALS : np.ndarray, optional
+        ALS baseline-corrected signal.
+    y_baseline_corrected_ARPLS : np.ndarray, optional
+        ARPLS baseline-corrected signal.
+    fitted_baseline_params : any, optional
+        Fitted baseline parameters. 
+    baseline_type : str, optional
+        Baseline-correction method.  
+    fitted_params : np.ndarray, optional
+        Fitted peak parameters according to specified line profile.
+    covariance_matrices : np.ndarray, optional
+        Covariance matrices according to fitted peak parameters. 
+    negative_indeces : np.ndarray, optional
+        Indeces of negative signal values from original spectrum. 
+    nan_indeces : np.ndarray, optional
+        Indeces of NAN signal values from original spectrum. 
+    x_cleaned : np.ndarray, optional
+        Wavenumber values with points containing negative/NAN signal values removed. 
+    y_cleaned : np.ndarray, optional
+        Signal values with points containing negative/NAN signal values removed. 
+
     """
 
     def __init__(
             self,
             signal_values: Union[np.ndarray, None] = None,
-            wavelength_names: Union[List[str], None] = None,
+            wavelength_names: Union[List[str], None] = None, # not used 
             wavenumber_values: Union[np.ndarray, None] = None,
             absorber_name: Union[str, None] = None,
             __reference_data__: Union[str, None] = None,
@@ -98,7 +132,7 @@ class SpecFitAnalyzer:
         z = ((x - center) + 1j * gamma) / (sigma * np.sqrt(2))
         return amplitude * np.real(wofz(z)).astype(float) / (sigma * np.sqrt(2 * np.pi))
 
-    def check_negative_nan(self) -> List[np.ndarray]:
+    def check_negative_nan(self) -> None:
         """
         Check the spectral data for negative or NAN values, and report their location.
 
@@ -109,10 +143,6 @@ class SpecFitAnalyzer:
         wavenumber_values : np.ndarray, optional
             Wavenumber array in cm^-1.   
 
-        Returns
-        -------  
-        trimmed_spectrum : list
-            List of 2 arrays containing x_trimmed and y_trimmed
         """
 
         x = self.wavenumber_values
