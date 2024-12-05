@@ -67,7 +67,6 @@ class FitLiteratureData:
         self.literature_file = literature_file
         self.hitran_file = hitran_file
         self.__reference_data__ = __reference_data__
-        self.line_assigner_instance = LineAssigner(hitran_file = hitran_file) # Warning: from another module and could cause bugs
 
     def pb_excel_reader(self, sheet_name):
         """
@@ -146,14 +145,18 @@ class FitLiteratureData:
 
 
     def parse_hitran_file(self, 
-                        selected_columns = ['molec_id', 'local_iso_id', 
-                        'nu', 'sw', 'gamma_air','gamma_self', 'n_air', 
-                        'local_upper_quanta', 'local_lower_quanta']
+                        columns: Union[dict,None] = None,
                         ):
         """
         Using LineAssigner parse_file_to_dataframe, convert HITRAN file to DataFrame.
         """
-        df = self.line_assigner_instance.parse_file_to_dataframe(selected_columns=selected_columns)
+
+        self.line_assigner_instance = LineAssigner(hitran_file = self.hitran_file) # Warning: from another module and could cause bugs
+        
+        if columns:
+            df = self.line_assigner_instance.parse_file_to_dataframe(columns=columns)
+        else: 
+            df = self.line_assigner_instance.parse_file_to_dataframe()
 
         self.hitran_df = df
 
