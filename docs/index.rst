@@ -15,7 +15,7 @@ For analyzing exoplanetary spectra in the lab, providing insights into atmospher
 .. image:: figures/xpectra_flowchart_2.jpg
    :width: 600
 
-``Xpectra`` is a Python package comprising a series of modules, each equipped with specialized machine learning and statistical capabilities for conducting spectral analysis or Machine Learning (ML) tasks on molecular and atomic spectra recorded from laboratory spectroscopic measurements to understand the atmospheres of extrasolar planets and brown dwarfs.
+``Xpectra`` is a Python package comprising a series of modules, each equipped with curve fitting and statistical capabilities for conducting spectral analysis tasks on molecular and atomic spectra recorded from laboratory spectroscopic measurements to understand the atmospheres of extrasolar planets and brown dwarfs.
 The tasks executed by the ``Xpectra`` modules are outlined below:
 
 
