@@ -6,7 +6,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>In this notebook, we will: &mdash; Xpectra 0.0.0 documentation</title>
+  <title>7. Update Hitran Linelist &mdash; Xpectra 0.0.0 documentation</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=fa44fd50" />
       <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=e59714d7" />
       <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
@@ -26,7 +26,7 @@
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
     <link rel="next" title="The Modules" href="../code.html" />
-    <link rel="prev" title="The key tasks in this tutorial is to:" href="6_handle_analyze_literature.html" /> 
+    <link rel="prev" title="6. Load Reported Pressure-Broadening Data from Literature" href="6_handle_analyze_literature.html" /> 
 </head>
 
 <body class="wy-body-for-nav"> 
@@ -56,7 +56,7 @@
 <li class="toctree-l2"><a class="reference internal" href="../tutorials.html#identify-peaks-automatically">3. Identify Peaks Automatically</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../tutorials.html#identify-peaks-manually">4. Identify Peaks Manually</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../tutorials.html#calculate-pressure-broadening">5. Calculate Pressure Broadening</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../tutorials.html#handle-analyze-literature">6. Handle Analyze Literature</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../tutorials.html#handle-analyze-literature">6. Handle/Analyze Literature</a></li>
 <li class="toctree-l2 current"><a class="reference internal" href="../tutorials.html#update-hitran-linelist">7. Update HITRAN Linelist</a><ul class="current">
 <li class="toctree-l3 current"><a class="current reference internal" href="#"> Update HITRAN Linelist</a></li>
 </ul>
@@ -82,12 +82,12 @@
   <ul class="wy-breadcrumbs">
       <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
           <li class="breadcrumb-item"><a href="../tutorials.html">Tutorials</a></li>
-      <li class="breadcrumb-item active">In this notebook, we will:</li>
+      <li class="breadcrumb-item active"><strong>7.</strong> Update Hitran Linelist</li>
       <li class="wy-breadcrumbs-aside">
             <a href="../_sources/tutorials/7_Update_Hitran_Linelist.ipynb.txt" rel="nofollow"> View page source</a>
       </li>
   </ul><div class="rst-breadcrumbs-buttons" role="navigation" aria-label="Sequential page navigation">
-        <a href="6_handle_analyze_literature.html" class="btn btn-neutral float-left" title="The key tasks in this tutorial is to:" accesskey="p"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="6_handle_analyze_literature.html" class="btn btn-neutral float-left" title="6. Load Reported Pressure-Broadening Data from Literature" accesskey="p"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
         <a href="../code.html" class="btn btn-neutral float-right" title="The Modules" accesskey="n">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
   </div>
   <hr/>
@@ -99,25 +99,24 @@
 <p class="admonition-title">Note</p>
 <p><a class="reference external" href="https://github.com/EhsanGharibNezhad/Xpectra/tree/master/docs/tutorials/7_Update_Hitran_Linelist.ipynb">Download full notebook here</a></p>
 </div>
-<div style="border-radius: 10px; padding: 5px; background-color: lightblue; font-size:200%; text-align:left"><ol class="arabic simple" start="7">
-<li><p>Update Hitran Linelist</p></li>
-</ol>
-<div style="border-radius: 10px; padding: 10px; background-color: #eaeaea; font-size:100%; text-align:left"><section id="In-this-notebook,-we-will:">
-<h1>In this notebook, we will:<a class="headerlink" href="#In-this-notebook,-we-will:" title="Link to this heading">¶</a></h1>
+<section id="7.-Update-Hitran-Linelist">
+<h1><strong>7.</strong> Update Hitran Linelist<a class="headerlink" href="#7.-Update-Hitran-Linelist" title="Link to this heading">¶</a></h1>
+<hr class="docutils" />
+<section id="Table-of-Contents">
+<h2>Table of Contents<a class="headerlink" href="#Table-of-Contents" title="Link to this heading">¶</a></h2>
 <ul class="simple">
-<li><p>7.1 | Handle the HITRAN line list</p></li>
-<li><p>7.2 | Load HITRAN line list - parse file</p>
+<li><p><a class="reference internal" href="#7.1---Handle/load-HITRAN-linelist,-parse-file"><span class="std std-ref">7.1 | Handle/load the HITRAN line list- parse file</span></a></p>
 <ul>
 <li><p>Extracting J quantum number and symmetry from local quanta</p></li>
 </ul>
 </li>
-<li><p>7.3 | EDA on HITRAN data</p>
+<li><p><a class="reference internal" href="#7.2---EDA-on-HITRAN-data"><span class="std std-ref">7.2 | EDA on HITRAN data</span></a></p>
 <ul>
 <li><p>J_low, symmetry, etc.</p></li>
 </ul>
 </li>
-<li><p>7.4 | Load 4th Pade fitted pressure broadening coefficients</p></li>
-<li><p>7.5 | Update HITRAN with fitted pressure broadening data</p>
+<li><p><a class="reference internal" href="#7.3---Load-fitted-pressure-broadening-coefficients"><span class="std std-ref">7.3 | Load 4th Pade fitted pressure broadening coefficients</span></a></p></li>
+<li><p><a class="reference internal" href="#7.4---Update-HITRAN-with-fitted-P-bro-data"><span class="std std-ref">7.4 | Update HITRAN with fitted pressure broadening data</span></a></p>
 <ul>
 <li><p>Using fitted coefficients for each symmetry, calculate gamma_L for H2/He and calculate nT</p></li>
 <li><p>Update line-by-line</p></li>
@@ -149,7 +148,7 @@
 </style>
 <div>
     <a href="https://bokeh.org" target="_blank" class="bk-notebook-logo"></a>
-    <span id="f3aa12f3-c31a-46b3-827b-d3b675b1e748">Loading BokehJS ...</span>
+    <span id="f7328e72-7c48-475f-b907-9df23c32b128">Loading BokehJS ...</span>
 </div></div>
 </div>
 <div class="nboutput nblast docutils container">
@@ -322,7 +321,7 @@ const JS_MIME_TYPE = 'application/javascript';
      "</div>"}};
 
   function display_loaded(error = null) {
-    const el = document.getElementById("f3aa12f3-c31a-46b3-827b-d3b675b1e748");
+    const el = document.getElementById("f7328e72-7c48-475f-b907-9df23c32b128");
     if (el != null) {
       const html = (() => {
         if (typeof root.Bokeh === "undefined") {
@@ -456,7 +455,7 @@ function(Bokeh) {
       console.log("Bokeh: BokehJS failed to load within specified timeout.");
       root._bokeh_failed_load = true;
     } else if (force !== true) {
-      const cell = $(document.getElementById("f3aa12f3-c31a-46b3-827b-d3b675b1e748")).parents('.cell').data().cell;
+      const cell = $(document.getElementById("f7328e72-7c48-475f-b907-9df23c32b128")).parents('.cell').data().cell;
       cell.output_area.append_execute_result(NB_LOAD_WARNING)
     }
   }
@@ -473,7 +472,9 @@ function(Bokeh) {
 }(window));
 </script></div>
 </div>
-<div style="border-radius: 10px; padding: 5px; background-color: lightblue; font-size:170%; text-align:left"><p>7.1 Handle HITRAN linelist</p>
+</section>
+<section id="7.1---Handle/load-HITRAN-linelist,-parse-file">
+<h2><strong>7.1</strong> - Handle/load HITRAN linelist, parse file<a class="headerlink" href="#7.1---Handle/load-HITRAN-linelist,-parse-file" title="Link to this heading">¶</a></h2>
 <div class="nbinput nblast docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[2]:
 </pre></div>
@@ -486,7 +487,7 @@ function(Bokeh) {
 </pre></div>
 </div>
 </div>
-<div style="font-size:120%; text-align:left"><p><span class="math notranslate nohighlight">\(\rightarrow\)</span> Initialize class: FitLiteratureData</p>
+<p><span class="math notranslate nohighlight">\(\rightarrow\)</span> Initialize class: FitLiteratureData</p>
 <div class="nbinput nblast docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[3]:
 </pre></div>
@@ -497,8 +498,7 @@ function(Bokeh) {
 </pre></div>
 </div>
 </div>
-<div style="border-radius: 10px; padding: 5px; background-color: lightblue; font-size:170%; text-align:left"><p>7.2 Load HITRAN line list - parse file</p>
-<div style="font-size:120%; text-align:left"><p><span class="math notranslate nohighlight">\(\rightarrow\)</span> With the class initialized, lets load the line list into memory by parsing the file into a DataFrame.</p>
+<p><span class="math notranslate nohighlight">\(\rightarrow\)</span> With the class initialized, lets load the line list into memory by parsing the file into a DataFrame.</p>
 <p><span class="math notranslate nohighlight">\(\rightarrow\)</span> Here we are also extracting J_low and symmetry C_low from local quanta expression</p>
 <div class="nbinput nblast docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[4]:
@@ -509,8 +509,10 @@ function(Bokeh) {
 </pre></div>
 </div>
 </div>
-<div style="border-radius: 10px; padding: 5px; background-color: lightblue; font-size:170%; text-align:left"><p>7.3 EDA on HITRAN data</p>
-<div style="font-size:120%; text-align:left"><p><span class="math notranslate nohighlight">\(\rightarrow\)</span> Let’s explore the available data</p>
+</section>
+<section id="7.2---EDA-on-HITRAN-data">
+<h2><strong>7.2</strong> - EDA on HITRAN data<a class="headerlink" href="#7.2---EDA-on-HITRAN-data" title="Link to this heading">¶</a></h2>
+<p><span class="math notranslate nohighlight">\(\rightarrow\)</span> Let’s explore the available data</p>
 <div class="nbinput docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[5]:
 </pre></div>
@@ -547,11 +549,17 @@ function(Bokeh) {
       <th>local_iso_id</th>
       <th>nu</th>
       <th>sw</th>
+      <th>a</th>
       <th>gamma_air</th>
       <th>gamma_self</th>
+      <th>elower</th>
       <th>n_air</th>
-      <th>local_upper_quanta</th>
-      <th>local_lower_quanta</th>
+      <th>delta_air</th>
+      <th>...</th>
+      <th>iref</th>
+      <th>line_mixing_flag</th>
+      <th>gp</th>
+      <th>gpp</th>
       <th>J_low</th>
       <th>sym_low</th>
       <th>N_low</th>
@@ -567,11 +575,17 @@ function(Bokeh) {
       <td>2</td>
       <td>2900.000621</td>
       <td>1.825000e-25</td>
+      <td>0.023890</td>
       <td>0.049</td>
       <td>0.067</td>
+      <td>814.6845</td>
       <td>0.63</td>
-      <td>13A2  9</td>
-      <td>12A1  1</td>
+      <td>-0.0058</td>
+      <td>...</td>
+      <td>64</td>
+      <td>3</td>
+      <td>3253433.0</td>
+      <td>None</td>
       <td>12</td>
       <td>A1</td>
       <td>1</td>
@@ -585,11 +599,17 @@ function(Bokeh) {
       <td>2</td>
       <td>2900.005693</td>
       <td>6.307000e-27</td>
+      <td>0.005030</td>
       <td>0.047</td>
       <td>0.065</td>
+      <td>1096.0334</td>
       <td>0.62</td>
-      <td>14F1 40</td>
-      <td>14F2  3</td>
+      <td>-0.0058</td>
+      <td>...</td>
+      <td>64</td>
+      <td>3</td>
+      <td>3253433.0</td>
+      <td>None</td>
       <td>14</td>
       <td>F2</td>
       <td>3</td>
@@ -603,11 +623,17 @@ function(Bokeh) {
       <td>2</td>
       <td>2900.022027</td>
       <td>3.048000e-27</td>
+      <td>0.022620</td>
       <td>0.046</td>
       <td>0.060</td>
+      <td>1593.6378</td>
       <td>0.61</td>
-      <td>17F1 47</td>
-      <td>17F2  2</td>
+      <td>-0.0058</td>
+      <td>...</td>
+      <td>64</td>
+      <td>3</td>
+      <td>3253433.0</td>
+      <td>None</td>
       <td>17</td>
       <td>F2</td>
       <td>2</td>
@@ -621,11 +647,17 @@ function(Bokeh) {
       <td>1</td>
       <td>2900.027223</td>
       <td>1.891000e-25</td>
+      <td>0.000465</td>
       <td>0.048</td>
       <td>0.067</td>
+      <td>815.1315</td>
       <td>0.63</td>
-      <td>13F2 21</td>
-      <td>12F1  3</td>
+      <td>-0.0058</td>
+      <td>...</td>
+      <td>34</td>
+      <td>3</td>
+      <td>3245363.0</td>
+      <td>None</td>
       <td>12</td>
       <td>F1</td>
       <td>3</td>
@@ -639,11 +671,17 @@ function(Bokeh) {
       <td>2</td>
       <td>2900.035027</td>
       <td>1.905000e-25</td>
+      <td>0.067460</td>
       <td>0.040</td>
       <td>0.067</td>
+      <td>815.0317</td>
       <td>0.63</td>
-      <td>12E  25</td>
-      <td>12E   2</td>
+      <td>-0.0058</td>
+      <td>...</td>
+      <td>64</td>
+      <td>3</td>
+      <td>3253433.0</td>
+      <td>None</td>
       <td>12</td>
       <td>E</td>
       <td>2</td>
@@ -653,9 +691,10 @@ function(Bokeh) {
     </tr>
   </tbody>
 </table>
+<p>5 rows × 25 columns</p>
 </div></div>
 </div>
-<div style="font-size:120%; text-align:left"><p><span class="math notranslate nohighlight">\(\rightarrow\)</span> The quanta expressions are now seperated into their parts:</p>
+<p><span class="math notranslate nohighlight">\(\rightarrow\)</span> The quanta expressions are now separated into their parts:</p>
 <div class="nbinput docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[6]:
 </pre></div>
@@ -830,7 +869,7 @@ function(Bokeh) {
 array([&#39;A1&#39;, &#39;F2&#39;, &#39;F1&#39;, &#39;E&#39;, &#39;A2&#39;], dtype=object)
 </pre></div></div>
 </div>
-<div style="font-size:120%; text-align:left"><p><span class="math notranslate nohighlight">\(\rightarrow\)</span> The distribution and range of J quantum number in this HITRAN line list</p>
+<p><span class="math notranslate nohighlight">\(\rightarrow\)</span> The distribution and range of J quantum number in this HITRAN line list:</p>
 <div class="nbinput docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[8]:
 </pre></div>
@@ -847,7 +886,7 @@ array([&#39;A1&#39;, &#39;F2&#39;, &#39;F1&#39;, &#39;E&#39;, &#39;A2&#39;], dty
 <div class="prompt empty docutils container">
 </div>
 <div class="output_area docutils container">
-<img alt="../_images/tutorials_7_Update_Hitran_Linelist_17_0.png" src="../_images/tutorials_7_Update_Hitran_Linelist_17_0.png" />
+<img alt="../_images/tutorials_7_Update_Hitran_Linelist_16_0.png" src="../_images/tutorials_7_Update_Hitran_Linelist_16_0.png" />
 </div>
 </div>
 <div class="nbinput docutils container">
@@ -865,26 +904,38 @@ array([&#39;A1&#39;, &#39;F2&#39;, &#39;F1&#39;, &#39;E&#39;, &#39;A2&#39;], dty
 </div>
 <div class="output_area docutils container">
 <div class="highlight"><pre>
-molec_id              41628
-local_iso_id          41628
-nu                    41628
-sw                    41628
-gamma_air             41628
-gamma_self            41628
-n_air                 41628
-local_upper_quanta    41628
-local_lower_quanta    41628
-J_low                 41628
-sym_low               41628
-N_low                 41628
-J_up                  41628
-sym_up                41628
-N_up                  41628
+molec_id               41628
+local_iso_id           41628
+nu                     41628
+sw                     41628
+a                      41628
+gamma_air              41628
+gamma_self             41628
+elower                 41628
+n_air                  41628
+delta_air              41628
+global_upper_quanta    41628
+global_lower_quanta    41628
+local_upper_quanta     41628
+local_lower_quanta     41628
+ierr                   41628
+iref                   41628
+line_mixing_flag       41628
+gp                     41621
+gpp                        0
+J_low                  41628
+sym_low                41628
+N_low                  41628
+J_up                   41628
+sym_up                 41628
+N_up                   41628
 dtype: int64
 </pre></div></div>
 </div>
-<div style="border-radius: 10px; padding: 5px; background-color: lightblue; font-size:170%; text-align:left"><p>7.4 Load fitted pressure broadening coefficients</p>
-<div style="font-size:120%; text-align:left"><p><span class="math notranslate nohighlight">\(\rightarrow\)</span> Next, we will use parameters of the 4th Pade equation, fitted with literature, to update the HITRAN data. First, let’s import those coefficients we fitted in the last step:</p>
+</section>
+<section id="7.3---Load-fitted-pressure-broadening-coefficients">
+<h2><strong>7.3</strong> - Load fitted pressure broadening coefficients<a class="headerlink" href="#7.3---Load-fitted-pressure-broadening-coefficients" title="Link to this heading">¶</a></h2>
+<p><span class="math notranslate nohighlight">\(\rightarrow\)</span> Next, we will use parameters of the 4th Pade equation, fitted with literature in previous notebook, to update the HITRAN data. First, let’s import those coefficients we fitted in the last step:</p>
 <div class="nbinput nblast docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[10]:
 </pre></div>
@@ -1053,8 +1104,10 @@ dtype: int64
 </table>
 </div></div>
 </div>
-<div style="border-radius: 10px; padding: 5px; background-color: lightblue; font-size:170%; text-align:left"><p>7.5 Update HITRAN with fitted P-bro data</p>
-<div style="font-size:120%; text-align:left"><p><span class="math notranslate nohighlight">\(\rightarrow\)</span> HITRAN line lists can be very large for a given molecule and wavenumber range, often including millions of lines.</p>
+</section>
+<section id="7.4---Update-HITRAN-with-fitted-P-bro-data">
+<h2><strong>7.4</strong> - Update HITRAN with fitted P-bro data<a class="headerlink" href="#7.4---Update-HITRAN-with-fitted-P-bro-data" title="Link to this heading">¶</a></h2>
+<p><span class="math notranslate nohighlight">\(\rightarrow\)</span> HITRAN line lists can be very large for a given molecule and wavenumber range, often including millions of lines.</p>
 <p><span class="math notranslate nohighlight">\(\rightarrow\)</span> Because of this, since we want to perform a calculation on each line, we’ll use multiprocessing for this task. Parallization decreases the time to process significantly and doesn’t overload memory.</p>
 <p><span class="math notranslate nohighlight">\(\rightarrow\)</span> We modify each line from the HITRAN file, calculating gamma_h2, gamma_he, and n_T from J_low and sym_low, and load into a new text file.</p>
 <div class="nbinput nblast docutils container">
@@ -1068,32 +1121,21 @@ dtype: int64
 </pre></div>
 </div>
 </div>
-<section id="Check-the-output:-Updated-HITRAN-line-list">
-<h2>Check the output: Updated HITRAN line list<a class="headerlink" href="#Check-the-output:-Updated-HITRAN-line-list" title="Link to this heading">¶</a></h2>
+<p><strong>Check the output: Updated HITRAN line list</strong></p>
 <div class="nbinput nblast docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[13]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Define how to parse df</span>
-<span class="k">def</span> <span class="nf">parse_file_to_dataframe</span><span class="p">(</span><span class="n">input_file</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Parse an input file into a pandas DataFrame based on specified columns.</span>
-
-<span class="sd">    Parameters</span>
-<span class="sd">    ----------</span>
-<span class="sd">    input_file : str</span>
-<span class="sd">        Path to the input file to parse.</span>
-<span class="sd">    selected_columns : list</span>
-<span class="sd">        List of column names to select from the input file. Default is</span>
-<span class="sd">        [&#39;local_iso_id&#39;,&#39;nu&#39;,&#39;sw&#39;,&#39;gamma_air&#39;,&#39;local_upper_quanta&#39;].</span>
-
-<span class="sd">    Returns</span>
-<span class="sd">    -------</span>
-<span class="sd">    df : pandas.DataFrame</span>
-<span class="sd">        DataFrame containing parsed data from the input file.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-    <span class="c1"># Define the formats and the ranges for the columns</span>
-    <span class="n">columns</span> <span class="o">=</span> <span class="p">{</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Change file path</span>
+<span class="n">update_hitran</span><span class="o">.</span><span class="n">hitran_file</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">__reference_data_path__</span><span class="p">,</span> <span class="s1">&#39;outputs&#39;</span><span class="p">,</span> <span class="s1">&#39;output_v3.txt&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[14]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">columns</span> <span class="o">=</span> <span class="p">{</span>
         <span class="s1">&#39;molec_id&#39;</span><span class="p">:</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="nb">int</span><span class="p">,</span> <span class="s2">&quot;</span><span class="si">%2d</span><span class="s2">&quot;</span><span class="p">),</span>
         <span class="s1">&#39;local_iso_id&#39;</span><span class="p">:</span> <span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="nb">int</span><span class="p">,</span> <span class="s2">&quot;</span><span class="si">%1d</span><span class="s2">&quot;</span><span class="p">),</span>
         <span class="s1">&#39;nu&#39;</span><span class="p">:</span> <span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="mi">15</span><span class="p">,</span> <span class="nb">float</span><span class="p">,</span> <span class="s2">&quot;</span><span class="si">%12.6f</span><span class="s2">&quot;</span><span class="p">),</span>
@@ -1113,34 +1155,17 @@ dtype: int64
         <span class="s1">&#39;line_mixing_flag&#39;</span><span class="p">:</span> <span class="p">(</span><span class="mi">130</span><span class="p">,</span> <span class="mi">131</span><span class="p">,</span> <span class="nb">str</span><span class="p">,</span> <span class="s2">&quot;</span><span class="si">%1s</span><span class="s2">&quot;</span><span class="p">),</span>
         <span class="s1">&#39;gp&#39;</span><span class="p">:</span> <span class="p">(</span><span class="mi">131</span><span class="p">,</span> <span class="mi">138</span><span class="p">,</span> <span class="nb">float</span><span class="p">,</span> <span class="s2">&quot;</span><span class="si">%7.1f</span><span class="s2">&quot;</span><span class="p">),</span>
         <span class="s1">&#39;gpp&#39;</span><span class="p">:</span> <span class="p">(</span><span class="mi">138</span><span class="p">,</span> <span class="mi">145</span><span class="p">,</span> <span class="nb">float</span><span class="p">,</span> <span class="s2">&quot;</span><span class="si">%7.1f</span><span class="s2">&quot;</span><span class="p">)</span>
-    <span class="p">}</span>
-
-    <span class="n">parsed_data_list</span> <span class="o">=</span> <span class="p">[]</span>  <span class="c1"># Initialize an empty list to store parsed data dictionaries</span>
-
-    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">input_file</span><span class="p">,</span> <span class="s1">&#39;r&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">infile</span><span class="p">:</span>
-        <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">infile</span><span class="p">:</span>
-            <span class="n">data</span> <span class="o">=</span> <span class="n">LineAssigner</span><span class="o">.</span><span class="n">parse_line</span><span class="p">(</span><span class="n">line</span><span class="p">,</span> <span class="n">columns</span><span class="p">)</span>
-            <span class="n">parsed_data_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>  <span class="c1"># Append each parsed line dictionary to the list</span>
-
-    <span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">parsed_data_list</span><span class="p">)</span>  <span class="c1"># Convert list of dictionaries to DataFrame</span>
-
-    <span class="k">if</span> <span class="s1">&#39;local_lower_quanta&#39;</span> <span class="ow">in</span> <span class="n">df</span><span class="o">.</span><span class="n">columns</span><span class="p">:</span>
-        <span class="c1"># Seperate terms</span>
-        <span class="n">df</span><span class="p">[[</span><span class="s1">&#39;J_low&#39;</span><span class="p">,</span><span class="s1">&#39;sym_low&#39;</span><span class="p">,</span><span class="s1">&#39;N_low&#39;</span><span class="p">]]</span> <span class="o">=</span> <span class="n">LineAssigner</span><span class="o">.</span><span class="n">parse_term_symbols</span><span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="s1">&#39;local_lower_quanta&#39;</span><span class="p">])</span>
-    <span class="k">if</span> <span class="s1">&#39;local_upper_quanta&#39;</span> <span class="ow">in</span> <span class="n">df</span><span class="o">.</span><span class="n">columns</span><span class="p">:</span>
-        <span class="c1"># Seperate terms</span>
-        <span class="n">df</span><span class="p">[[</span><span class="s1">&#39;J_up&#39;</span><span class="p">,</span><span class="s1">&#39;sym_up&#39;</span><span class="p">,</span><span class="s1">&#39;N_up&#39;</span><span class="p">]]</span> <span class="o">=</span> <span class="n">LineAssigner</span><span class="o">.</span><span class="n">parse_term_symbols</span><span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="s1">&#39;local_upper_quanta&#39;</span><span class="p">])</span>
-
-    <span class="k">return</span> <span class="n">df</span>
+        <span class="p">}</span>
 </pre></div>
 </div>
 </div>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[14]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[15]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Parse coefficients in .txt file</span>
-<span class="n">edited_df</span> <span class="o">=</span> <span class="n">parse_file_to_dataframe</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">__reference_data_path__</span><span class="p">,</span> <span class="s1">&#39;outputs&#39;</span><span class="p">,</span> <span class="s1">&#39;output_v3.txt&#39;</span><span class="p">))</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Parse edited file</span>
+<span class="n">update_hitran</span><span class="o">.</span><span class="n">parse_hitran_file</span><span class="p">(</span><span class="n">columns</span><span class="o">=</span><span class="n">columns</span><span class="p">)</span>
+<span class="n">edited_df</span> <span class="o">=</span> <span class="n">update_hitran</span><span class="o">.</span><span class="n">hitran_df</span>
 
 <span class="c1"># Show header</span>
 <span class="n">edited_df</span><span class="o">.</span><span class="n">head</span><span class="p">()</span>
@@ -1148,7 +1173,7 @@ dtype: int64
 </div>
 </div>
 <div class="nboutput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[14]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[15]:
 </pre></div>
 </div>
 <div class="output_area rendered_html docutils container">
@@ -1319,11 +1344,9 @@ dtype: int64
 <p>5 rows × 25 columns</p>
 </div></div>
 </div>
-</section>
-<section id="Visualize-calculated-values:-\gamma_{\mathrm{_{H_{2}}}},-gamma\mathrm{_{He}},-and-n\mathrm{_{T}}-versus-J\mathrm{_{low}}">
-<h2>Visualize calculated values: <span class="math notranslate nohighlight">\(\gamma_{\mathrm{_{H_{2}}}}\)</span>, gamma<span class="math notranslate nohighlight">\(\mathrm{_{He}}\)</span>, and n<span class="math notranslate nohighlight">\(\mathrm{_{T}}\)</span> versus J<span class="math notranslate nohighlight">\(\mathrm{_{low}}\)</span><a class="headerlink" href="#Visualize-calculated-values:-\gamma_{\mathrm{_{H_{2}}}},-gamma\mathrm{_{He}},-and-n\mathrm{_{T}}-versus-J\mathrm{_{low}}" title="Link to this heading">¶</a></h2>
+<p><strong>Visualize calculated values: :math:`gamma_{H_{2}}`, :math:`gamma_{He}`, and n:math:`_{T}` versus J:math:`_{low}`</strong></p>
 <div class="nbinput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[15]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[16]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Mapping symmetry to colors</span>
@@ -1340,7 +1363,7 @@ dtype: int64
 </div>
 </div>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[16]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[17]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Create Figure</span>
@@ -1377,75 +1400,6 @@ dtype: int64
 <img alt="../_images/tutorials_7_Update_Hitran_Linelist_31_0.png" src="../_images/tutorials_7_Update_Hitran_Linelist_31_0.png" />
 </div>
 </div>
-<div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[17]:
-</pre></div>
-</div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Investigation - what the first panel should look like</span>
-
-<span class="n">df_pbro</span> <span class="o">=</span> <span class="n">pbro</span>
-<span class="n">y_param</span> <span class="o">=</span> <span class="s1">&#39;gamma_L&#39;</span>
-<span class="n">J_range</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">25</span><span class="p">]</span>
-<span class="n">__save_plot__</span> <span class="o">=</span> <span class="kc">False</span>
-<span class="n">__show_plot__</span> <span class="o">=</span> <span class="kc">True</span>
-
-<span class="n">J_arr</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="o">*</span><span class="n">J_range</span><span class="p">)</span>
-<span class="c1"># df index</span>
-<span class="n">indeces</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">df_pbro</span><span class="p">[</span><span class="s1">&#39;coeff&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="n">y_param</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
-
-<span class="k">for</span> <span class="n">index</span> <span class="ow">in</span> <span class="n">indeces</span><span class="p">:</span>
-    <span class="n">coefficients</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">df_pbro</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">index</span><span class="p">,</span><span class="s1">&#39;a0&#39;</span><span class="p">:</span><span class="s1">&#39;b4&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">)</span>
-    <span class="n">fitted_values</span> <span class="o">=</span> <span class="n">FitLiteratureData</span><span class="o">.</span><span class="n">fit_Pbro_Pade</span><span class="p">(</span><span class="n">J_arr</span><span class="p">,</span> <span class="o">*</span><span class="n">coefficients</span><span class="p">)</span>
-    <span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">J_arr</span><span class="p">,</span> <span class="n">fitted_values</span><span class="p">,</span> <span class="s1">&#39;.&#39;</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span> <span class="n">df_pbro</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">index</span><span class="p">,</span><span class="s1">&#39;sym_low&#39;</span><span class="p">])</span>
-
-<span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s1">&#39;J_low&#39;</span><span class="p">)</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Fitted </span><span class="si">{</span><span class="n">y_param</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">legend</span><span class="p">()</span>
-
-<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
-</pre></div>
-</div>
-</div>
-<div class="nboutput nblast docutils container">
-<div class="prompt empty docutils container">
-</div>
-<div class="output_area docutils container">
-<img alt="../_images/tutorials_7_Update_Hitran_Linelist_32_0.png" src="../_images/tutorials_7_Update_Hitran_Linelist_32_0.png" />
-</div>
-</div>
-<div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[18]:
-</pre></div>
-</div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Investigating weird points:</span>
-
-<span class="n">plt</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">edited_df</span><span class="p">[</span><span class="s1">&#39;gamma_H2&#39;</span><span class="p">],</span><span class="n">edited_df</span><span class="p">[</span><span class="s1">&#39;gamma_He&#39;</span><span class="p">],</span><span class="n">alpha</span><span class="o">=</span><span class="mf">0.2</span><span class="p">,</span><span class="n">label</span><span class="o">=</span><span class="s1">&#39;results&#39;</span><span class="p">)</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">edited_df</span><span class="p">[</span><span class="s1">&#39;gamma_H2&#39;</span><span class="p">],</span> <span class="n">edited_df</span><span class="p">[</span><span class="s1">&#39;gamma_H2&#39;</span><span class="p">]</span><span class="o">*</span><span class="mf">0.4</span><span class="p">,</span><span class="n">color</span><span class="o">=</span><span class="s1">&#39;r&#39;</span><span class="p">,</span><span class="n">label</span><span class="o">=</span><span class="s1">&#39;expected: gammaHe = 0.4 * gammaH2&#39;</span><span class="p">)</span>
-
-<span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s1">&#39;gamma_H2&#39;</span><span class="p">)</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s1">&#39;gamma_He&#39;</span><span class="p">)</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">legend</span><span class="p">()</span>
-</pre></div>
-</div>
-</div>
-<div class="nboutput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[18]:
-</pre></div>
-</div>
-<div class="output_area docutils container">
-<div class="highlight"><pre>
-&lt;matplotlib.legend.Legend at 0x14ef2e710&gt;
-</pre></div></div>
-</div>
-<div class="nboutput nblast docutils container">
-<div class="prompt empty docutils container">
-</div>
-<div class="output_area docutils container">
-<img alt="../_images/tutorials_7_Update_Hitran_Linelist_33_1.png" src="../_images/tutorials_7_Update_Hitran_Linelist_33_1.png" />
-</div>
-</div>
-<section id="END">
-<h3>END<a class="headerlink" href="#END" title="Link to this heading">¶</a></h3>
 <div class="nbinput nblast docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
 </pre></div>
@@ -1454,31 +1408,6 @@ dtype: int64
 </pre></div>
 </div>
 </div>
-<div class="nbinput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
-</pre></div>
-</div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>
-</pre></div>
-</div>
-</div>
-<div class="nbinput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
-</pre></div>
-</div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>
-</pre></div>
-</div>
-</div>
-<div class="nbinput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
-</pre></div>
-</div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>
-</pre></div>
-</div>
-</div>
-</section>
 </section>
 </section>
 
@@ -1486,7 +1415,7 @@ dtype: int64
            </div>
           </div>
           <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
-        <a href="6_handle_analyze_literature.html" class="btn btn-neutral float-left" title="The key tasks in this tutorial is to:" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="6_handle_analyze_literature.html" class="btn btn-neutral float-left" title="6. Load Reported Pressure-Broadening Data from Literature" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
         <a href="../code.html" class="btn btn-neutral float-right" title="The Modules" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
 
