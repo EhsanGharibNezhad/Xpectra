@@ -134,7 +134,8 @@ If you plan to develop the code, navigate to the *Xpectra* directory and install
     python3.11 setup.py develop
 
 
-3.2 For General Use
+3.2 For General Use:
+
 If you intend to use the code without making changes in the future, install the PyPI version:
 
 .. code-block:: bash

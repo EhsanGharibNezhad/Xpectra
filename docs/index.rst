@@ -7,10 +7,7 @@ Xpectra
 ==============
 
 
-# Xpectra
-for analyzing exoplanetary spectra in the lab, providing insights into atmospheric composition
-and habitability. The tasks executed by the ``Xpectra``
-modules are outlined below:
+For analyzing exoplanetary spectra in the lab, providing insights into atmospheric composition and habitability. The ``Xpectra`` workflow is as follows:
 
 .. image:: figures/xpectra_flowchart_1.jpg
    :width: 600
@@ -18,30 +15,34 @@ modules are outlined below:
 .. image:: figures/xpectra_flowchart_2.jpg
    :width: 600
 
-``Xpectra`` is a Python package comprising a series of modules, each equipped with specialized machine learning and
-statistical capabilities for conducting spectral analysis or Machine Learning (ML) tasks on
-molecular and atomic spectra recorded from laboratory spectroscopic measuremtns to understand the atmospheres of extrasolar planets and brown dwarfs.
+``Xpectra`` is a Python package comprising a series of modules, each equipped with specialized machine learning and statistical capabilities for conducting spectral analysis or Machine Learning (ML) tasks on molecular and atomic spectra recorded from laboratory spectroscopic measurements to understand the atmospheres of extrasolar planets and brown dwarfs.
 The tasks executed by the ``Xpectra`` modules are outlined below:
 
 
-- *SpecMaster module*: Performs various tasks to process the spectra, including:
+- *SpecFitAnalyzer module*: Implements curve fitting to subtract baseline and predict spectroscopic parameters:
 
-    - Preparing inputs and outputs
-    - Visualizing the data
+  - Preprocess laboratory spectrum
+  - Correct spectral baseline 
+  - Fit spectral peaks
+  - Extract spectroscopic parameters 
 
-- *SpecAnalyzer module*: Utilizes different methods/packages such as TensorFlow to:
+- *SpecStatVisualizer module*: Utilizes interactive plotting with Bokeh to explore the data:
 
-  - Build Convolutional Neural Networks (CNNs) model using the training examples
-  - Utilize tuned hyperparameters
-  - Fit/train the ML models
-  - Visualize the loss and training history, as well as the trained model's performance
+  - Visualizing the data in specified range
+  - Explore spectral features 
+  - Represent results 
 
-- *SpecStatVisualizer module*: Implements the following tasks to predict atmospheric parameters:
+- *LineAssigner module*: Parses HITRAN line lists to load and identify spectral lines:
 
-  - Processes and predicts the observational datasets
-  - Deploys the trained ML/CNNs model to predict atmospheric parameters
-  - Visualizes the processed observational dataset and the uncertainty in the predicted results
+  - Load and parse HITRAN line list
+  - Tabulate spectroscopic parameters 
+  - Identify spectral lines 
 
+- *FitLiteratureData module*: Implements parallel processing to update HITRAN line list using literature:
+
+  - Collect and vet literature coefficients 
+  - Fit pressure-broadening accross quantum numbers, symmetry, and bands
+  - Modify and update HITRAN line list 
 
 
 or simply...
