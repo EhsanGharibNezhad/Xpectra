@@ -1,0 +1,1019 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="./">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>The Modules &mdash; Xpectra 0.0.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=fa44fd50" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="_static/copybutton.css?v=76b2166b" />
+      <link rel="stylesheet" type="text/css" href="_static/sg_gallery.css?v=d2d258e8" />
+
+  
+      <script src="_static/documentation_options.js?v=7026087e"></script>
+      <script src="_static/doctools.js?v=9bcbadda"></script>
+      <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script src="_static/clipboard.min.js?v=a7894cd8"></script>
+      <script src="_static/copybutton.js?v=f281be69"></script>
+      <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="prev" title="2. Correct Spectral Baseline" href="tutorials/2_Correct_Spectral_Baseline.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            Xpectra
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tutorials.html">Tutorials</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">The Code</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#module-Xpectra.SpecFitAnalyzer">Xpectra.SpecFitAnalyzer Module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#Xpectra.SpecFitAnalyzer.SpecFitAnalyzer"><code class="docutils literal notranslate"><span class="pre">SpecFitAnalyzer</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#xpectra-specstatvisualizer-module">Xpectra.SpecStatVisualizer Module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#Xpectra.SpecStatVisualizer.plot_auto_peaks_bokeh"><code class="docutils literal notranslate"><span class="pre">plot_auto_peaks_bokeh()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#Xpectra.SpecStatVisualizer.plot_baseline_fitting_bokeh"><code class="docutils literal notranslate"><span class="pre">plot_baseline_fitting_bokeh()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#Xpectra.SpecStatVisualizer.plot_baseline_fitting_seaborn"><code class="docutils literal notranslate"><span class="pre">plot_baseline_fitting_seaborn()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#Xpectra.SpecStatVisualizer.plot_compare_baselines"><code class="docutils literal notranslate"><span class="pre">plot_compare_baselines()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#Xpectra.SpecStatVisualizer.plot_fitted_als_bokeh"><code class="docutils literal notranslate"><span class="pre">plot_fitted_als_bokeh()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#Xpectra.SpecStatVisualizer.plot_fitted_als_seaborn"><code class="docutils literal notranslate"><span class="pre">plot_fitted_als_seaborn()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#Xpectra.SpecStatVisualizer.plot_fitted_spectrum_bokeh"><code class="docutils literal notranslate"><span class="pre">plot_fitted_spectrum_bokeh()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#Xpectra.SpecStatVisualizer.plot_fitted_spectrum_seaborn"><code class="docutils literal notranslate"><span class="pre">plot_fitted_spectrum_seaborn()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#Xpectra.SpecStatVisualizer.plot_hitran_lines_bokeh"><code class="docutils literal notranslate"><span class="pre">plot_hitran_lines_bokeh()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#Xpectra.SpecStatVisualizer.plot_hitran_lines_seaborn"><code class="docutils literal notranslate"><span class="pre">plot_hitran_lines_seaborn()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#Xpectra.SpecStatVisualizer.plot_spectra_errorbar_bokeh"><code class="docutils literal notranslate"><span class="pre">plot_spectra_errorbar_bokeh()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#Xpectra.SpecStatVisualizer.plot_spectra_errorbar_seaborn"><code class="docutils literal notranslate"><span class="pre">plot_spectra_errorbar_seaborn()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#Xpectra.SpecStatVisualizer.print_fitted_parameters"><code class="docutils literal notranslate"><span class="pre">print_fitted_parameters()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#Xpectra.SpecStatVisualizer.print_fitted_parameters_df"><code class="docutils literal notranslate"><span class="pre">print_fitted_parameters_df()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#Xpectra.SpecStatVisualizer.print_results_fun"><code class="docutils literal notranslate"><span class="pre">print_results_fun()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#Xpectra.SpecStatVisualizer.print_spectral_info"><code class="docutils literal notranslate"><span class="pre">print_spectral_info()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#module-Xpectra.LineAssigner">Xpectra.LineAssigner Module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#Xpectra.LineAssigner.LineAssigner"><code class="docutils literal notranslate"><span class="pre">LineAssigner</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#xpectra-fitliteraturedata-module">Xpectra.FitLiteratureData Module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#Xpectra.FitLiteratureData.FitLiteratureData"><code class="docutils literal notranslate"><span class="pre">FitLiteratureData</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference external" href="https://github.com/EhsanGharibNezhad/Xpectra">GitHub</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">Xpectra</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">The Modules</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/code.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul><div class="rst-breadcrumbs-buttons" role="navigation" aria-label="Sequential page navigation">
+        <a href="tutorials/2_Correct_Spectral_Baseline.html" class="btn btn-neutral float-left" title="2. Correct Spectral Baseline" accesskey="p"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+  </div>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="the-modules">
+<h1>The Modules<a class="headerlink" href="#the-modules" title="Link to this heading">¶</a></h1>
+<section id="module-Xpectra.SpecFitAnalyzer">
+<span id="xpectra-specfitanalyzer-module"></span><h2>Xpectra.SpecFitAnalyzer Module<a class="headerlink" href="#module-Xpectra.SpecFitAnalyzer" title="Link to this heading">¶</a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="Xpectra.SpecFitAnalyzer.SpecFitAnalyzer">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">Xpectra.SpecFitAnalyzer.</span></span><span class="sig-name descname"><span class="pre">SpecFitAnalyzer</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">signal_values</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">wavelength_names</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">wavenumber_values</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">absorber_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">__reference_data__</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y_baseline_corrected</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#Xpectra.SpecFitAnalyzer.SpecFitAnalyzer" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Perform various tasks to process the lab spectra, including:</p>
+<ul class="simple">
+<li><p>Load/Save</p></li>
+<li><p>Manipulate &amp; Visualize</p></li>
+<li><p>Correct Spectral Baseline</p></li>
+<li><p>Fit Spectral Peaks</p></li>
+</ul>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>signal_values</strong> (<em>np.ndarray</em><em>, </em><em>optional</em>) – Signal arrays (input data).</p></li>
+<li><p><strong>wavelength_names</strong> (<em>List</em><em>[</em><em>str</em><em>]</em><em>, </em><em>optional</em>) – Names of wavelengths in microns.</p></li>
+<li><p><strong>wavenumber_values</strong> (<em>np.ndarray</em><em>, </em><em>optional</em>) – Wavenumber array in cm^-1.</p></li>
+<li><p><strong>absorber_name</strong> (<em>str</em><em>, </em><em>optional</em>) – Molecule or atom name.</p></li>
+<li><p><strong>__reference_data__</strong> (<em>str</em><em>, </em><em>optional</em>) – Reference data path.</p></li>
+<li><p><strong>y_baseline_corrected</strong> (<em>np.ndarray</em><em>, </em><em>optional</em>) – Baseline-corrected signal.</p></li>
+<li><p><strong>y_baseline_corrected_polynomial</strong> (<em>np.ndarray</em><em>, </em><em>optional</em>) – Polylnomial baseline-corrected signal.</p></li>
+<li><p><strong>baseline_degree</strong> (<em>int</em><em>, </em><em>optional</em>) – Degree of fitted polynomial baseline.</p></li>
+<li><p><strong>y_baseline_corrected_sinusoidal</strong> (<em>np.ndarray</em><em>, </em><em>optional</em>) – Sinusoidal baseline-corrected signal.</p></li>
+<li><p><strong>y_baseline_corrected_spline</strong> (<em>np.ndarray</em><em>, </em><em>optional</em>) – Spline baseline-corrected signal.</p></li>
+<li><p><strong>y_baseline_corrected_ALS</strong> (<em>np.ndarray</em><em>, </em><em>optional</em>) – ALS baseline-corrected signal.</p></li>
+<li><p><strong>y_baseline_corrected_ARPLS</strong> (<em>np.ndarray</em><em>, </em><em>optional</em>) – ARPLS baseline-corrected signal.</p></li>
+<li><p><strong>fitted_baseline_params</strong> (<em>any</em><em>, </em><em>optional</em>) – Fitted baseline parameters.</p></li>
+<li><p><strong>baseline_type</strong> (<em>str</em><em>, </em><em>optional</em>) – Baseline-correction method.</p></li>
+<li><p><strong>fitted_params</strong> (<em>np.ndarray</em><em>, </em><em>optional</em>) – Fitted peak parameters according to specified line profile.</p></li>
+<li><p><strong>covariance_matrices</strong> (<em>np.ndarray</em><em>, </em><em>optional</em>) – Covariance matrices according to fitted peak parameters.</p></li>
+<li><p><strong>negative_indeces</strong> (<em>np.ndarray</em><em>, </em><em>optional</em>) – Indeces of negative signal values from original spectrum.</p></li>
+<li><p><strong>nan_indeces</strong> (<em>np.ndarray</em><em>, </em><em>optional</em>) – Indeces of NAN signal values from original spectrum.</p></li>
+<li><p><strong>x_cleaned</strong> (<em>np.ndarray</em><em>, </em><em>optional</em>) – Wavenumber values with points containing negative/NAN signal values removed.</p></li>
+<li><p><strong>y_cleaned</strong> (<em>np.ndarray</em><em>, </em><em>optional</em>) – Signal values with points containing negative/NAN signal values removed.</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="Xpectra.SpecFitAnalyzer.SpecFitAnalyzer.als">
+<span class="sig-name descname"><span class="pre">als</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">lam</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">1000000.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">p</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">itermax</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">10</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">__plot__</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">__save_plots__</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">__print__</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#Xpectra.SpecFitAnalyzer.SpecFitAnalyzer.als" title="Link to this definition">¶</a></dt>
+<dd><p>Implements an Asymmetric Least Squares Smoothing
+baseline correction algorithm (P. Eilers, H. Boelens 2005)</p>
+<p>Baseline Correction with Asymmetric Least Squares Smoothing
+based on <a class="reference external" href="https://web.archive.org/web/20200914144852/https://github.com/vicngtor/BaySpecPlots">https://web.archive.org/web/20200914144852/https://github.com/vicngtor/BaySpecPlots</a></p>
+<p>Baseline Correction with Asymmetric Least Squares Smoothing
+Paul H. C. Eilers and Hans F.M. Boelens
+October 21, 2005</p>
+<p>Description from the original documentation:</p>
+<p>Most baseline problems in instrumental methods are characterized by a smooth
+baseline and a superimposed signal that carries the analytical information: a series
+of peaks that are either all positive or all negative. We combine a smoother
+with asymmetric weighting of deviations from the (smooth) trend get an effective
+baseline estimator. It is easy to use, fast and keeps the analytical peak signal intact.
+No prior information about peak shapes or baseline (polynomial) is needed
+by the method. The performance is illustrated by simulation and applications to
+real data.</p>
+<dl class="simple">
+<dt>Inputs:</dt><dd><dl class="simple">
+<dt>y:</dt><dd><p>input data (i.e. chromatogram of spectrum)</p>
+</dd>
+<dt>lam:</dt><dd><p>parameter that can be adjusted by user. The larger lambda is,
+the smoother the resulting background, z</p>
+</dd>
+<dt>p:</dt><dd><p>wheighting deviations. 0.5 = symmetric, &lt;0.5: negative
+deviations are stronger suppressed</p>
+</dd>
+<dt>itermax:</dt><dd><p>number of iterations to perform</p>
+</dd>
+</dl>
+</dd>
+<dt>Output:</dt><dd><p>the fitted background vector</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="Xpectra.SpecFitAnalyzer.SpecFitAnalyzer.arpls">
+<span class="sig-name descname"><span class="pre">arpls</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">lam</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">10000.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ratio</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.05</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">itermax</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">100</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">__plot__</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">__save_plots__</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">__print__</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#Xpectra.SpecFitAnalyzer.SpecFitAnalyzer.arpls" title="Link to this definition">¶</a></dt>
+<dd><p>Baseline correction using asymmetrically
+reweighted penalized least squares smoothing
+Sung-June Baek, Aaron Park, Young-Jin Ahna and Jaebum Choo,
+Analyst, 2015, 140, 250 (2015)</p>
+<p>Abstract</p>
+<p>Baseline correction methods based on penalized least squares are successfully
+applied to various spectral analyses. The methods change the weights iteratively
+by estimating a baseline. If a signal is below a previously fitted baseline,
+large weight is given. On the other hand, no weight or small weight is given
+when a signal is above a fitted baseline as it could be assumed to be a part
+of the peak. As noise is distributed above the baseline as well as below the
+baseline, however, it is desirable to give the same or similar weights in
+either case. For the purpose, we propose a new weighting scheme based on the
+generalized logistic function. The proposed method estimates the noise level
+iteratively and adjusts the weights correspondingly. According to the
+experimental results with simulated spectra and measured Raman spectra, the
+proposed method outperforms the existing methods for baseline correction and
+peak height estimation.</p>
+<dl class="simple">
+<dt>Inputs:</dt><dd><dl class="simple">
+<dt>y:</dt><dd><p>input data (i.e. chromatogram of spectrum)</p>
+</dd>
+<dt>lam:</dt><dd><p>parameter that can be adjusted by user. The larger lambda is,
+the smoother the resulting background, z</p>
+</dd>
+<dt>ratio:</dt><dd><p>wheighting deviations: 0 &lt; ratio &lt; 1, smaller values allow less negative values</p>
+</dd>
+<dt>itermax:</dt><dd><p>number of iterations to perform</p>
+</dd>
+</dl>
+</dd>
+<dt>Output:</dt><dd><p>the fitted background vector</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="Xpectra.SpecFitAnalyzer.SpecFitAnalyzer.check_negative_nan">
+<span class="sig-name descname"><span class="pre">check_negative_nan</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#Xpectra.SpecFitAnalyzer.SpecFitAnalyzer.check_negative_nan" title="Link to this definition">¶</a></dt>
+<dd><p>Check the spectral data for negative or NAN values, and report their location.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>signal_values</strong> (<em>np.ndarray</em><em>, </em><em>optional</em>) – Signal arrays (input data).</p></li>
+<li><p><strong>wavenumber_values</strong> (<em>np.ndarray</em><em>, </em><em>optional</em>) – Wavenumber array in cm^-1.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="Xpectra.SpecFitAnalyzer.SpecFitAnalyzer.fit_polynomial_baseline">
+<span class="sig-name descname"><span class="pre">fit_polynomial_baseline</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">degree</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">__plot_seaborn__</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">__plot_bokeh__</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">__print__</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">ndarray</span></span></span><a class="headerlink" href="#Xpectra.SpecFitAnalyzer.SpecFitAnalyzer.fit_polynomial_baseline" title="Link to this definition">¶</a></dt>
+<dd><p>Fit a polynomial baseline to the spectrum using least squares.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>degree</strong> (<em>int</em>) – Degree of the polynomial to fit.</p></li>
+<li><p><strong>__plot_seaborn__</strong> (<em>bool</em>) – True or False.</p></li>
+<li><p><strong>__plot_bokeh__</strong> (<em>bool</em>) – True or False.</p></li>
+<li><p><strong>__print__</strong> (<em>bool</em>) – True or False.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>params</strong> – Coefficients of the fitted polynomial.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>np.ndarray</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="Xpectra.SpecFitAnalyzer.SpecFitAnalyzer.fit_sinusoidal_baseline">
+<span class="sig-name descname"><span class="pre">fit_sinusoidal_baseline</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">initial_guesses</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">__plot_seaborn__</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">__plot_bokeh__</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">__print__</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">ndarray</span></span></span><a class="headerlink" href="#Xpectra.SpecFitAnalyzer.SpecFitAnalyzer.fit_sinusoidal_baseline" title="Link to this definition">¶</a></dt>
+<dd><p>Fit a sinusoidal baseline to the spectrum.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>initial_guesses</strong> (<em>list</em>) – Initial guesses for amplitude, frequency, phase, and offset.</p></li>
+<li><p><strong>__plot_seaborn__</strong> (<em>bool</em>) – True or False.</p></li>
+<li><p><strong>__plot_bokeh__</strong> (<em>bool</em>) – True or False.</p></li>
+<li><p><strong>__print__</strong> (<em>bool</em>) – True or False.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>params</strong> – Parameters of the fitted sinusoidal baseline.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>np.ndarray</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="Xpectra.SpecFitAnalyzer.SpecFitAnalyzer.fit_spectrum">
+<span class="sig-name descname"><span class="pre">fit_spectrum</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">initial_guesses</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">ndarray</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">line_profile</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'gaussian'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fitting_method</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'lm'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">wavenumber_range</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">tuple</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">ndarray</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">__plot_bokeh__</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">__plot_seaborn__</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">__show_plots__</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">__save_plots__</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">__print__</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#Xpectra.SpecFitAnalyzer.SpecFitAnalyzer.fit_spectrum" title="Link to this definition">¶</a></dt>
+<dd><p>Fit a spectrum with multiple peaks using specified line profiles (gaussian, lorentzian, voigt).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>initial_guesses</strong> (<em>list</em><em> or </em><em>np.ndarray</em>) – List of initial guesses for parameters of the line profile.</p></li>
+<li><p><strong>line_profile</strong> (<em>str</em><em>, </em><em>{'gaussian'</em><em>, </em><em>'lorentzian'</em><em>, </em><em>'voigt'}</em><em>, </em><em>optional</em>) – Type of line profile to use for fitting. Default is ‘gaussian’.</p></li>
+<li><p><strong>wavenumber_range</strong> (<em>list-like</em><em>, </em><em>optional</em>) – List-like object (list, tuple, or np.ndarray) with of length 2 representing wavenumber range to fit within.</p></li>
+<li><p><strong>__plot_bokeh__</strong> (<em>bool</em>) – True or False.</p></li>
+<li><p><strong>__plot_seaborn__</strong> (<em>bool</em>) – True or False.</p></li>
+<li><p><strong>__print__</strong> (<em>bool</em>) – True or False.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>fitted_params</strong> – List of fitted parameters for each peak.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>list</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="Xpectra.SpecFitAnalyzer.SpecFitAnalyzer.fit_spline_baseline">
+<span class="sig-name descname"><span class="pre">fit_spline_baseline</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">s</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">__plot_seaborn__</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">__plot_bokeh__</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">UnivariateSpline</span></span></span><a class="headerlink" href="#Xpectra.SpecFitAnalyzer.SpecFitAnalyzer.fit_spline_baseline" title="Link to this definition">¶</a></dt>
+<dd><p>Fit a spline baseline to the spectrum.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>s</strong> (<em>float</em><em> or </em><em>None</em>) – Smoothing factor to control the spline smoothness. If None, it is set by the algorithm.</p></li>
+<li><p><strong>__plot_seaborn__</strong> (<em>bool</em>) – True or False.</p></li>
+<li><p><strong>__plot_bokeh__</strong> (<em>bool</em>) – True or False.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>spline</strong> – The fitted spline object.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>UnivariateSpline</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="Xpectra.SpecFitAnalyzer.SpecFitAnalyzer.gaussian">
+<span class="sig-name descname"><span class="pre">gaussian</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">center</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">amplitude</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">width</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">ndarray</span></span></span><a class="headerlink" href="#Xpectra.SpecFitAnalyzer.SpecFitAnalyzer.gaussian" title="Link to this definition">¶</a></dt>
+<dd><p>Gaussian function.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="Xpectra.SpecFitAnalyzer.SpecFitAnalyzer.lorentzian">
+<span class="sig-name descname"><span class="pre">lorentzian</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">center</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">amplitude</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">width</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">ndarray</span></span></span><a class="headerlink" href="#Xpectra.SpecFitAnalyzer.SpecFitAnalyzer.lorentzian" title="Link to this definition">¶</a></dt>
+<dd><p>Lorentzian function.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="Xpectra.SpecFitAnalyzer.SpecFitAnalyzer.rmse">
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">rmse</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">predictions</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">targets</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#Xpectra.SpecFitAnalyzer.SpecFitAnalyzer.rmse" title="Link to this definition">¶</a></dt>
+<dd><p>Calculate root mean square error (RMSE).</p>
+<p>Parameters:
+- predictions: array-like, predicted values.
+- targets: array-like, true values.</p>
+<p>Returns:
+- RMSE value.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="Xpectra.SpecFitAnalyzer.SpecFitAnalyzer.voigt">
+<span class="sig-name descname"><span class="pre">voigt</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">center</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">amplitude</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">wid_g</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">wid_l</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">ndarray</span></span></span><a class="headerlink" href="#Xpectra.SpecFitAnalyzer.SpecFitAnalyzer.voigt" title="Link to this definition">¶</a></dt>
+<dd><p>Voigt profile function.</p>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="xpectra-specstatvisualizer-module">
+<h2>Xpectra.SpecStatVisualizer Module<a class="headerlink" href="#xpectra-specstatvisualizer-module" title="Link to this heading">¶</a></h2>
+<dl class="py function" id="module-Xpectra.SpecStatVisualizer">
+<dt class="sig sig-object py" id="Xpectra.SpecStatVisualizer.plot_auto_peaks_bokeh">
+<span class="sig-prename descclassname"><span class="pre">Xpectra.SpecStatVisualizer.</span></span><span class="sig-name descname"><span class="pre">plot_auto_peaks_bokeh</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x_obs</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y_obs</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">peaks</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#Xpectra.SpecStatVisualizer.plot_auto_peaks_bokeh" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="Xpectra.SpecStatVisualizer.plot_baseline_fitting_bokeh">
+<span class="sig-prename descclassname"><span class="pre">Xpectra.SpecStatVisualizer.</span></span><span class="sig-name descname"><span class="pre">plot_baseline_fitting_bokeh</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">wavenumber_values</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">signal_values</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">baseline_type</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fitted_baseline_params</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">baseline_degree</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#Xpectra.SpecStatVisualizer.plot_baseline_fitting_bokeh" title="Link to this definition">¶</a></dt>
+<dd><p>Plot the original spectrum and the fitted baseline using Bokeh.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>wavenumber_values</strong> (<em>np.ndarray</em>) – Wavenumber array in cm^-1.</p></li>
+<li><p><strong>signal_values</strong> (<em>np.ndarray</em>) – Signal arrays (input data).</p></li>
+<li><p><strong>baseline_type</strong> (<em>str</em><em>, </em><em>{'polynomial'</em><em>, </em><em>'sinusoidal'</em><em>, </em><em>'spline'}</em>) – Function type of fitted baseline.</p></li>
+<li><p><strong>fitted_baseline_params</strong> (<em>np.ndarray</em>) – Fitted baseline parameters according to baseline_type.</p></li>
+<li><p><strong>baseline_degree</strong> (<em>int</em><em>, </em><em>optional</em>) – Degree of fitted polynomial baseline.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="Xpectra.SpecStatVisualizer.plot_baseline_fitting_seaborn">
+<span class="sig-prename descclassname"><span class="pre">Xpectra.SpecStatVisualizer.</span></span><span class="sig-name descname"><span class="pre">plot_baseline_fitting_seaborn</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">wavenumber_values</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">signal_values</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">baseline_type</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fitted_baseline_params</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">baseline_degree</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#Xpectra.SpecStatVisualizer.plot_baseline_fitting_seaborn" title="Link to this definition">¶</a></dt>
+<dd><p>Plot the original spectrum and the fitted baseline using Seaborn.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>wavenumber_values</strong> (<em>np.ndarray</em>) – Wavenumber array in cm^-1.</p></li>
+<li><p><strong>signal_values</strong> (<em>np.ndarray</em>) – Signal arrays (input data).</p></li>
+<li><p><strong>baseline_type</strong> (<em>str</em><em>, </em><em>{'polynomial'</em><em>, </em><em>'sinusoidal'</em><em>, </em><em>'spline'}</em>) – Function type of fitted baseline.</p></li>
+<li><p><strong>fitted_baseline_params</strong> (<em>np.ndarray</em>) – Fitted baseline parameters according to baseline_type.</p></li>
+<li><p><strong>baseline_degree</strong> (<em>int</em><em>, </em><em>optional</em>) – Degree of fitted polynomial baseline.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="Xpectra.SpecStatVisualizer.plot_compare_baselines">
+<span class="sig-prename descclassname"><span class="pre">Xpectra.SpecStatVisualizer.</span></span><span class="sig-name descname"><span class="pre">plot_compare_baselines</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">wavenumber_values</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">corrected_signal_1</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">baseline_type_1</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">corrected_signal_2</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">baseline_type_2</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">wavenumber_range</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">ndarray</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fitting_method</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'lm'</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#Xpectra.SpecStatVisualizer.plot_compare_baselines" title="Link to this definition">¶</a></dt>
+<dd><p>Plot the original spectrum and the fitted peaks using Bokeh.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>wavenumber_values</strong> (<em>np.ndarray</em>) – Wavenumber array in cm^-1.</p></li>
+<li><p><strong>signal_values</strong> (<em>np.ndarray</em>) – Signal arrays (input data).</p></li>
+<li><p><strong>wavenumber_range</strong> (<em>list-like</em><em>, </em><em>optional</em>) – Ascending list or np.ndarray with of length 2 representing wavenumber range for plotting.</p></li>
+<li><p><strong>line_profile</strong> (<em>str</em><em>, </em><em>{'gaussian'</em><em>, </em><em>'lorentzian'</em><em>, </em><em>'voigt'}</em><em>, </em><em>optional</em>) – Type of line profile to use for fitting. Default is ‘gaussian’.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="Xpectra.SpecStatVisualizer.plot_fitted_als_bokeh">
+<span class="sig-prename descclassname"><span class="pre">Xpectra.SpecStatVisualizer.</span></span><span class="sig-name descname"><span class="pre">plot_fitted_als_bokeh</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">wavenumber_values</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">signal_values</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fitted_baseline</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">baseline_type</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'als'</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#Xpectra.SpecStatVisualizer.plot_fitted_als_bokeh" title="Link to this definition">¶</a></dt>
+<dd><p>Plot the original spectrum and the fitted baseline using Bokeh.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>wavenumber_values</strong> (<em>np.ndarray</em>) – Wavenumber array in cm^-1.</p></li>
+<li><p><strong>signal_values</strong> (<em>np.ndarray</em>) – Signal arrays (input data).</p></li>
+<li><p><strong>fitted_baseline</strong> (<em>np.ndarray</em>) – Fitted baseline using baseline_type.</p></li>
+<li><p><strong>baseline_type</strong> (<em>str</em><em>, </em><em>{'als'</em><em>, </em><em>'arpls'}</em>) – Function type of fitted baseline.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="Xpectra.SpecStatVisualizer.plot_fitted_als_seaborn">
+<span class="sig-prename descclassname"><span class="pre">Xpectra.SpecStatVisualizer.</span></span><span class="sig-name descname"><span class="pre">plot_fitted_als_seaborn</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">wavenumber_values</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">signal_values</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fitted_baseline</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">__reference_data__</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">__save_plots__</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">baseline_type</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'als'</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#Xpectra.SpecStatVisualizer.plot_fitted_als_seaborn" title="Link to this definition">¶</a></dt>
+<dd><p>Plot the original spectrum and the fitted baseline using Seaborn.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>wavenumber_values</strong> (<em>np.ndarray</em>) – Wavenumber array in cm^-1.</p></li>
+<li><p><strong>signal_values</strong> (<em>np.ndarray</em>) – Signal arrays (input data).</p></li>
+<li><p><strong>fitted_baseline</strong> (<em>np.ndarray</em>) – Fitted baseline using baseline_type.</p></li>
+<li><p><strong>baseline_type</strong> (<em>str</em><em>, </em><em>{'als'</em><em>, </em><em>'arpls'}</em>) – Function type of fitted baseline.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="Xpectra.SpecStatVisualizer.plot_fitted_spectrum_bokeh">
+<span class="sig-prename descclassname"><span class="pre">Xpectra.SpecStatVisualizer.</span></span><span class="sig-name descname"><span class="pre">plot_fitted_spectrum_bokeh</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">wavenumber_values</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">signal_values</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fitted_params</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">wavenumber_range</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">ndarray</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">line_profile</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'gaussian'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fitting_method</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'lm'</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#Xpectra.SpecStatVisualizer.plot_fitted_spectrum_bokeh" title="Link to this definition">¶</a></dt>
+<dd><p>Plot the original spectrum and the fitted peaks using Bokeh.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>wavenumber_values</strong> (<em>np.ndarray</em>) – Wavenumber array in cm^-1.</p></li>
+<li><p><strong>signal_values</strong> (<em>np.ndarray</em>) – Signal arrays (input data).</p></li>
+<li><p><strong>fitted_params</strong> (<em>list</em>) – List of fitted parameters of the line profile.</p></li>
+<li><p><strong>wavenumber_range</strong> (<em>list-like</em><em>, </em><em>optional</em>) – Ascending list or np.ndarray with of length 2 representing wavenumber range for plotting.</p></li>
+<li><p><strong>line_profile</strong> (<em>str</em><em>, </em><em>{'gaussian'</em><em>, </em><em>'lorentzian'</em><em>, </em><em>'voigt'}</em><em>, </em><em>optional</em>) – Type of line profile to use for fitting. Default is ‘gaussian’.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="Xpectra.SpecStatVisualizer.plot_fitted_spectrum_seaborn">
+<span class="sig-prename descclassname"><span class="pre">Xpectra.SpecStatVisualizer.</span></span><span class="sig-name descname"><span class="pre">plot_fitted_spectrum_seaborn</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">wavenumber_values</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">signal_values</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fitted_params</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">wavenumber_range</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">ndarray</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">line_profile</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'gaussian'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fitting_method</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'lm'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">__save_plots__</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">__reference_data__</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">__show_plots__</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#Xpectra.SpecStatVisualizer.plot_fitted_spectrum_seaborn" title="Link to this definition">¶</a></dt>
+<dd><p>Plot the original spectrum and the fitted peaks using Bokeh.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>wavenumber_values</strong> (<em>np.ndarray</em>) – Wavenumber array in cm^-1.</p></li>
+<li><p><strong>signal_values</strong> (<em>np.ndarray</em>) – Signal arrays (input data).</p></li>
+<li><p><strong>fitted_params</strong> (<em>list</em>) – List of fitted parameters of the line profile.</p></li>
+<li><p><strong>wavenumber_range</strong> (<em>list-like</em><em>, </em><em>optional</em>) – Ascending list or np.ndarray with of length 2 representing wavenumber range for plotting.</p></li>
+<li><p><strong>line_profile</strong> (<em>str</em><em>, </em><em>{'gaussian'</em><em>, </em><em>'lorentzian'</em><em>, </em><em>'voigt'}</em><em>, </em><em>optional</em>) – Type of line profile to use for fitting. Default is ‘gaussian’.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="Xpectra.SpecStatVisualizer.plot_hitran_lines_bokeh">
+<span class="sig-prename descclassname"><span class="pre">Xpectra.SpecStatVisualizer.</span></span><span class="sig-name descname"><span class="pre">plot_hitran_lines_bokeh</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">wavenumber_values</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">signal_values</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fitted_hitran</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">DataFrame</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">columns_to_print</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">wavenumber_range</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">ndarray</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">line_profile</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'gaussian'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fitting_method</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'lm'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">absorber_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#Xpectra.SpecStatVisualizer.plot_hitran_lines_bokeh" title="Link to this definition">¶</a></dt>
+<dd><p>Plot the original spectrum and the fitted peaks using Bokeh.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>wavenumber_values</strong> (<em>np.ndarray</em>) – Wavenumber array in cm^-1.</p></li>
+<li><p><strong>signal_values</strong> (<em>np.ndarray</em>) – Signal arrays (input data).</p></li>
+<li><p><strong>fitted_hitran</strong> (<em>pd.DataFrame</em>) – Dataframe containing information about the assigned spectral lines, including columns [‘amplitude’, ‘center’, ‘wing’].</p></li>
+<li><p><strong>fitted_params</strong> (<em>np.ndarray</em>) – Fitted parameters of peaks.</p></li>
+<li><p><strong>columns_to_print</strong> (<em>list</em>) – Columns to print corresponding to line positions.</p></li>
+<li><p><strong>wavenumber_range</strong> (<em>list-like</em><em>, </em><em>optional</em>) – Ascending list or np.ndarray with of length 2 representing wavenumber range for plotting.</p></li>
+<li><p><strong>line_profile</strong> (<em>str</em><em>, </em><em>{'gaussian'</em><em>, </em><em>'lorentzian'</em><em>, </em><em>'voigt'}</em><em>, </em><em>optional</em>) – Type of line profile to use for fitting. Default is ‘gaussian’.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="Xpectra.SpecStatVisualizer.plot_hitran_lines_seaborn">
+<span class="sig-prename descclassname"><span class="pre">Xpectra.SpecStatVisualizer.</span></span><span class="sig-name descname"><span class="pre">plot_hitran_lines_seaborn</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">wavenumber_values</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">signal_values</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fitted_hitran</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">DataFrame</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">columns_to_print</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">wavenumber_range</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">ndarray</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">line_profile</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'gaussian'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fitting_method</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'lm'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">absorber_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">__save_plot__</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">__reference_data__</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">__show_plot__</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#Xpectra.SpecStatVisualizer.plot_hitran_lines_seaborn" title="Link to this definition">¶</a></dt>
+<dd><p>Plot the original spectrum and the assigned lines using Seaborn.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>wavenumber_values</strong> (<em>np.ndarray</em>) – Wavenumber array in cm^-1.</p></li>
+<li><p><strong>signal_values</strong> (<em>np.ndarray</em>) – Signal arrays (input data).</p></li>
+<li><p><strong>fitted_hitran</strong> (<em>pd.DataFrame</em>) – Dataframe containing information about the assigned spectral lines, including columns [‘amplitude’, ‘center’, ‘wing’].</p></li>
+<li><p><strong>fitted_params</strong> (<em>np.ndarray</em>) – Fitted parameters of peaks.</p></li>
+<li><p><strong>columns_to_print</strong> (<em>str</em><em> or </em><em>list</em>) – Columns to print corresponding to line positions.</p></li>
+<li><p><strong>wavenumber_range</strong> (<em>list-like</em><em>, </em><em>optional</em>) – Ascending list or np.ndarray with of length 2 representing wavenumber range for plotting.</p></li>
+<li><p><strong>line_profile</strong> (<em>str</em><em>, </em><em>{'gaussian'</em><em>, </em><em>'lorentzian'</em><em>, </em><em>'voigt'}</em><em>, </em><em>optional</em>) – Type of line profile to use for fitting. Default is ‘gaussian’.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="Xpectra.SpecStatVisualizer.plot_spectra_errorbar_bokeh">
+<span class="sig-prename descclassname"><span class="pre">Xpectra.SpecStatVisualizer.</span></span><span class="sig-name descname"><span class="pre">plot_spectra_errorbar_bokeh</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">wavenumber_values</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">signal_values</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">wavenumber_range</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">ndarray</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">signal_values_err</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">absorber_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y_label</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'Signal'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">title_label</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data_type</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'x_y_yerr'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">plot_type</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'scatter'</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#Xpectra.SpecStatVisualizer.plot_spectra_errorbar_bokeh" title="Link to this definition">¶</a></dt>
+<dd><p>Plot the spectra with error bars using Bokeh.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>wavenumber_values</strong> (<em>np.ndarray</em>) – Wavenumber array in cm^-1.</p></li>
+<li><p><strong>signal_values</strong> (<em>np.ndarray</em>) – Signal arrays (input data).</p></li>
+<li><p><strong>wavenumber_range</strong> (<em>list-like</em><em>, </em><em>optional</em>) – Ascending list or np.ndarray with of length 2 representing wavenumber range for plotting.</p></li>
+<li><p><strong>signal_values_err</strong> (<em>np.ndarray</em><em>, </em><em>optional</em>) – Error on input data.</p></li>
+<li><p><strong>absorber_name</strong> (<em>str</em><em>, </em><em>optional</em>) – Molecule or atom name.</p></li>
+<li><p><strong>y_label</strong> (<em>str</em><em>, </em><em>optional</em>) – Label for the y-axis. Default is “Signal”.</p></li>
+<li><p><strong>title_label</strong> (<em>str</em><em>, </em><em>optional</em>) – Title of the plot. Default is None.</p></li>
+<li><p><strong>data_type</strong> (<em>str</em><em>, </em><em>optional</em>) – Type of data. Default is ‘x_y_yerr’.</p></li>
+<li><p><strong>plot_type</strong> (<em>str</em><em>, </em><em>optional</em>) – Type of plot. Can be ‘scatter’ or ‘line’. Default is ‘scatter’.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="Xpectra.SpecStatVisualizer.plot_spectra_errorbar_seaborn">
+<span class="sig-prename descclassname"><span class="pre">Xpectra.SpecStatVisualizer.</span></span><span class="sig-name descname"><span class="pre">plot_spectra_errorbar_seaborn</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">wavenumber_values</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">signal_values</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">__reference_data__</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">wavenumber_range</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">ndarray</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">signal_values_err</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">absorber_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y_label</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'Signal'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">title_label</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data_type</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'x_y_yerr'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">plot_type</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'scatter'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">__save_plots__</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#Xpectra.SpecStatVisualizer.plot_spectra_errorbar_seaborn" title="Link to this definition">¶</a></dt>
+<dd><p>Plot the spectra with error bars using Seaborn.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>wavenumber_values</strong> (<em>nd.array</em>) – Wavenumber array in cm^-1.</p></li>
+<li><p><strong>signal_values</strong> (<em>nd.array</em>) – Signal arrays (input data).</p></li>
+<li><p><strong>wavenumber_range</strong> (<em>list-like</em><em>, </em><em>optional</em>) – Ascending list or np.ndarray with of length 2 representing wavenumber range for plotting.</p></li>
+<li><p><strong>signal_values_err</strong> (<em>nd.array</em><em>, </em><em>optional</em>) – Error on input data.</p></li>
+<li><p><strong>absorber_name</strong> (<em>str</em><em>, </em><em>optional</em>) – Molecule or atom name.</p></li>
+<li><p><strong>y_label</strong> (<em>str</em><em>, </em><em>optional</em>) – Label for the y-axis. Default is “Signal”.</p></li>
+<li><p><strong>title_label</strong> (<em>str</em><em>, </em><em>optional</em>) – Title of the plot. Default is None.</p></li>
+<li><p><strong>data_type</strong> (<em>str</em><em>, </em><em>optional</em>) – Type of data. Default is ‘x_y_yerr’.</p></li>
+<li><p><strong>plot_type</strong> (<em>str</em><em>, </em><em>optional</em>) – Type of plot. Can be ‘scatter’ or ‘line’. Default is ‘scatter’.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="Xpectra.SpecStatVisualizer.print_fitted_parameters">
+<span class="sig-prename descclassname"><span class="pre">Xpectra.SpecStatVisualizer.</span></span><span class="sig-name descname"><span class="pre">print_fitted_parameters</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fitted_params</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">covariance_matrices</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#Xpectra.SpecStatVisualizer.print_fitted_parameters" title="Link to this definition">¶</a></dt>
+<dd><p>Print the fitted parameters and their errors for each peak as a dataframe.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>fitted_params</strong> (<em>np.ndarray</em>) – The fitted parameters for each peak.</p></li>
+<li><p><strong>covariance_matrices</strong> (<em>np.ndarray</em>) – The covariance matrices of the fitted parameters.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="Xpectra.SpecStatVisualizer.print_fitted_parameters_df">
+<span class="sig-prename descclassname"><span class="pre">Xpectra.SpecStatVisualizer.</span></span><span class="sig-name descname"><span class="pre">print_fitted_parameters_df</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fitted_params</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">covariance_matrices</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#Xpectra.SpecStatVisualizer.print_fitted_parameters_df" title="Link to this definition">¶</a></dt>
+<dd><p>Print the fitted parameters and their errors for each peak.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>fitted_params</strong> (<em>np.ndarray</em>) – The fitted parameters for each peak.</p></li>
+<li><p><strong>covariance_matrices</strong> (<em>np.ndarray</em>) – The covariance matrices of the fitted parameters.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="Xpectra.SpecStatVisualizer.print_results_fun">
+<span class="sig-prename descclassname"><span class="pre">Xpectra.SpecStatVisualizer.</span></span><span class="sig-name descname"><span class="pre">print_results_fun</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">targets</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">print_title</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#Xpectra.SpecStatVisualizer.print_results_fun" title="Link to this definition">¶</a></dt>
+<dd><p>Print the outputs in a pretty format using the pprint library.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>targets</strong> (<em>any</em>) – The data to be printed.</p></li>
+<li><p><strong>print_title</strong> (<em>str</em>) – An optional title to display before the printed data.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="Xpectra.SpecStatVisualizer.print_spectral_info">
+<span class="sig-prename descclassname"><span class="pre">Xpectra.SpecStatVisualizer.</span></span><span class="sig-name descname"><span class="pre">print_spectral_info</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">wavenumber_values</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">signal_values</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">print_title</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#Xpectra.SpecStatVisualizer.print_spectral_info" title="Link to this definition">¶</a></dt>
+<dd><p>Pretty print information about the spectrum.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>wavenumber_values</strong> (<em>np.ndarray</em><em>, </em><em>optional</em>) – Wavenumber array in cm^-1.</p></li>
+<li><p><strong>signal_values</strong> (<em>np.ndarray</em><em>, </em><em>optional</em>) – Signal arrays (input data).</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+<section id="module-Xpectra.LineAssigner">
+<span id="xpectra-lineassigner-module"></span><h2>Xpectra.LineAssigner Module<a class="headerlink" href="#module-Xpectra.LineAssigner" title="Link to this heading">¶</a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="Xpectra.LineAssigner.LineAssigner">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">Xpectra.LineAssigner.</span></span><span class="sig-name descname"><span class="pre">LineAssigner</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fitted_params</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">ndarray</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">hitran_file</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">absorber_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">wavenumber_values</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">signal_values</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#Xpectra.LineAssigner.LineAssigner" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Perform quantum assignments to fitted spectra.</p>
+<ul class="simple">
+<li><p>Load HITRAN linelist</p></li>
+<li><p>Find/tabulate spectral peaks</p></li>
+<li><p>Identify and assign found lines</p></li>
+</ul>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>fitted_params</strong> (<em>np.ndarray</em><em>, </em><em>optional</em>) – Fitted parameters of spectral peaks with [center, amplitude, width].</p></li>
+<li><p><strong>hitran_file</strong> (<em>str</em><em>, </em><em>optional</em>) – File path containing HITRAN data.</p></li>
+<li><p><strong>absorber_name</strong> (<em>str</em><em>, </em><em>optional</em>) – Molecule or atom name.</p></li>
+<li><p><strong>wavenumber_values</strong> (<em>np.ndarray</em><em>, </em><em>optional</em>) – Wavenumber array in cm-1</p></li>
+<li><p><strong>signal_values</strong> (<em>np.ndarray</em><em>, </em><em>optional</em>) – Signal arrays (input data)</p></li>
+<li><p><strong>hitran_df</strong> (<em>pd.DataFrame</em><em>, </em><em>optional</em>) – DataFrame containing parsed HITRAN line list.</p></li>
+<li><p><strong>fitted_hitran</strong> (<em>pd.DataFrame</em><em>, </em><em>optional</em>) – DataFrame containing information for identified lines.</p></li>
+<li><p><strong>peak_centers_manual</strong> (<em>np.ndarray</em><em>, </em><em>optional</em>) – Manually-found spectral peak locations in wavenumber (cm-1).</p></li>
+<li><p><strong>peak_centers_auto</strong> (<em>np.ndarray</em><em>, </em><em>optional</em>) – Autmoatically-found spectral peak locations in wavenumber (cm-1).</p></li>
+<li><p><strong>peak_heights_auto</strong> (<em>np.ndarray</em><em>, </em><em>optional</em>) – Autmoatically-found spectral peak heights in signal units.</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="Xpectra.LineAssigner.LineAssigner.filter_dataframe">
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">filter_dataframe</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">df</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">filters</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#Xpectra.LineAssigner.LineAssigner.filter_dataframe" title="Link to this definition">¶</a></dt>
+<dd><p>Filter the DataFrame based on multiple column value pairs or conditions.</p>
+<p>Parameters:
+df (pd.DataFrame): The DataFrame to filter.
+filters (dict): A dictionary where keys are column names and values are lists of values to filter by or conditions.</p>
+<p>Returns:
+pd.DataFrame: The filtered DataFrame.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="Xpectra.LineAssigner.LineAssigner.find_peaks_bokeh">
+<span class="sig-name descname"><span class="pre">find_peaks_bokeh</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x_obs</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y_obs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#Xpectra.LineAssigner.LineAssigner.find_peaks_bokeh" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="Xpectra.LineAssigner.LineAssigner.hitran_line_assigner">
+<span class="sig-name descname"><span class="pre">hitran_line_assigner</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filters</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ierr_weights</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">weights</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">ndarray</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">threshold</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.01</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">columns_to_print</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">['nu']</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">wavenumber_range</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">ndarray</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">__print__</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">__plot_bokeh__</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">__plot_seaborn__</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">__save_plot__</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">__reference_data__</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#Xpectra.LineAssigner.LineAssigner.hitran_line_assigner" title="Link to this definition">¶</a></dt>
+<dd><p>Find the closest data points in the hitran DataFrame
+to multiple sets of fitted parameters, with weighted preference for earlier sets.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>weights</strong> (<em>list</em><em> or </em><em>np.ndarray</em><em>, </em><em>optional</em>) – List of weights for each set of fitted parameters. Default is None,
+which gives equal weight to each set.</p></li>
+<li><p><strong>columns_to_print</strong> (<em>list</em><em>, </em><em>optional</em>) – List of column names from HITRAN dataframe to display on assigned lines if
+plotted. Default is [“nu”, “local_upper_quanta”].</p></li>
+<li><p><strong>wavenumber_range</strong> (<em>list-like</em><em>, </em><em>optional</em>) – List-like object (list, tuple, or np.ndarray) of length 2 representing
+wavenumber range for plotting. Default is None.</p></li>
+<li><p><strong>__plot_bokeh__</strong> (<em>bool</em><em>, </em><em>optional</em>) – Default is False.</p></li>
+<li><p><strong>__plot_seaborn__</strong> (<em>bool</em><em>, </em><em>optional</em>) – Default is False.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>fitted_hitran</strong> – DataFrame containing the closest data points in hitran DataFrame for each
+set of fitted parameters.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>pd.DataFrame</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="Xpectra.LineAssigner.LineAssigner.line_finder_auto">
+<span class="sig-name descname"><span class="pre">line_finder_auto</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">wavenumber_range</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">ndarray</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sigma</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">peak_height_min</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">peak_height_max</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">__plot__</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">__print__</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#Xpectra.LineAssigner.LineAssigner.line_finder_auto" title="Link to this definition">¶</a></dt>
+<dd><p>Click and print spectral peaks on plotted spectra with error bars using Bokeh.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>wavenumber_values</strong> (<em>np.ndarray</em>) – Wavenumber array in cm^-1.</p></li>
+<li><p><strong>signal_values</strong> (<em>np.ndarray</em>) – Signal arrays (input data).</p></li>
+<li><p><strong>wavenumber_range</strong> (<em>list-like</em><em>, </em><em>optional</em>) – List-like object (list or np.ndarray) with of length 2 representing wavenumber range for plotting.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="Xpectra.LineAssigner.LineAssigner.line_finder_manual">
+<span class="sig-name descname"><span class="pre">line_finder_manual</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">wavenumber_range</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">ndarray</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sigma</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">__print__</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#Xpectra.LineAssigner.LineAssigner.line_finder_manual" title="Link to this definition">¶</a></dt>
+<dd><p>Click and print spectral peaks on plotted spectra with error bars using Bokeh.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>wavenumber_values</strong> (<em>np.ndarray</em>) – Wavenumber array in cm^-1.</p></li>
+<li><p><strong>signal_values</strong> (<em>np.ndarray</em>) – Signal arrays (input data).</p></li>
+<li><p><strong>wavenumber_range</strong> (<em>list-like</em><em>, </em><em>optional</em>) – List-like object (list or np.ndarray) with of length 2 representing wavenumber range for plotting.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="Xpectra.LineAssigner.LineAssigner.parse_file_to_dataframe">
+<span class="sig-name descname"><span class="pre">parse_file_to_dataframe</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">columns:</span> <span class="pre">dict</span> <span class="pre">=</span> <span class="pre">{'a':</span> <span class="pre">(25</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">35</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">&lt;class</span> <span class="pre">'float'&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">'%10.3e')</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">'delta_air':</span> <span class="pre">(59</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">67</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">&lt;class</span> <span class="pre">'float'&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">'%8.6f')</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">'elower':</span> <span class="pre">(45</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">55</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">&lt;class</span> <span class="pre">'float'&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">'%10.4f')</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">'gamma_air':</span> <span class="pre">(35</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">40</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">&lt;class</span> <span class="pre">'float'&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">'%5.4f')</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">'gamma_self':</span> <span class="pre">(40</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">45</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">&lt;class</span> <span class="pre">'float'&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">'%5.3f')</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">'global_lower_quanta':</span> <span class="pre">(82</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">97</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">&lt;class</span> <span class="pre">'str'&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">'%15s')</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">'global_upper_quanta':</span> <span class="pre">(67</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">82</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">&lt;class</span> <span class="pre">'str'&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">'%15s')</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">'gp':</span> <span class="pre">(131</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">138</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">&lt;class</span> <span class="pre">'float'&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">'%7.1f')</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">'gpp':</span> <span class="pre">(138</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">145</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">&lt;class</span> <span class="pre">'float'&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">'%7.1f')</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">'ierr':</span> <span class="pre">(127</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">128</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">&lt;class</span> <span class="pre">'int'&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">'%1d')</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">'iref':</span> <span class="pre">(128</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">130</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">&lt;class</span> <span class="pre">'int'&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">'%2d')</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">'line_mixing_flag':</span> <span class="pre">(130</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">131</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">&lt;class</span> <span class="pre">'str'&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">'%1s')</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">'local_iso_id':</span> <span class="pre">(2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">3</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">&lt;class</span> <span class="pre">'int'&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">'%1d')</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">'local_lower_quanta':</span> <span class="pre">(112</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">127</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">&lt;class</span> <span class="pre">'str'&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">'%15s')</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">'local_upper_quanta':</span> <span class="pre">(97</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">112</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">&lt;class</span> <span class="pre">'str'&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">'%15s')</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">'molec_id':</span> <span class="pre">(0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">&lt;class</span> <span class="pre">'int'&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">'%2d')</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">'n_air':</span> <span class="pre">(55</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">59</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">&lt;class</span> <span class="pre">'float'&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">'%4.2f')</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">'nu':</span> <span class="pre">(3</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">15</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">&lt;class</span> <span class="pre">'float'&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">'%12.6f')</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">'sw':</span> <span class="pre">(15</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">25</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">&lt;class</span> <span class="pre">'float'&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">'%10.3e')}</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">DataFrame</span></span></span><a class="headerlink" href="#Xpectra.LineAssigner.LineAssigner.parse_file_to_dataframe" title="Link to this definition">¶</a></dt>
+<dd><p>Parse an input file into a pandas DataFrame based on specified columns.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>input_file</strong> (<em>str</em>) – Path to the input file to parse.</p></li>
+<li><p><strong>columns</strong> (<em>dict</em>) – List of column names from the input file. Default is HITRAN2004 format specifiers.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>df</strong> – DataFrame containing parsed data from the input file.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>pandas.DataFrame</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="Xpectra.LineAssigner.LineAssigner.parse_hitran_description">
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">parse_hitran_description</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">hitran_description</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">DataFrame</span></span></span><a class="headerlink" href="#Xpectra.LineAssigner.LineAssigner.parse_hitran_description" title="Link to this definition">¶</a></dt>
+<dd><p>Parse HITRAN data description and extract column information.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>hitran_description</strong> (<em>str</em>) – description of HITRAN data fields.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>df</strong> – DataFrame containing column name, format specifier, units, and description.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>pandas.DataFrame</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="Xpectra.LineAssigner.LineAssigner.parse_line">
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">parse_line</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">line</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">columns</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">dict</span></span></span><a class="headerlink" href="#Xpectra.LineAssigner.LineAssigner.parse_line" title="Link to this definition">¶</a></dt>
+<dd><p>Parse a single line of data according to the specified columns.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>line</strong> (<em>str</em>) – Line of text to parse.</p></li>
+<li><p><strong>columns</strong> (<em>dict</em>) – Dictionary defining column names, positions, data types, and format specifiers.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>parsed_data</strong> – Dictionary where keys are column names and values are parsed data.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>dict</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="Xpectra.LineAssigner.LineAssigner.parse_term_symbols">
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">parse_term_symbols</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">term_list</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">list</span></span></span><a class="headerlink" href="#Xpectra.LineAssigner.LineAssigner.parse_term_symbols" title="Link to this definition">¶</a></dt>
+<dd><p>Parse and seperate a multi-term column into multiple single-term columns.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>term_list</strong> (<em>list</em>) – List of text to parse.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>parsed_terms</strong> – List of parsed data.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>list</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="xpectra-fitliteraturedata-module">
+<h2>Xpectra.FitLiteratureData Module<a class="headerlink" href="#xpectra-fitliteraturedata-module" title="Link to this heading">¶</a></h2>
+<dl class="py class" id="module-Xpectra.FitLiteratureData">
+<dt class="sig sig-object py" id="Xpectra.FitLiteratureData.FitLiteratureData">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">Xpectra.FitLiteratureData.</span></span><span class="sig-name descname"><span class="pre">FitLiteratureData</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">literature_file</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">hitran_file</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">__reference_data__</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#Xpectra.FitLiteratureData.FitLiteratureData" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Fit and plot literature data.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>literature_file</strong> (<em>str</em><em>, </em><em>optional</em>) – Excel spreadsheet containing literature data.</p></li>
+<li><p><strong>hitran_file</strong> (<em>str</em><em>, </em><em>optional</em>) – File path containing HITRAN data.</p></li>
+<li><p><strong>__reference_data__</strong> (<em>str</em><em>, </em><em>optional</em>) – Reference data path.</p></li>
+<li><p><strong>line_assigner_instance</strong> (<em>Xpectra.LineAssigner</em><em>, </em><em>optional</em>) – Instance of LineAssigner class for parsing linelist.</p></li>
+<li><p><strong>literature_df</strong> (<em>pd.DataFrame</em><em>, </em><em>optional</em>) – DataFrame containing literature data.</p></li>
+<li><p><strong>hitran_df</strong> (<em>pd.DataFrame</em><em>, </em><em>optional</em>) – DataFrame containing parsed HITRAN linelist.</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="Xpectra.FitLiteratureData.FitLiteratureData.calculate_gamma_nT">
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">calculate_gamma_nT</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">J_low</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sym_low</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pb_coeffs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">DataFrame</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">list</span></span></span><a class="headerlink" href="#Xpectra.FitLiteratureData.FitLiteratureData.calculate_gamma_nT" title="Link to this definition">¶</a></dt>
+<dd><p>Calculate gamma_H2, gamma_He, and n_T using fitted 4th pade coefficients for given symmetry and J values.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>J_low</strong> (<em>float</em>) – Lower J number for calculation.</p></li>
+<li><p><strong>sym_low</strong> (<em>str</em>) – Lower symmetry for calculation.</p></li>
+<li><p><strong>pb_coeffs</strong> (<em>pd.DataFrame</em>) – DataFrame containing 4th pade coefficients.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>[gamma_H2, gamma_He, n_T]</strong> – Calculated values.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>list</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="Xpectra.FitLiteratureData.FitLiteratureData.filter_dataframe">
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">filter_dataframe</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">df</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">filters</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#Xpectra.FitLiteratureData.FitLiteratureData.filter_dataframe" title="Link to this definition">¶</a></dt>
+<dd><p>Filter the DataFrame based on multiple column value pairs or conditions.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>df</strong> (<em>pd.DataFrame</em><em>)</em>) – The DataFrame to filter.</p></li>
+<li><p><strong>filters</strong> (<em>dict</em>) – A dictionary where keys are column names and values are lists of values to filter by or conditions.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>filtered_df</strong> – The filtered DataFrame.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>pd.DataFrame</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="Xpectra.FitLiteratureData.FitLiteratureData.fit_Pbro_Pade">
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">fit_Pbro_Pade</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">J</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">a0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">a1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">a2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">a3</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">b1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">b2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">b3</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">b4</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#Xpectra.FitLiteratureData.FitLiteratureData.fit_Pbro_Pade" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="Xpectra.FitLiteratureData.FitLiteratureData.fit_Pbro_Pade_shifted">
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">fit_Pbro_Pade_shifted</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">J</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">a0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">a1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">a2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">a3</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">b1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">b2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">b3</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">b4</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#Xpectra.FitLiteratureData.FitLiteratureData.fit_Pbro_Pade_shifted" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="Xpectra.FitLiteratureData.FitLiteratureData.get_palette">
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">get_palette</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">num_categories</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#Xpectra.FitLiteratureData.FitLiteratureData.get_palette" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="Xpectra.FitLiteratureData.FitLiteratureData.modify_line">
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">modify_line</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">line</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pb_coeffs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#Xpectra.FitLiteratureData.FitLiteratureData.modify_line" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="Xpectra.FitLiteratureData.FitLiteratureData.parse_hitran_file">
+<span class="sig-name descname"><span class="pre">parse_hitran_file</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">columns</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#Xpectra.FitLiteratureData.FitLiteratureData.parse_hitran_file" title="Link to this definition">¶</a></dt>
+<dd><p>Using LineAssigner parse_file_to_dataframe, convert HITRAN file to DataFrame.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="Xpectra.FitLiteratureData.FitLiteratureData.pb_excel_reader">
+<span class="sig-name descname"><span class="pre">pb_excel_reader</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sheet_name</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#Xpectra.FitLiteratureData.FitLiteratureData.pb_excel_reader" title="Link to this definition">¶</a></dt>
+<dd><p>Converts pressure broadening data in an excel spreadsheet to a data frame.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="Xpectra.FitLiteratureData.FitLiteratureData.plot_fitted_value_bokeh">
+<span class="sig-name descname"><span class="pre">plot_fitted_value_bokeh</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">df_pbro</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">DataFrame</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y_param</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'gamma_L'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">J_range</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">[0,</span> <span class="pre">150]</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#Xpectra.FitLiteratureData.FitLiteratureData.plot_fitted_value_bokeh" title="Link to this definition">¶</a></dt>
+<dd><p>Plot fitted n or gamma vs J_low, color-coded by symmetry</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>df_pbro</strong> (<em>pd.DataFrame</em>) – DataFrame containing fitted coefficients.</p></li>
+<li><p><strong>y_param</strong> (<em>str</em><em>, </em><em>optional</em>) – Parameter to plot on y-axis, options are {‘gamma_L’, ‘n_T’}.</p></li>
+<li><p><strong>J_range</strong> (<em>list</em><em>, </em><em>optional</em>) – J number range to plot. Default is [0,150].</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="Xpectra.FitLiteratureData.FitLiteratureData.plot_fitted_value_seaborn">
+<span class="sig-name descname"><span class="pre">plot_fitted_value_seaborn</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">df_pbro</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">DataFrame</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y_param</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'gamma_L'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">J_range</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">[0,</span> <span class="pre">150]</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">__save_plot__</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">__show_plot__</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#Xpectra.FitLiteratureData.FitLiteratureData.plot_fitted_value_seaborn" title="Link to this definition">¶</a></dt>
+<dd><p>Plot fitted n or gamma vs J_low, color-coded by symmetry</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>df_pbro</strong> (<em>pd.DataFrame</em>) – DataFrame containing fitted coefficients.</p></li>
+<li><p><strong>y_param</strong> (<em>str</em><em>, </em><em>optional</em>) – Parameter to plot on y-axis, options are {‘gamma_L’, ‘n_T’}.</p></li>
+<li><p><strong>J_range</strong> (<em>list</em><em>, </em><em>optional</em>) – J number range to plot. Default is [0,150].</p></li>
+<li><p><strong>__save_plot__</strong> (<em>bool</em><em>, </em><em>optional</em>) – Defaults to False.</p></li>
+<li><p><strong>__show_plot__</strong> (<em>bool</em><em>, </em><em>optional</em>) – Defaults to True.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="Xpectra.FitLiteratureData.FitLiteratureData.plot_literature_hist">
+<span class="sig-name descname"><span class="pre">plot_literature_hist</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">hist_param</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'J_low'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">hist_param_range</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sort_by</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'author'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">filters</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bins</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">15</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">stat</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'count'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dpi</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">400</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#Xpectra.FitLiteratureData.FitLiteratureData.plot_literature_hist" title="Link to this definition">¶</a></dt>
+<dd><p>Plot histogram using seaborn hue of any data from literature, color-coded.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>hist_param</strong> (<em>str</em><em>, </em><em>optional</em>) – Name of DataFrame column for plotting. Default is ‘J_low’.</p></li>
+<li><p><strong>hist_param_range</strong> (<em>list</em><em>, </em><em>optional</em>) – Range for x-axis of histogram. Default is None.</p></li>
+<li><p><strong>sort_by</strong> (<em>str</em><em>, </em><em>optional</em>) – Name of DataFrame column for sorting. Default is ‘author’.</p></li>
+<li><p><strong>filters</strong> (<em>dict</em><em>, </em><em>optional</em>) – Dictionary containing filters for literature DataFrame.</p></li>
+<li><p><strong>stat</strong> (<em>str</em><em>, </em><em>optional</em>) – Aggregate statistic to compute in each bin. Options are {‘count’,
+‘frequency’, ‘probability’, ‘percent’, ‘density’}. Default is ‘count’.</p></li>
+<li><p><strong>bins</strong> (<em>int</em><em>, </em><em>optonal</em>) – Number of bins. Default is 15.</p></li>
+<li><p><strong>dpi</strong> (<em>int</em><em>, </em><em>optional</em>) – Resolution of the figure. Default is 400.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="Xpectra.FitLiteratureData.FitLiteratureData.plot_with_uncertainty">
+<span class="sig-name descname"><span class="pre">plot_with_uncertainty</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x_fit</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">param_to_fit</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'gamma_L</span> <span class="pre">[cm-1/atm]'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">param_to_fit_uncertainty</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'gamma_uncertainty'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">param_to_sort</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'author'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">include_authors</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">filters</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">drop_na_authors</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fit_4thPade</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">print_fitted_params</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">show_plot</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">save_plot</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">save_path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#Xpectra.FitLiteratureData.FitLiteratureData.plot_with_uncertainty" title="Link to this definition">¶</a></dt>
+<dd><p>Create a scatter plot with uncertainty bars and optionally fit data using a 4th order Pade equation.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>df</strong> (<em>pd.DataFrame</em><em>, </em><em>optional</em>) – The input DataFrame containing columns ‘J_low’, ‘gamma_L [cm-1/atm]’, and ‘author’.</p></li>
+<li><p><strong>x_fit</strong> (<em>list</em><em> or </em><em>None</em><em>, </em><em>optional</em>) – X values for the fit range. Defaults to None.</p></li>
+<li><p><strong>param_to_sort</strong> (<em>str</em><em>, </em><em>optional</em>) – Name of column corresponding to parameter to color-code and label in legend.</p></li>
+<li><p><strong>param_to_fit</strong> (<em>str</em><em>, </em><em>optional</em>) – Name of column corresponding to parameter to fit.</p></li>
+<li><p><strong>param_to_fit_uncertainty</strong> (<em>str</em><em>, </em><em>optional</em>) – Name of column corresponding to uncertainty of parameter to fit.</p></li>
+<li><p><strong>num_iterations</strong> (<em>int</em><em>, </em><em>optional</em>) – Number of fitting iterations. Defaults to 5.</p></li>
+<li><p><strong>hidden_authors</strong> (<em>list</em><em> or </em><em>None</em><em>, </em><em>optional</em>) – Authors to hide from the plot. Defaults to None.</p></li>
+<li><p><strong>filters</strong> (<em>dict</em><em> or </em><em>None</em><em>, </em><em>optional</em>) – Filters for the DataFrame. Defaults to None.</p></li>
+<li><p><strong>drop_na_authors</strong> (<em>bool</em><em>, </em><em>optional</em>) – Drop rows with missing authors if True. Defaults to True.</p></li>
+<li><p><strong>fit_4thPade</strong> (<em>bool</em><em>, </em><em>optional</em>) – Whether to fit the data using a 4th-order Pade equation. Defaults to True.</p></li>
+<li><p><strong>show_plot</strong> (<em>bool</em><em>, </em><em>optional</em>) – Whether to display the plot immediately. Defaults to True.</p></li>
+<li><p><strong>save_plot</strong> (<em>bool</em><em>, </em><em>optional</em>) – Whether to save the plot immediately. Defaults to False.</p></li>
+<li><p><strong>save_path</strong> (<em>str</em><em>, </em><em>optional</em>) – Location to save plot. Defaults to None.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="Xpectra.FitLiteratureData.FitLiteratureData.replace_in_file">
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">replace_in_file</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">file_path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">file_path_to_save</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pb_coeffs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#Xpectra.FitLiteratureData.FitLiteratureData.replace_in_file" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="Xpectra.FitLiteratureData.FitLiteratureData.replace_in_file_parallel">
+<span class="sig-name descname"><span class="pre">replace_in_file_parallel</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pb_coeffs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">DataFrame</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">save_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'output.txt'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_processes</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">8</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#Xpectra.FitLiteratureData.FitLiteratureData.replace_in_file_parallel" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="tutorials/2_Correct_Spectral_Baseline.html" class="btn btn-neutral float-left" title="2. Correct Spectral Baseline" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, Ehsan (Sam) Gharib-Nezhad.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(false);
+      });
+  </script> 
+
+</body>
+</html>
