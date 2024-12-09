@@ -8,26 +8,22 @@ Installation
 
 
 .. note::
-    `TelescopeML` requires python >= 3.9.
+    `Xpectra_project` requires python >= 3.11.
 
 
 Step 1: Create your directory structure
 ----------------------------------------
-Let’s start by creating the folder structure as follow, named *TelescopeML_project*. While you are inside this parent
-*TelescopeML_project* directory, download the *reference_data* folder which include the following sub-directories:
-*training_datasets*, *tutorials*, *observational_datasets*,  *figures*, *trained_ML_models*.
+Let’s start by creating the folder structure as follow, named *Xpectra_project*. While you are inside this parent *Xpectra_project* directory, download the *reference_data* folder which include the following sub-directories: *datasets*, *processed_data*, *tutorials*,  *figures*.
 
-Download link for **reference_data** folder is: `Link <https://zenodo.org/doi/10.5281/zenodo.10183098>`_
+Download link for **reference_data** folder is: `Link <link>`_
 
-| TelescopeML_project
+| Xpectra_project
 | ├── reference_data
-| │   ├── training_datasets
+| │   ├── datasets
+| │   ├── processed_data
 | │   ├── tutorials
-| │   ├── observational_datasets
-| │   ├── figures
-| │   └── trained_ML_models
+| │   └── figures
 |
-
 
 
 
@@ -39,7 +35,7 @@ Step 2: Set input file environment variables
 For Mac OS
 ++++++++++++++++++++++++++++++++++++++++++++
 
-follow the following steps to set the link to the input data:
+Follow the following steps to set the link to the input data:
 
 1. Check your default shell in your terminal:
 
@@ -56,26 +52,26 @@ like `/bin/bash` or `/bin/zsh`, or `/bin/sh`.
 
     .. code-block:: bash
 
-        echo 'export TelescopeML_reference_data="/PATH_TO_YOUR_reference_data/" ' >>~/.zshrc
+        echo 'export Xpectra_reference_data="/PATH_TO_YOUR_reference_data/" ' >>~/.zshrc
         source ~/.zshrc
-        echo $TelescopeML_reference_data
+        echo $Xpectra_reference_data
 
 
     * if your shell is `/bin/bash`:
 
     .. code-block:: bash
 
-        echo 'export TelescopeML_reference_data="/PATH_TO_YOUR_reference_data/"' >>~/.bash_profile
+        echo 'export Xpectra_reference_data="/PATH_TO_YOUR_reference_data/"' >>~/.bash_profile
         source ~/.bash_profile
-        echo $TelescopeML_reference_data
+        echo $Xpectra_reference_data
 
     * if your sell is `/bin/sh`:
 
     .. code-block:: bash
 
-        echo 'export TelescopeML_reference_data="/PATH_TO_YOUR_reference_data/"' >>~/.profile
+        echo 'export Xpectra_reference_data="/PATH_TO_YOUR_reference_data/"' >>~/.profile
         source ~/.profile
-        echo $TelescopeML_reference_data
+        echo $Xpectra_reference_data
 
 
 .. note::
@@ -86,15 +82,13 @@ like `/bin/bash` or `/bin/zsh`, or `/bin/sh`.
 
 For Linux
 ++++++++++
-In Linux, the choice between `~/.bashrc` and `~/.bash_profile` depends on your specific use case and how
-you want environment variables to be set, but `~/.bashrc` is a common and practical choice for
-modern Linux system.
+In Linux, the choice between `~/.bashrc` and `~/.bash_profile` depends on your specific use case and how you want environment variables to be set, but `~/.bashrc` is a common and practical choice for modern Linux system.
 
 .. code-block:: bash
 
-    echo 'export TelescopeML_reference_data="/PATH_TO_YOUR_reference_data/" ' >>~/.bashrc
+    echo 'export Xpectra_reference_data="/PATH_TO_YOUR_reference_data/" ' >>~/.bashrc
     source ~/.bashrc
-    echo $TelescopeML_reference_data
+    echo $Xpectra_reference_data
 
 
 
@@ -102,23 +96,20 @@ Step 3: Install the Package
 ----------------------------
 
 .. note::
-    You need to first have `Anaconda distribution <https://www.anaconda.com/download/>`_ installed on your machine,
-    before proceed to the next steps.
+    You need to first have `Anaconda distribution <https://www.anaconda.com/download/>`_ installed on your machine, before proceed to the next steps.
 
 
-If you want to access the latest features or modify the code and contribute, we suggest that you clone the source code
-from GitHub by following steps:
+If you want to access the latest features or modify the code and contribute, we suggest that you clone the source code from GitHub by following steps:
 
 .. note::
-    For best practise, it is recommended to be inside the `TelescopeML_project` parent directory and then
-    clone the github repository.
+    For best practise, it is recommended to be inside the `Xpectra_project` parent directory and then clone the github repository.
 
-1. Clone the repo and Create `Conda` environment named *TelescopeML*:
+1. Clone the repo and Create `Conda` environment named *Xpectra*:
 
 .. code-block:: bash
 
-    git clone https://github.com/ehsangharibnezhad/TelescopeML.git
-    cd TelescopeML
+    git clone https://github.com/ehsangharibnezhad/Xpectra.git
+    cd Xpectra
     conda env create -f environment.yml
 
 
@@ -127,27 +118,28 @@ from GitHub by following steps:
 
 .. code-block:: bash
 
-    conda activate TelescopeML
+    conda activate Xpectra
 
 
-3. Install the `TelescopeML` Library
+3. Install the `Xpectra` Library
 
-You can install the `TelescopeML` library using one of the following methods:
+You can install the `Xpectra` library using one of the following methods:
 
 3.1 For Development Purposes:
 
-If you plan to develop the code, navigate to the *TelescopeML* directory and install it using:
+If you plan to develop the code, navigate to the *Xpectra* directory and install it using:
 
 .. code-block:: bash
 
-    python3.9 setup.py develop
+    python3.11 setup.py develop
 
 
-3.2 For General Use
+3.2 For General Use:
+
 If you intend to use the code without making changes in the future, install the PyPI version:
 
 .. code-block:: bash
 
-    pip install TelescopeML
+    pip install Xpectra
 
 4. Test the package by going to the **docs/tutorials/** directory and run all notebooks there using *jupyter-lab*.
