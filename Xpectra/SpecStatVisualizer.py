@@ -242,7 +242,7 @@ def plot_spectra_errorbar_bokeh(wavenumber_values: np.ndarray,
 
     # Create the figure
     p = figure(title=f"{molecule_name}: Calibrated Laboratory Spectra" if title_label is None else title_label,
-               x_axis_label="Wavenumber [cm^-1]",
+               x_axis_label="Wavenumber [cm-1]",
                y_axis_label=y_label,
                width=1000, height=300,
                y_axis_type="linear",
@@ -278,7 +278,7 @@ def plot_spectra_errorbar_bokeh(wavenumber_values: np.ndarray,
     # Add HoverTool
     hover = HoverTool()
     hover.tooltips = [
-        ("Wavenumber [cm^-1]", "@x{0.0000}"),
+        ("Wavenumber [cm-1]", "@x{0.0000}"),
         ("Intensity", "@y{0.0000}")
         ]
     p.add_tools(hover)
@@ -316,7 +316,7 @@ def plot_spectra_errorbar_seaborn(wavenumber_values: np.ndarray,
     Parameters
     ----------
     wavenumber_values : nd.array
-        Wavenumber array in cm^-1.
+        Wavenumber array in cm-1.
     signal_values : nd.array
         Signal arrays (input data).
     wavenumber_range : list-like, optional
@@ -466,7 +466,7 @@ def plot_baseline_fitting_seaborn(wavenumber_values: np.ndarray,
     Parameters
     ----------
     wavenumber_values : np.ndarray
-        Wavenumber array in cm^-1.
+        Wavenumber array in cm-1.
     signal_values : np.ndarray
         Signal arrays (input data).    
     baseline_type : str, {'polynomial', 'sinusoidal', 'spline'}
@@ -524,7 +524,7 @@ def plot_baseline_fitting_seaborn(wavenumber_values: np.ndarray,
         ax.tick_params(axis='both', which='minor', direction='in', length=3.5, width=1)  
 
     ax1.set_ylabel("Signal")
-    ax2.set_xlabel("Wavenumber [cm^-1]")
+    ax2.set_xlabel("Wavenumber [cm$^{-1}$]")
     ax2.set_ylabel("Baseline-Corrected Signal")
 
     ax1.set_title(f"Spectra with Fitted {baseline_type.capitalize()} Baseline")
@@ -558,7 +558,7 @@ def plot_baseline_fitting_bokeh(wavenumber_values: np.ndarray,
     Parameters
     ----------
     wavenumber_values : np.ndarray
-        Wavenumber array in cm^-1.
+        Wavenumber array in cm-1.
     signal_values : np.ndarray
         Signal arrays (input data). 
     baseline_type : str, {'polynomial', 'sinusoidal', 'spline'}
@@ -617,7 +617,7 @@ def plot_baseline_fitting_bokeh(wavenumber_values: np.ndarray,
 
     # Create lower plot
     p2 = figure(title=' ',
-               x_axis_label="Wavenumber [cm^-1]",
+               x_axis_label="Wavenumber [cm-1]",
                y_axis_label="Baseline-Corrected Signal",
                width=800, height=350,
                x_range=x_range, 
@@ -644,13 +644,13 @@ def plot_baseline_fitting_bokeh(wavenumber_values: np.ndarray,
     # Add HoverTool
     hover_p1 = HoverTool()
     hover_p1.tooltips = [
-        ("Wavenumber [cm^-1]", "@x{0.000}"),
+        ("Wavenumber [cm-1]", "@x{0.000}"),
         ("Intensity", "@y{0.000}"),
         (f"Fitted {baseline_type.capitalize()} Baseline", "@y_baseline{0.000}"),
     ]
     hover_p2 = HoverTool()
     hover_p2.tooltips = [
-        ("Wavenumber [cm^-1]", "@x{0.000}"),
+        ("Wavenumber [cm-1]", "@x{0.000}"),
         ("Baseline-Corrected Intensity", "@y_baseline_corrected{0.000}"),
     ]
     p1.add_tools(hover_p1)
@@ -676,7 +676,7 @@ def plot_fitted_als_bokeh(wavenumber_values: np.ndarray,
     Parameters
     ----------
     wavenumber_values : np.ndarray
-        Wavenumber array in cm^-1.
+        Wavenumber array in cm-1.
     signal_values : np.ndarray
         Signal arrays (input data). 
     fitted_baseline : np.ndarray
@@ -717,7 +717,7 @@ def plot_fitted_als_bokeh(wavenumber_values: np.ndarray,
 
     # Create lower plot
     p2 = figure(title=' ',
-               x_axis_label="Wavenumber [cm^-1]",
+               x_axis_label="Wavenumber [cm-1]",
                y_axis_label="Baseline-Corrected Signal",
                width=800, height=200,
                x_range=x_range, 
@@ -740,13 +740,13 @@ def plot_fitted_als_bokeh(wavenumber_values: np.ndarray,
     # Add HoverTool
     hover_p1 = HoverTool()
     hover_p1.tooltips = [
-        ("Wavenumber [cm^-1]", "@x{0.000}"),
+        ("Wavenumber [cm-1]", "@x{0.000}"),
         ("Intensity", "@y{0.000}"),
         (f"Fitted {baseline_type.upper()} Baseline", "@y_baseline{0.000}"),
     ]
     hover_p2 = HoverTool()
     hover_p2.tooltips = [
-        ("Wavenumber [cm^-1]", "@x{0.000}"),
+        ("Wavenumber [cm-1]", "@x{0.000}"),
         ("Baseline-Corrected Intensity", "@y_baseline_corrected{0.000}"),
     ]
     p1.add_tools(hover_p1)
@@ -773,7 +773,7 @@ def plot_fitted_als_seaborn(wavenumber_values: np.ndarray,
     Parameters
     ----------
     wavenumber_values : np.ndarray
-        Wavenumber array in cm^-1.
+        Wavenumber array in cm-1.
     signal_values : np.ndarray
         Signal arrays (input data).
     fitted_baseline : np.ndarray
@@ -809,7 +809,7 @@ def plot_fitted_als_seaborn(wavenumber_values: np.ndarray,
 
     # Axes labels
     ax1.set_ylabel("Signal")
-    ax2.set_xlabel("Wavenumber [cm^-1]")
+    ax2.set_xlabel("Wavenumber [cm$^{-1}$]")
     ax2.set_ylabel("Baseline-Corrected Signal")
 
     # Title
@@ -857,7 +857,7 @@ def plot_fitted_spectrum_bokeh(wavenumber_values: np.ndarray,
     Parameters
     ----------
     wavenumber_values : np.ndarray
-        Wavenumber array in cm^-1.
+        Wavenumber array in cm-1.
     signal_values : np.ndarray
         Signal arrays (input data). 
     fitted_params : list
@@ -948,7 +948,7 @@ def plot_fitted_spectrum_bokeh(wavenumber_values: np.ndarray,
     
     # Create lower plot
     p2 = figure(title=' ',
-               x_axis_label="Wavenumber [cm^-1]",
+               x_axis_label="Wavenumber [cm-1]",
                y_axis_label="Residual",
                width=800, height=200,
                x_range=x_range, 
@@ -984,13 +984,13 @@ def plot_fitted_spectrum_bokeh(wavenumber_values: np.ndarray,
     # Add HoverTool
     hover_p1 = HoverTool()
     hover_p1.tooltips = [
-        ("Wavenumber [cm^-1]", "@x{0.000}"),
+        ("Wavenumber [cm-1]", "@x{0.000}"),
         ("Intensity", "@y{0.000}"),
         (f"Fitted {line_profile.capitalize()}", "@y_fitted{0.000}"),
     ]
     hover_p2 = HoverTool()
     hover_p2.tooltips = [
-        ("Wavenumber [cm^-1]", "@x{0.000}"),
+        ("Wavenumber [cm-1]", "@x{0.000}"),
         ("Residual", "@residual{0.000}"),
     ]
     p1.add_tools(hover_p1)
@@ -1020,7 +1020,7 @@ def plot_fitted_spectrum_seaborn(wavenumber_values: np.ndarray,
     Parameters
     ----------
     wavenumber_values : np.ndarray
-        Wavenumber array in cm^-1.
+        Wavenumber array in cm-1.
     signal_values : np.ndarray
         Signal arrays (input data). 
     fitted_params : list
@@ -1163,7 +1163,7 @@ def plot_hitran_lines_bokeh(wavenumber_values: np.ndarray,
     Parameters
     ----------
     wavenumber_values : np.ndarray
-        Wavenumber array in cm^-1.
+        Wavenumber array in cm-1.
     signal_values : np.ndarray
         Signal arrays (input data). 
     fitted_hitran : pd.DataFrame
@@ -1291,7 +1291,7 @@ def plot_hitran_lines_bokeh(wavenumber_values: np.ndarray,
     # Add HoverTool
     hover_p1 = HoverTool()
     hover_p1.tooltips = [
-        ("Wavenumber [cm^-1]", "@x{0.000}"),
+        ("Wavenumber [cm-1]", "@x{0.000}"),
         ("Intensity", "@y{0.000}"),
         (f"Fitted {line_profile.capitalize()}", "@y_fitted{0.000}"),
     ]
@@ -1321,7 +1321,7 @@ def plot_hitran_lines_seaborn(wavenumber_values: np.ndarray,
     Parameters
     ----------
     wavenumber_values : np.ndarray
-        Wavenumber array in cm^-1.
+        Wavenumber array in cm-1.
     signal_values : np.ndarray
         Signal arrays (input data). 
     fitted_hitran : pd.DataFrame
@@ -1462,14 +1462,14 @@ def plot_auto_peaks_bokeh(x_obs, y_obs, peaks):
     
     # Create the figure
     p = figure(title="Identified Peaks",
-               x_axis_label="Wavenumber [cm^-1]",
+               x_axis_label="Wavenumber [cm-1]",
                y_axis_label="Signal",
                width=1000, height=300,
                y_axis_type="linear",
                tools="pan,wheel_zoom,box_zoom,reset")
 
     # Add HoverTool to the plot
-    hover = HoverTool(tooltips=[("Wavenumber [cm^-1]", "@x{0.000} µm"), ("Signal", "@y{0.000}")], mode='vline')
+    hover = HoverTool(tooltips=[("Wavenumber [cm-1]", "@x{0.000} µm"), ("Signal", "@y{0.000}")], mode='vline')
     p.add_tools(hover)
 
     # Add the line plot
@@ -1506,7 +1506,7 @@ def plot_compare_baselines(wavenumber_values: np.ndarray,
     Parameters
     ----------
     wavenumber_values : np.ndarray
-        Wavenumber array in cm^-1.
+        Wavenumber array in cm-1.
     signal_values : np.ndarray
         Signal arrays (input data). 
     wavenumber_range : list-like, optional
