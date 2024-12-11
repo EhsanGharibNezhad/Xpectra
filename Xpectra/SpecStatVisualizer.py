@@ -1196,7 +1196,7 @@ def plot_hitran_lines_bokeh(wavenumber_values: np.ndarray,
             formatted_columns.append(fitted_hitran[col].astype(str))
         else:
             # For other types, convert with float formatting
-            formatted_columns.append(fitted_hitran[col].apply(lambda x: f"{x:.6g}" 
+            formatted_columns.append(fitted_hitran[col].apply(lambda x: f"{x:.7g}" 
                 if isinstance(x, float) else str(x)))
     # Make iterable array of text for found lines 
     print_columns = pd.concat(formatted_columns, axis=1).to_numpy()[id_found]
@@ -1232,6 +1232,7 @@ def plot_hitran_lines_bokeh(wavenumber_values: np.ndarray,
 
     # Create a new plot with a title and axis labels
     p = figure(title=f"{absorber_name} Spectrum and Found HITRAN Lines",
+               x_axis_label = "Wavenumber [cm-1]",
                y_axis_label="Signal",
                width=800, height=500,
                y_axis_type="linear",
@@ -1293,7 +1294,6 @@ def plot_hitran_lines_bokeh(wavenumber_values: np.ndarray,
     hover_p1.tooltips = [
         ("Wavenumber [cm-1]", "@x{0.000}"),
         ("Intensity", "@y{0.000}"),
-        (f"Fitted {line_profile.capitalize()}", "@y_fitted{0.000}"),
     ]
     p.add_tools(hover_p1)
 
@@ -1357,7 +1357,7 @@ def plot_hitran_lines_seaborn(wavenumber_values: np.ndarray,
             formatted_columns.append(fitted_hitran[col].astype(str))
         else:
             # For other types, convert with float formatting
-            formatted_columns.append(fitted_hitran[col].apply(lambda x: f"{x:.6g}" 
+            formatted_columns.append(fitted_hitran[col].apply(lambda x: f"{x:.7g}" 
                 if isinstance(x, float) else str(x)))
     # Make iterable array of text for found lines 
     print_columns = pd.concat(formatted_columns, axis=1).to_numpy()[id_found]
