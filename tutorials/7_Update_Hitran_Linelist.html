@@ -148,7 +148,7 @@
 </style>
 <div>
     <a href="https://bokeh.org" target="_blank" class="bk-notebook-logo"></a>
-    <span id="ae941138-3ac7-48bf-bd8f-e084af8cd6d1">Loading BokehJS ...</span>
+    <span id="b2abf4ac-1f3b-4a17-95c5-e557ca2b0d0a">Loading BokehJS ...</span>
 </div></div>
 </div>
 <div class="nboutput nblast docutils container">
@@ -321,7 +321,7 @@ const JS_MIME_TYPE = 'application/javascript';
      "</div>"}};
 
   function display_loaded(error = null) {
-    const el = document.getElementById("ae941138-3ac7-48bf-bd8f-e084af8cd6d1");
+    const el = document.getElementById("b2abf4ac-1f3b-4a17-95c5-e557ca2b0d0a");
     if (el != null) {
       const html = (() => {
         if (typeof root.Bokeh === "undefined") {
@@ -455,7 +455,7 @@ function(Bokeh) {
       console.log("Bokeh: BokehJS failed to load within specified timeout.");
       root._bokeh_failed_load = true;
     } else if (force !== true) {
-      const cell = $(document.getElementById("ae941138-3ac7-48bf-bd8f-e084af8cd6d1")).parents('.cell').data().cell;
+      const cell = $(document.getElementById("b2abf4ac-1f3b-4a17-95c5-e557ca2b0d0a")).parents('.cell').data().cell;
       cell.output_area.append_execute_result(NB_LOAD_WARNING)
     }
   }
@@ -1344,7 +1344,7 @@ dtype: int64
 <p>5 rows × 25 columns</p>
 </div></div>
 </div>
-<p><strong>Visualize calculated values: :math:`gamma_{H_{2}}`, :math:`gamma_{He}`, and n:math:`_{T}` versus J:math:`_{low}`</strong></p>
+<p><strong>Visualize calculated values: gamma_H2, gamma_He, and n_T versus J_low</strong></p>
 <div class="nbinput nblast docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[16]:
 </pre></div>
@@ -1367,7 +1367,7 @@ dtype: int64
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Create Figure</span>
-<span class="n">fig</span><span class="p">,</span> <span class="n">axes</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">8</span><span class="p">,</span><span class="mi">10</span><span class="p">),</span> <span class="n">dpi</span><span class="o">=</span><span class="mi">110</span><span class="p">)</span>
+<span class="n">fig</span><span class="p">,</span> <span class="n">axes</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">8</span><span class="p">,</span><span class="mi">10</span><span class="p">),</span> <span class="n">dpi</span><span class="o">=</span><span class="mi">300</span><span class="p">)</span>
 <span class="n">ax1</span><span class="p">,</span><span class="n">ax2</span><span class="p">,</span><span class="n">ax3</span> <span class="o">=</span> <span class="n">axes</span>
 
 <span class="n">ax1</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">edited_df</span><span class="p">[</span><span class="s1">&#39;J_low&#39;</span><span class="p">],</span> <span class="n">edited_df</span><span class="p">[</span><span class="s1">&#39;gamma_H2&#39;</span><span class="p">],</span><span class="n">s</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span><span class="n">alpha</span><span class="o">=</span><span class="mf">0.05</span><span class="p">,</span><span class="n">c</span><span class="o">=</span><span class="n">color_values</span><span class="p">)</span>
@@ -1398,30 +1398,6 @@ dtype: int64
 </div>
 <div class="output_area docutils container">
 <img alt="../_images/tutorials_7_Update_Hitran_Linelist_31_0.png" src="../_images/tutorials_7_Update_Hitran_Linelist_31_0.png" />
-</div>
-</div>
-<div class="nbinput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
-</pre></div>
-</div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>
-</pre></div>
-</div>
-</div>
-<div class="nbinput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
-</pre></div>
-</div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>
-</pre></div>
-</div>
-</div>
-<div class="nbinput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
-</pre></div>
-</div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>
-</pre></div>
 </div>
 </div>
 <div class="nbinput nblast docutils container">
