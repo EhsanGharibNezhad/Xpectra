@@ -8,10 +8,12 @@ from scipy.sparse.linalg import spsolve, splu
 from scipy import sparse
 from scipy.linalg import cholesky
 from scipy.sparse.linalg import spsolve, splu
+from scipy.sparse import SparseEfficiencyWarning 
 # Module for performing detailed spectral analysis, including feature extraction, peak identification, and line fitting.
 
 import logging
 logging.basicConfig(level=logging.WARNING, format='%(levelname)s: %(message)s')
+import warnings
 
 
 # Import libraries
@@ -37,7 +39,9 @@ from .SpecStatVisualizer import *
 # Import local module
 # from io_funs import LoadSave
 
-
+# Suppress specific warnings
+warnings.filterwarnings("ignore", category=RuntimeWarning)
+warnings.filterwarnings("ignore", category=SparseEfficiencyWarning)
 
 
 class SpecFitAnalyzer:
